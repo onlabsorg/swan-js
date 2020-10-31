@@ -507,10 +507,6 @@ The following functions are available out-of-the-box.
 See the [built-in functions documentation](./builtin-functions.md) for more
 details.
 
-More predefined functions can be loaded at runtime by using the `require` 
-function. See the [Swan standard library documentation](./stdlib.md) for
-more info.
-
 
 ## Comments
 Everything following a `#` symbol, up to the end of the line, is a comment and 

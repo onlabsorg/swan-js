@@ -1,8 +1,10 @@
 /**
  *  swan
  *  ============================================================================
- *  This is the main swan module; it contains functions for parsing and 
- *  evaluation swan expressions.
+ *  The swan JavaScript API include a `parse` function and a `createContext` 
+ *  function. The parse function compiles an expression string to a function that
+ *  takes a context (created with `createdContext`) and asynchronously returns
+ *  the expression value.
  *  
  *  Example:
  *  ```js
@@ -316,7 +318,7 @@ for (let fname in F) {
  *  expression value.
  *
  *  ```js
- *  evaluate = olojs.expression.parse(expression);
+ *  evaluate = swan.parse(expression);
  *  value = await evaluate(context);
  *  ```
  *  
@@ -342,7 +344,7 @@ exports.parse = (expression) => {
  *  Creates a valid expression context.
  *  
  *  ```js
- *  context = olojs.expression.createContext(...namespaces)
+ *  context = swan.createContext(...namespaces)
  *  ```
  *  
  *  - `namespaces` is a list of objects `ns1, ns2, ns3, ...` that will be merged
@@ -363,9 +365,9 @@ exports.createContext = (...namespaces) => {
 /**
  *  Internals
  *  ----------------------------------------------------------------------------
- *  - `swan.types` is an object containing types-realted functions.
- *  - `swan.functions` is an object exposing to JavaScript the swan built-in functions
- *  - `swan.operations` is an object exposing to JavaScript the swan binary operations
+ *  - `swan.T` is an object containing types-realted functions.
+ *  - `swan.F` is an object exposing to JavaScript the swan built-in functions
+ *  - `swan.O` is an object exposing to JavaScript the swan binary operations
  */
  exports.T = T;
  exports.F = F;
