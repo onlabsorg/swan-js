@@ -11,6 +11,12 @@ context = swan.createContext({x:10});
 value = await evaluate(context);         // 30
 ```
 
+You can install SwanJS via npm:
+
+```
+npm install @onlabsorg/swan-js
+```
+
 
 Syntax
 --------------------------------------------------------------------------------
