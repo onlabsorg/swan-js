@@ -89,7 +89,8 @@ The `str` function convers `x` to a string as follows:
 - if `x` is a namespace, it resolves to `"[[Namespace of n items]]"`, where 
   `n` is the number of names contained in the namespace
 - if `x` is a namespace and `x.__str__` is a function, it returns `x.__str__(x)`
-- if `x` is a function, it resolves to `"[[Function]]"`
+- if `x` is a Swan function, it resolves to the function source
+- if `x` is a javascript function, it resolves to `"[[Function]]"`
 - if `x` is a tuple `(x1,x2,x3,...)`, it resolves to `(str x1) + (str x2) + 
   (str x3) + ...`
   

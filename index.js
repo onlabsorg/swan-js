@@ -159,17 +159,27 @@ const context = {
     },
     
     $def (params, expression) {
-        return async (...args) => {
+        const func = async (...args) => {
             const functionContext = Object.create(this);
             await functionContext.$set(params, () => T.createTuple(...args));
             return await expression(functionContext);
         }
+        func.toSource = () => `((${params(serializationContext)})->${expression(serializationContext)})`;
+        return func;
     },
     
     async $apply (X, Y) {
         const x = await X(this);
         const y = await Y(this);
-        return await O.apply.call(this, x, y);
+        try {
+            return await O.apply.call(this, x, y);            
+        } catch (error) {
+            if (T.isFunction(x) && typeof x.toSource === "function") {
+                if (!error.swanStack) error.swanStack = [];
+                error.swanStack.unshift(`@function ${x.toSource()}`);
+            }
+            throw error;
+        }
     },
     
     async $dot (X, Y) {
@@ -303,6 +313,140 @@ for (let fname in F) {
 }
 
 
+// Context used to un-parse a compiled expression back to its source
+const serializationContext = {
+    
+    $nothing () {
+        return "()";
+    },
+    
+    async $str0 (text) {
+        return "`" + text + "`";
+    },
+    
+    $str1 (value) {
+        return `'${value}'`;
+    },
+    
+    $str2 (value) {
+        return `"${value}"`;
+    },
+    
+    $numb (value) {
+        return String(value);
+    },
+    
+    $pair (X, Y) {
+        return `${X(this)}, ${Y(this)}`
+    },
+        
+    $list (X) {
+        return `[${X(this)}]`;
+    },
+    
+    $name (name) {
+        return name;
+    },
+    
+    $label (X, Y) {
+        return `(${X(this)}: ${Y(this)})`;
+    },
+    
+    $set (X, Y) {
+        return `(${X(this)} = ${Y(this)})`;
+    },
+
+    $namespace (X) {
+        return `{${X(this)}}`;
+    },
+    
+    $def (params, expression) {
+        return `((${params(this)})->${expression(this)})`;
+    },
+    
+    $apply (X, Y) {
+        return `(${X(this)}(${Y(this)}))`;
+    },
+    
+    $dot (X, Y) {
+        return `(${X(this)}.${Y(this)})`;
+    },
+    
+    $or (X, Y) {
+        return `(${X(this)}|${Y(this)})`;
+    },
+    
+    $and (X, Y) {
+        return `(${X(this)})&(${Y(this)})`;
+    },
+    
+    $if (X, Y) {
+        return `(${X(this)}?${Y(this)})`;
+    },
+
+    $else (X, Y) {
+        return `(${X(this)};${Y(this)})`;
+    },
+    
+    $add (X, Y) {
+        return `(${X(this)}+${Y(this)})`;
+    },
+
+    $sub (X, Y) {
+        return `(${X(this)}-${Y(this)})`;
+    },
+
+    $mul (X, Y) {
+        return `(${X(this)}*${Y(this)})`;
+    },
+
+    $div (X, Y) {
+        return `(${X(this)}/${Y(this)})`;
+    },
+
+    $mod (X, Y) {
+        return `(${X(this)}%${Y(this)})`;
+    },
+
+    $pow (X, Y) {
+        return `(${X(this)}^${Y(this)})`;
+    },
+
+    $eq (X, Y) {
+        return `(${X(this)}==${Y(this)})`;
+    },
+     
+    $ne (X, Y) {
+        return `(${X(this)}!=${Y(this)})`;
+    },
+
+    $lt (X, Y) {
+        return `(${X(this)}<${Y(this)})`;
+    },
+
+    $ge (X, Y) {
+        return `(${X(this)}>=${Y(this)})`;
+    },
+
+    $gt (X, Y) {
+        return `(${X(this)}>${Y(this)})`;
+    },
+
+    $le (X, Y) {
+        return `(${X(this)}<=${Y(this)})`;
+    },   
+    
+    $compose (X, Y) {
+        return `(${X(this)}<<${Y(this)})`;
+    },
+
+    $pipe (X, Y) {
+        return `(${X(this)}>>${Y(this)})`;
+    }
+}
+
+
+
 
 
 
@@ -332,8 +476,15 @@ exports.parse = (expression) => {
         if (!context.isPrototypeOf(expressionContext)) {
             throw new Error("Invalid context.")
         };
-        const value = await evaluate(expressionContext);
-        return T.isNothing(value) ? null : value;
+        try {
+            const value = await evaluate(expressionContext);            
+            return T.isNothing(value) ? null : value;
+        } catch (error) {
+            if (error.swanStack) {
+                error.toString = () => error.message + "\n" + error.swanStack.join("\n");
+            }
+            throw error;
+        }
     }
 }
 
@@ -369,6 +520,6 @@ exports.createContext = (...namespaces) => {
  *  - `swan.F` is an object exposing to JavaScript the swan built-in functions
  *  - `swan.O` is an object exposing to JavaScript the swan binary operations
  */
- exports.T = T;
- exports.F = F;
- exports.O = O;
+exports.T = T;
+exports.F = F;
+exports.O = O;

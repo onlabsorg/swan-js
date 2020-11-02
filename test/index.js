@@ -1104,12 +1104,16 @@ describe("expression", () => {
             expect(await evaluate("str 'abc'", ctx)).to.equal("abc");
         });
     
-        it("should return '[[Function]]' if X is a function", async () => {
+        it("should return '[[Function]]' if X is a javascript function", async () => {
             var ctx = createContext({jsFn: x => 2*x});
-            expect(await evaluate("str(x -> 2)", ctx)).to.equal("[[Function]]");
             expect(await evaluate("str jsFn", ctx)).to.equal("[[Function]]");
         });
     
+        it("should return the functions source if X is a Swan function", async () => {
+            var evaluate = createEvaluator({});
+            expect(await evaluate("str(x -> 2+3*x)")).to.equal("((x)->(2+(3*x)))");
+        });
+
         it("should return '[[List of n items]]' when X is a list with n items", async () => {
             var ctx = createContext({T:true, F:false});            
             expect(await evaluate("str[1,2,'abc']", ctx)).to.equal("[[List of 3 items]]")
@@ -2974,6 +2978,40 @@ describe("expression", () => {
     
             expect(await evaluate("{f=x->2*x}.f 2", ctx)).to.equal(4);
             expect(await evaluate("(x->{a=2*x}) 4 . a", ctx)).to.equal(8);
+        });
+    });
+    
+    describe("errors stack", () => {
+        
+        it("should add the functions stack to the runtime errors", async () => {
+            class DidNotThrow extends Error {};
+            var ctx = createContext();
+            await evaluate("f1 = x -> 2/x", ctx);
+            await evaluate("f2 = x -> f1 x + 1", ctx)
+            try {
+                await evaluate("f2 [1,2,3]", ctx);
+                throw DidNotThrow();
+            } catch (error) {
+                expect(error).to.be.not.instanceof(DidNotThrow);
+                expect(error.swanStack).to.deep.equal([
+                    '@function ((x)->((f1(x))+1))', 
+                    '@function ((x)->(2/x))'
+                ]);
+            }
+        });
+
+        it("should stringify to the error message, including the stack", async () => {
+            class DidNotThrow extends Error {};
+            var ctx = createContext();
+            await evaluate("f1 = x -> 2/x", ctx);
+            await evaluate("f2 = x -> f1 x + 1", ctx)
+            try {
+                await evaluate("f2 [1,2,3]", ctx);
+                throw DidNotThrow();
+            } catch (error) {
+                expect(error).to.be.not.instanceof(DidNotThrow);
+                expect(String(error)).to.equal("Division operation not defined between Number and List\n@function ((x)->((f1(x))+1))\n@function ((x)->(2/x))");
+            }
         });
     });
 });
