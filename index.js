@@ -480,9 +480,8 @@ exports.parse = (expression) => {
             const value = await evaluate(expressionContext);            
             return T.isNothing(value) ? null : value;
         } catch (error) {
-            if (error.swanStack) {
-                error.toString = () => error.message + "\n" + error.swanStack.join("\n");
-            }
+            error.source = expression;
+            error.swanStackStr = (error.swanStack || []).join("\n");
             throw error;
         }
     }

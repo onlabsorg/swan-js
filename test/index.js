@@ -2981,9 +2981,8 @@ describe("expression", () => {
         });
     });
     
-    describe("errors stack", () => {
-        
-        it("should add the functions stack to the runtime errors", async () => {
+    describe("errors stack", () => {        
+        it("should add the functions stack and the expression source to the runtime errors", async () => {
             class DidNotThrow extends Error {};
             var ctx = createContext();
             await evaluate("f1 = x -> 2/x", ctx);
@@ -2997,20 +2996,8 @@ describe("expression", () => {
                     '@function ((x)->((f1(x))+1))', 
                     '@function ((x)->(2/x))'
                 ]);
-            }
-        });
-
-        it("should stringify to the error message, including the stack", async () => {
-            class DidNotThrow extends Error {};
-            var ctx = createContext();
-            await evaluate("f1 = x -> 2/x", ctx);
-            await evaluate("f2 = x -> f1 x + 1", ctx)
-            try {
-                await evaluate("f2 [1,2,3]", ctx);
-                throw DidNotThrow();
-            } catch (error) {
-                expect(error).to.be.not.instanceof(DidNotThrow);
-                expect(String(error)).to.equal("Division operation not defined between Number and List\n@function ((x)->((f1(x))+1))\n@function ((x)->(2/x))");
+                expect(error.swanStackStr).to.equal("@function ((x)->((f1(x))+1))\n@function ((x)->(2/x))");
+                expect(error.source).to.equal("f2 [1,2,3]");
             }
         });
     });
