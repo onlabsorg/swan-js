@@ -52,12 +52,6 @@ describe("expression", () => {
             expect(await evaluate(`'def'`, ctx)).to.equal("def");
             expect(await evaluate(`''`, ctx)).to.equal("");
         });        
-    
-        it("should evaluate string literals between accent quotes '``'", async () => {
-            var ctx = createContext();
-            expect(await evaluate("`ghi`", ctx)).to.equal("ghi");
-            expect(await evaluate("``", ctx)).to.equal("");
-        });        
     });
     
     describe("tuples: `exp1, exp2, exp3, ...`", () => {
@@ -590,7 +584,6 @@ describe("expression", () => {
     
         it("should not parse `#` characters in a string as comments", async () => {
             var ctx = createContext();
-            expect(await evaluate("`this # is a string`", ctx)).to.equal("this # is a string");
             expect(await evaluate("'this # is a string'", ctx)).to.equal("this # is a string");
             expect(await evaluate(`"this # is a string"`, ctx)).to.equal("this # is a string");
         });
@@ -2876,20 +2869,6 @@ describe("expression", () => {
     
     
     // MISCELLANEOUS
-    
-    describe("string templates", () => {
-    
-        it("should evaluate the expressions between ${...} when the string is enclosed between accent quotes", async () => {
-            var ctx = createContext({y:2});
-            expect(await evaluate("`x = ${1+y}`", ctx)).to.equal("x = 3");
-        });
-    
-        it("should evaluate the expressions in a child context", async () => {
-            var ctx = createContext({x:10, y:20});
-            expect(await evaluate("`${x=2}x+y = ${x+y}`", ctx)).to.equal("x+y = 22");
-            expect(ctx.x).to.equal(10);
-        });
-    });
     
     describe("operators precedence and grouping", () => {
     

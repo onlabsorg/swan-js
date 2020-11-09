@@ -32,16 +32,10 @@ Examples of valid numeric literals are:
 String data type
 --------------------------------------------------------------------------------
 A string is any sequence of characters, enclosed between one of the following
-three types of quotes:
+two types of quotes:
 
 * `"double quotes string"`
 * `'single quotes string'`
-* `` `accent quotes string` ``
-
-The accent quotes are although special: they define a string template, meaning
-that they evaluate the `${expression}` fields and replace them with the expression
-return value. For example the string `` `twice 3 is ${2*3}` `` will resolve
-to `twice 3 is 6`.
 
 
 Tuple data type and pairing operator

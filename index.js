@@ -60,7 +60,6 @@ const parse = Parser({
      
      voidHandler        : "$nothing",
      nameHandler        : "$name",
-     stringHandler0     : "$str0",
      stringHandler1     : "$str1",
      stringHandler2     : "$str2",
      numberHandler      : "$numb",
@@ -80,24 +79,6 @@ const context = {
     
     $nothing () {
         return null;
-    },
-    
-    async $str0 (text) {
-        const parsedExpressions = [];
-        text = text.replace(/\$\{([\s\S]+?)\}/g, (match, expressionSource) => {  
-            let i = parsedExpressions.length;
-            parsedExpressions.push( parse(expressionSource) );
-            return "${"+i+"}";
-        }); 
-        
-        const templateContext = Object.create(this);
-        for (let i=0; i<parsedExpressions.length; i++) {
-            let evaluateExpression = parsedExpressions[i];
-            let value = await evaluateExpression(templateContext);                
-            text = text.replace("${"+i+"}", await this.str(...T.iter(value)));
-        }
-
-        return text;
     },
     
     $str1 (value) {
