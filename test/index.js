@@ -774,7 +774,7 @@ describe("expression", () => {
         
         it("should throw an error if the passed argument is not a function", async () => {
             var evaluate = createEvaluator({});
-            await expectError(() => evaluate("map [1,2,3]"), "The 'map' function requires a function as parameter");
+            await expectError(() => evaluate("map [1,2,3]"), "The 'map' function requires a function as argument");
         });
         
         describe("the returned mapping function", () => {

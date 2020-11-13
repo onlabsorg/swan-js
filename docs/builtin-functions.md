@@ -27,6 +27,13 @@ Returns a sub-listnof the passed list, containing only the items `xi` that
 verify the condition `bool(f xi) == TRUE`.
 For example, `filter (x -> x>0) [0,1,-3,7,-12, 3]` returns `[1,7,3]`.
   
+iter f x
+----------------------------------------------------------------------------
+The iter function takes a function as argument and return another function
+`fn x` that takes a tuple `(a, b, c, ...)` as argument and returns 
+`(f(a), f(b), f(c) ...)`.
+If the parameter passed to map is not a function, it throws an error.
+  
 map f x
 ----------------------------------------------------------------------------
 The map function takes a function as argument and return another function
