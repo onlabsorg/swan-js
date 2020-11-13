@@ -735,6 +735,35 @@ describe("expression", () => {
         });
     });
     
+    describe("iter f", () => {
+        
+        it("should return a function that takes a tuple X", async () => {
+            var evaluate = createEvaluator({f: x=>2*x});
+            var fn = await evaluate("iter f");
+            expect(fn).to.be.a("function");
+        });
+        
+        it("should throw an error if the passed argument is not a function", async () => {
+            var evaluate = createEvaluator({});
+            await expectError(() => evaluate("iter [1,2,3]"), "The 'iter' function requires a function as parameter");
+        });
+        
+        describe("the returned mapping function", () => {
+            
+            it("should map (a,b,c,...) to (f(a),f(b),f(c),...)", async () => {
+                var evaluate = createEvaluator({f:x=>2*x});
+                var tuple = await evaluate("iter f (1,2,3)");
+                expect(isTuple(tuple)).to.be.true;
+                expect(Array.from(tuple)).to.deep.equal([2,4,6]);
+            });
+
+            it("should map `x` to `f(x)`", async () => {
+                var evaluate = createEvaluator({f:x=>2*x});
+                expect(await evaluate("iter f 3")).to.equal(6);
+            });
+        });
+    });
+
     describe("map f", () => {
         
         it("should return a function that takes a singleton X", async () => {
