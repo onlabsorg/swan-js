@@ -60,7 +60,8 @@ The swan built-in functions are:
 - `enum x`, returns the tuple of the items contained in x
 - `error msg`, throws an error
 - `filter f x`, filters the items contained in x that match the test function `f`
-- `map f x`, maps x via the mapping function `f`
+- `iter f x`, maps the tuple x via the mapping function `f`
+- `map f x`, maps the item x via the mapping function `f`
 - `not x`, return `FALSE` if `bool x` is true, otherwise `TRUE`
 - `range n`, returns the list of numbers between `0` and `n`
 - `reduce f x`, reduces the tuple `x` to a single value via the reducer function `f`
