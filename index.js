@@ -65,6 +65,7 @@ const parse = Parser({
      numberHandler      : "$numb",
      squareGroupHandler : "$list",
      curlyGroupHandler  : "$namespace",
+     errorHandler       : "$error"
 });
 
 
@@ -91,6 +92,10 @@ const context = {
     
     $numb (value) {
         return value;
+    },
+    
+    $error (error) {
+        throw error;
     },
     
     async $pair (X, Y) {
@@ -145,7 +150,7 @@ const context = {
             await functionContext.$set(params, () => T.createTuple(...args));
             return await expression(functionContext);
         }
-        func.toSource = () => `((${params(serializationContext)})->${expression(serializationContext)})`;
+        func.toSource = async () => `((${await params(serializationContext)})->${await expression(serializationContext)})`;
         return func;
     },
     
@@ -154,11 +159,9 @@ const context = {
         const y = await Y(this);
         try {
             return await O.apply.call(this, x, y);            
-        } catch (error) {
-            if (T.isFunction(x) && typeof x.toSource === "function") {
-                if (!error.swanStack) error.swanStack = [];
-                error.swanStack.unshift(`@function ${x.toSource()}`);
-            }
+        } catch (parentError) {
+            const error = new Error(parentError.message);
+            error.parent = parentError;
             throw error;
         }
     },
@@ -317,112 +320,112 @@ const serializationContext = {
         return String(value);
     },
     
-    $pair (X, Y) {
-        return `${X(this)}, ${Y(this)}`
+    async $pair (X, Y) {
+        return `${await X(this)}, ${await Y(this)}`
     },
         
-    $list (X) {
-        return `[${X(this)}]`;
+    async $list (X) {
+        return `[${await X(this)}]`;
     },
     
     $name (name) {
         return name;
     },
     
-    $label (X, Y) {
-        return `(${X(this)}: ${Y(this)})`;
+    async $label (X, Y) {
+        return `(${await X(this)}: ${await Y(this)})`;
     },
     
-    $set (X, Y) {
-        return `(${X(this)} = ${Y(this)})`;
+    async $set (X, Y) {
+        return `(${await X(this)} = ${await Y(this)})`;
     },
 
-    $namespace (X) {
-        return `{${X(this)}}`;
+    async $namespace (X) {
+        return `{${await X(this)}}`;
     },
     
-    $def (params, expression) {
-        return `((${params(this)})->${expression(this)})`;
+    async $def (params, expression) {
+        return `((${await params(this)})->${await expression(this)})`;
     },
     
-    $apply (X, Y) {
-        return `(${X(this)}(${Y(this)}))`;
+    async $apply (X, Y) {
+        return `(${await X(this)}(${await Y(this)}))`;
     },
     
-    $dot (X, Y) {
-        return `(${X(this)}.${Y(this)})`;
+    async $dot (X, Y) {
+        return `(${await X(this)}.${await Y(this)})`;
     },
     
-    $or (X, Y) {
-        return `(${X(this)}|${Y(this)})`;
+    async $or (X, Y) {
+        return `(${await X(this)}|${await Y(this)})`;
     },
     
-    $and (X, Y) {
-        return `(${X(this)})&(${Y(this)})`;
+    async $and (X, Y) {
+        return `(${await X(this)})&(${await Y(this)})`;
     },
     
-    $if (X, Y) {
-        return `(${X(this)}?${Y(this)})`;
+    async $if (X, Y) {
+        return `(${await X(this)}?${await Y(this)})`;
     },
 
-    $else (X, Y) {
-        return `(${X(this)};${Y(this)})`;
+    async $else (X, Y) {
+        return `(${await X(this)};${await Y(this)})`;
     },
     
-    $add (X, Y) {
-        return `(${X(this)}+${Y(this)})`;
+    async $add (X, Y) {
+        return `(${await X(this)}+${await Y(this)})`;
     },
 
-    $sub (X, Y) {
-        return `(${X(this)}-${Y(this)})`;
+    async $sub (X, Y) {
+        return `(${await X(this)}-${await Y(this)})`;
     },
 
-    $mul (X, Y) {
-        return `(${X(this)}*${Y(this)})`;
+    async $mul (X, Y) {
+        return `(${await X(this)}*${await Y(this)})`;
     },
 
-    $div (X, Y) {
-        return `(${X(this)}/${Y(this)})`;
+    async $div (X, Y) {
+        return `(${await X(this)}/${await Y(this)})`;
     },
 
-    $mod (X, Y) {
-        return `(${X(this)}%${Y(this)})`;
+    async $mod (X, Y) {
+        return `(${await X(this)}%${await Y(this)})`;
     },
 
-    $pow (X, Y) {
-        return `(${X(this)}^${Y(this)})`;
+    async $pow (X, Y) {
+        return `(${await X(this)}^${await Y(this)})`;
     },
 
-    $eq (X, Y) {
-        return `(${X(this)}==${Y(this)})`;
+    async $eq (X, Y) {
+        return `(${await X(this)}==${await Y(this)})`;
     },
      
-    $ne (X, Y) {
-        return `(${X(this)}!=${Y(this)})`;
+    async $ne (X, Y) {
+        return `(${await X(this)}!=${await Y(this)})`;
     },
 
-    $lt (X, Y) {
-        return `(${X(this)}<${Y(this)})`;
+    async $lt (X, Y) {
+        return `(${await X(this)}<${await Y(this)})`;
     },
 
-    $ge (X, Y) {
-        return `(${X(this)}>=${Y(this)})`;
+    async $ge (X, Y) {
+        return `(${await X(this)}>=${await Y(this)})`;
     },
 
-    $gt (X, Y) {
-        return `(${X(this)}>${Y(this)})`;
+    async $gt (X, Y) {
+        return `(${await X(this)}>${await Y(this)})`;
     },
 
-    $le (X, Y) {
-        return `(${X(this)}<=${Y(this)})`;
+    async $le (X, Y) {
+        return `(${await X(this)}<=${await Y(this)})`;
     },   
     
-    $compose (X, Y) {
-        return `(${X(this)}<<${Y(this)})`;
+    async $compose (X, Y) {
+        return `(${await X(this)}<<${await Y(this)})`;
     },
 
-    $pipe (X, Y) {
-        return `(${X(this)}>>${Y(this)})`;
+    async $pipe (X, Y) {
+        return `(${await X(this)}>>${await Y(this)})`;
     }
 }
 
@@ -459,12 +462,25 @@ exports.parse = (expression) => {
         };
         try {
             const value = await evaluate(expressionContext);            
-            return T.isNothing(value) ? null : value;
+            return T.isNothing(value) ? null : value;            
         } catch (error) {
-            error.source = expression;
-            error.swanStackStr = (error.swanStack || []).join("\n");
+            error.swanStack = buildErrorStack(error);
             throw error;
         }
+    }
+}
+
+function buildErrorStack (error) {
+    if (error instanceof Error && error.location) {
+        const lines = error.location.source.split('\n');
+        let row=0, col=error.location.position;
+        while (col > lines[row].length) {
+            col = col - lines[row].length -1;
+            row = row + 1;
+        }
+        return `@ ${lines[row]}\n  ${' '.repeat(col)}^\n` + buildErrorStack(error.parent);        
+    } else {
+        return "";
     }
 }
 

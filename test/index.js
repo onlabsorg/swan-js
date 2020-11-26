@@ -2990,22 +2990,23 @@ describe("expression", () => {
     });
     
     describe("errors stack", () => {        
+        
         it("should add the functions stack and the expression source to the runtime errors", async () => {
             class DidNotThrow extends Error {};
             var ctx = createContext();
-            await evaluate("f1 = x -> 2/x", ctx);
+            
+            await evaluate("x+1,\nf1 = x -> 2/x", ctx);
             await evaluate("f2 = x -> f1 x + 1", ctx)
             try {
                 await evaluate("f2 [1,2,3]", ctx);
                 throw DidNotThrow();
             } catch (error) {
                 expect(error).to.be.not.instanceof(DidNotThrow);
-                expect(error.swanStack).to.deep.equal([
-                    '@function ((x)->((f1(x))+1))', 
-                    '@function ((x)->(2/x))'
-                ]);
-                expect(error.swanStackStr).to.equal("@function ((x)->((f1(x))+1))\n@function ((x)->(2/x))");
-                expect(error.source).to.equal("f2 [1,2,3]");
+                // console.log();
+                // console.log("Error:", error.message);
+                // console.log();
+                // console.log(error.swanStack);
+                expect(error.swanStack).to.equal(`@ f2 [1,2,3]\n    ^\n@ f2 = x -> f1 x + 1\n              ^\n@ f1 = x -> 2/x\n             ^\n`);
             }
         });
     });
