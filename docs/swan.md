@@ -36,6 +36,11 @@ two types of quotes:
 
 * `"double quotes string"`
 * `'single quotes string'`
+* `` `accent quotes string` ``
+
+A string within accent quotes is a template string: expression eventually
+enclosed between `${` and `}` get evaluated and replaced. For example, the
+expression `` `2*10 = ${2*10}` `` returns the string `2*10 = 20`.
 
 
 Tuple data type and pairing operator

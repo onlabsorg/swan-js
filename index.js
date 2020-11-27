@@ -62,6 +62,7 @@ const parse = Parser({
      nameHandler        : "$name",
      stringHandler1     : "$str1",
      stringHandler2     : "$str2",
+     stringHandler3     : "$strt",
      numberHandler      : "$numb",
      squareGroupHandler : "$list",
      curlyGroupHandler  : "$namespace",
@@ -90,6 +91,22 @@ const context = {
         return value;
     },
     
+    async $strt (value) {
+        const expressions = [];
+        value = value.replace(/\${([\s\S]+?)}/g, (match, expression) => {  
+            const i = expressions.length;
+            expressions.push( parse(expression) );
+            return "${" + i + "}";
+        });
+        for (let i=0; i<expressions.length; i++) {
+            const evaluateXp = expressions[i];
+            const xpVal = await evaluateXp(this);
+            const xpStr = await F.str(xpVal);
+            value = value.replace("${" + i + "}", xpStr);
+        }
+        return value;
+    },
+
     $numb (value) {
         return value;
     },
@@ -316,6 +333,10 @@ const serializationContext = {
         return `"${value}"`;
     },
     
+    $str3 (value) {
+        return '`' + value + '`';
+    },
+
     $numb (value) {
         return String(value);
     },

@@ -2899,6 +2899,20 @@ describe("expression", () => {
     
     // MISCELLANEOUS
     
+    describe("string templates", () => {
+        
+        it("should evaluate string literals between accent quotes '``'", async () => {
+            var ctx = createContext();
+            expect(await evaluate("`ab\nc`", ctx)).to.equal("ab\nc");
+            expect(await evaluate("``", ctx)).to.equal("");
+        });        
+
+        it("should replace expressions between `${` and `}` with their value", async () => {
+            var ctx = createContext({x:10});
+            expect(await evaluate("`aaa ${2*x} bbb`", ctx)).to.equal("aaa 20 bbb");
+        });        
+    });
+    
     describe("operators precedence and grouping", () => {
     
         it("should execute assignment operations (`=`) before pairing operations (`,`)", async () => {
@@ -2989,14 +3003,14 @@ describe("expression", () => {
         });
     });
     
-    describe("errors stack", () => {        
+    describe("errors stack", () => {
         
         it("should add the functions stack and the expression source to the runtime errors", async () => {
             class DidNotThrow extends Error {};
             var ctx = createContext();
             
             await evaluate("x+1,\nf1 = x -> 2/x", ctx);
-            await evaluate("f2 = x -> f1 x + 1", ctx)
+            await evaluate("`aaa ${f2 = x -> f1 x + 1} bbb`", ctx)
             try {
                 await evaluate("f2 [1,2,3]", ctx);
                 throw DidNotThrow();
