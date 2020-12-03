@@ -520,7 +520,9 @@ function buildErrorStack (error) {
  *  - `context` is an object containing all the core context properties, plus 
  *    all the properties of the passed namespace, added in order.
  */
-const expression_globals = {};
+const expression_globals = {
+    'require': require('./lib/stdlib-loader')
+};
 exports.createContext = (...namespaces) => {
     var ctx = context.$extend(expression_globals);
     for (let namespace of namespaces) {

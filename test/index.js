@@ -3024,4 +3024,6 @@ describe("expression", () => {
             }
         });
     });
+    
+    require('./stdlib');
 });
