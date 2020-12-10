@@ -75,6 +75,7 @@ Learn more
 --------------------------------------------------------------------------------
 - [Introduction to the Swan expression language](./docs/swan.md)
 - [Built-in functions](./docs/builtin-functions.md)
+- [Standard library](./docs/stdlib.md)
 - [JavaScript API](./docs/api.md)
 
 
