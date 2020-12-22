@@ -8,5 +8,11 @@ module.exports = {
         filename: 'swan.js',
         chunkFilename: '[name].bundle.js',
         path: path.resolve(__dirname, './dist')
+    },
+    
+    resolve: {
+        fallback: {
+            "path": require.resolve('path-browserify')
+        }
     }
 }
