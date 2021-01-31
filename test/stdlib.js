@@ -6,14 +6,6 @@ const apply = (f, ...args) => swan.O.apply(f, swan.T.createTuple(...args));
 
 describe("stdlib", () => {
 
-    describe("markdown", () => {
-        it("should expose a function that converts markdown to HTML", async () => {
-            var markdown = await loadlib("markdown");
-            var html = await apply(markdown, "*bold*");
-            expect(html).to.equal("<p><em>bold</em></p>\n");
-        });
-    });
-
     describe("path", () => {
         it("should expose NodeJS path functions", async () => {
             var path = await loadlib("path");

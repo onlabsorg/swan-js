@@ -23,7 +23,6 @@
   },
   "dependencies": {
     "isomorphic-fetch": "^3.0.0",
-    "marked": "^1.2.2",
     "path-browserify": "^1.0.1"
   }
 }
