@@ -1,11 +1,11 @@
 /**
  *  swan
  *  ============================================================================
- *  The swan JavaScript API include a `parse` function and a `createContext` 
+ *  The swan JavaScript API include a `parse` function and a `createContext`
  *  function. The parse function compiles an expression string to a function that
  *  takes a context (created with `createdContext`) and asynchronously returns
  *  the expression value.
- *  
+ *
  *  Example:
  *  ```js
  *  evaluate = swan.parse( "3 * x" );
@@ -28,7 +28,7 @@ const O = require('./lib/binary-operations');
 const Parser = require("./lib/parser");
 
 const parse = Parser({
-     
+
      binaryOperations: {
          ","  : {precedence:10, handler:"$pair"    },
          "<<" : {precedence:11, handler:"$compose" },
@@ -49,15 +49,15 @@ const parse = Parser({
          ">=" : {precedence:24, handler:"$ge"  },
          "+"  : {precedence:25, handler:"$add" },
          "-"  : {precedence:25, handler:"$sub" },
-         "*"  : {precedence:26, handler:"$mul" },    
+         "*"  : {precedence:26, handler:"$mul" },
          "/"  : {precedence:26, handler:"$div" },
          "%"  : {precedence:26, handler:"$mod" },
          "^"  : {precedence:27, handler:"$pow" },
-         
+
          "."  : {precedence:30, handler:"$dot" },
          ""   : {precedence:30, handler:"$apply" },
      },
-     
+
      voidHandler        : "$nothing",
      nameHandler        : "$name",
      stringHandler1     : "$str1",
@@ -78,22 +78,22 @@ const parse = Parser({
 // -----------------------------------------------------------------------------
 
 const context = {
-    
+
     $nothing () {
         return null;
     },
-    
+
     $str1 (value) {
         return value;
     },
-    
+
     $str2 (value) {
         return value;
     },
-    
+
     async $strt (value) {
         const expressions = [];
-        value = value.replace(/\${([\s\S]+?)}/g, (match, expression) => {  
+        value = value.replace(/\${([\s\S]+?)}/g, (match, expression) => {
             const i = expressions.length;
             expressions.push( parse(expression) );
             return "${" + i + "}";
@@ -110,20 +110,20 @@ const context = {
     $numb (value) {
         return value;
     },
-    
+
     $error (error) {
         throw error;
     },
-    
+
     async $pair (X, Y) {
         return O.pair(await X(this), await Y(this));
     },
-        
+
     async $list (X) {
         const x = await X(this);
         return Array.from(T.iter(x));
     },
-    
+
     async $name (name) {
         if (T.isName(name)) {
             let value = this[name];
@@ -131,7 +131,7 @@ const context = {
         }
         return null;
     },
-    
+
     async $label (X, Y) {
         const x = await X({
             $nothing: this.$nothing,
@@ -149,7 +149,7 @@ const context = {
         }
         return y;
     },
-    
+
     async $set (X, Y) {
         await this.$label(X, Y);
         return null;
@@ -160,7 +160,7 @@ const context = {
         await X(context);
         return Object.assign({}, context);
     },
-    
+
     $def (params, expression) {
         const func = async (...args) => {
             const functionContext = Object.create(this);
@@ -170,19 +170,19 @@ const context = {
         func.toSource = async () => `((${await params(serializationContext)})->${await expression(serializationContext)})`;
         return func;
     },
-    
+
     async $apply (X, Y) {
         const x = await X(this);
         const y = await Y(this);
         try {
-            return await O.apply.call(this, x, y);            
+            return await O.apply.call(this, x, y);
         } catch (parentError) {
             const error = new Error(parentError.message);
             error.parent = parentError;
             throw error;
         }
     },
-    
+
     async $dot (X, Y) {
         const namespace = await X(this);
         if (!T.isNamespace(namespace)) {
@@ -191,19 +191,19 @@ const context = {
         const childNamespace = this.$extend(namespace);
         return await Y(childNamespace);
     },
-    
+
     async $or (X, Y) {
         const x = await X(this);
         if (await this.bool(x)) return x;
         return await Y(this);
     },
-    
+
     async $and (X, Y) {
         const x = await X(this);
         if (await this.not(x)) return x;
         return await Y(this);
     },
-    
+
     async $if (X, Y) {
         const x = await X(this);
         return (await this.bool(x)) ? await Y(this) : null;
@@ -213,7 +213,7 @@ const context = {
         const x = await X(this);
         return T.isNothing(x) ? await Y(this) : x;
     },
-    
+
     async $add (X, Y) {
         const x = await X(this);
         const y = await Y(this);
@@ -255,7 +255,7 @@ const context = {
         const y = await Y(this);
         return O.equal(x, y);
     },
-     
+
     async $ne (X, Y) {
         return !(await this.$eq(X, Y));
     },
@@ -278,8 +278,8 @@ const context = {
 
     async $le (X, Y) {
         return !(await this.$gt(X, Y));
-    },   
-    
+    },
+
     async $compose (X, Y) {
         const x = await X(this);
         const y = await Y(this);
@@ -289,17 +289,17 @@ const context = {
     async $pipe (X, Y) {
         return await this.$compose(Y, X);
     },
-    
+
     TRUE: true,
     FALSE: false,
-    
+
     $assign (namespace) {
         for (let name in namespace) {
             this[name] = namespace[name];
         }
         return this;
     },
-    
+
     $extend (namespace) {
         return Object.create(this).$assign(namespace);
     }
@@ -316,23 +316,23 @@ for (let fname in F) {
 
 // Context used to un-parse a compiled expression back to its source
 const serializationContext = {
-    
+
     $nothing () {
         return "()";
     },
-    
+
     async $str0 (text) {
         return "`" + text + "`";
     },
-    
+
     $str1 (value) {
         return `'${value}'`;
     },
-    
+
     $str2 (value) {
         return `"${value}"`;
     },
-    
+
     $str3 (value) {
         return '`' + value + '`';
     },
@@ -340,23 +340,23 @@ const serializationContext = {
     $numb (value) {
         return String(value);
     },
-    
+
     async $pair (X, Y) {
         return `${await X(this)}, ${await Y(this)}`
     },
-        
+
     async $list (X) {
         return `[${await X(this)}]`;
     },
-    
+
     $name (name) {
         return name;
     },
-    
+
     async $label (X, Y) {
         return `(${await X(this)}: ${await Y(this)})`;
     },
-    
+
     async $set (X, Y) {
         return `(${await X(this)} = ${await Y(this)})`;
     },
@@ -364,27 +364,27 @@ const serializationContext = {
     async $namespace (X) {
         return `{${await X(this)}}`;
     },
-    
+
     async $def (params, expression) {
         return `((${await params(this)})->${await expression(this)})`;
     },
-    
+
     async $apply (X, Y) {
         return `(${await X(this)}(${await Y(this)}))`;
     },
-    
+
     async $dot (X, Y) {
         return `(${await X(this)}.${await Y(this)})`;
     },
-    
+
     async $or (X, Y) {
         return `(${await X(this)}|${await Y(this)})`;
     },
-    
+
     async $and (X, Y) {
         return `(${await X(this)})&(${await Y(this)})`;
     },
-    
+
     async $if (X, Y) {
         return `(${await X(this)}?${await Y(this)})`;
     },
@@ -392,7 +392,7 @@ const serializationContext = {
     async $else (X, Y) {
         return `(${await X(this)};${await Y(this)})`;
     },
-    
+
     async $add (X, Y) {
         return `(${await X(this)}+${await Y(this)})`;
     },
@@ -420,7 +420,7 @@ const serializationContext = {
     async $eq (X, Y) {
         return `(${await X(this)}==${await Y(this)})`;
     },
-     
+
     async $ne (X, Y) {
         return `(${await X(this)}!=${await Y(this)})`;
     },
@@ -439,8 +439,8 @@ const serializationContext = {
 
     async $le (X, Y) {
         return `(${await X(this)}<=${await Y(this)})`;
-    },   
-    
+    },
+
     async $compose (X, Y) {
         return `(${await X(this)}<<${await Y(this)})`;
     },
@@ -470,7 +470,7 @@ const serializationContext = {
  *  evaluate = swan.parse(expression);
  *  value = await evaluate(context);
  *  ```
- *  
+ *
  *  - `espression` is a string containing any valid swan expression
  *  - `context` is a valid swan expression context
  *  - `value` is the value that expression result has in the given context
@@ -482,8 +482,8 @@ exports.parse = (expression) => {
             throw new Error("Invalid context.")
         };
         try {
-            const value = await evaluate(expressionContext);            
-            return T.isNothing(value) ? null : value;            
+            const value = await evaluate(expressionContext);
+            return T.isNothing(value) ? null : value;
         } catch (error) {
             error.swanStack = buildErrorStack(error);
             throw error;
@@ -499,7 +499,7 @@ function buildErrorStack (error) {
             col = col - lines[row].length -1;
             row = row + 1;
         }
-        return `@ ${lines[row]}\n  ${' '.repeat(col)}^\n` + buildErrorStack(error.parent);        
+        return `@ ${lines[row]}\n  ${' '.repeat(col)}^\n` + buildErrorStack(error.parent);
     } else {
         return "";
     }
@@ -510,18 +510,18 @@ function buildErrorStack (error) {
  *  swan.createContext - function
  *  ----------------------------------------------------------------------------
  *  Creates a valid expression context.
- *  
+ *
  *  ```js
  *  context = swan.createContext(...namespaces)
  *  ```
- *  
+ *
  *  - `namespaces` is a list of objects `ns1, ns2, ns3, ...` that will be merged
- *    to the core swan context 
- *  - `context` is an object containing all the core context properties, plus 
+ *    to the core swan context
+ *  - `context` is an object containing all the core context properties, plus
  *    all the properties of the passed namespace, added in order.
  */
 const expression_globals = {
-    'require': require('./lib/stdlib-loader')
+    'require': require('./lib/lib-loader').require
 };
 exports.createContext = (...namespaces) => {
     var ctx = context.$extend(expression_globals);

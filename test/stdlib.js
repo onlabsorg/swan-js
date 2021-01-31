@@ -1,11 +1,11 @@
 var expect = require("chai").expect;
-var loadlib = require("../lib/stdlib-loader");
+var loadlib = require("../lib/lib-loader").require;
 var swan = require("..");
 const apply = (f, ...args) => swan.O.apply(f, swan.T.createTuple(...args));
 
 
 describe("stdlib", () => {
-    
+
     describe("markdown", () => {
         it("should expose a function that converts markdown to HTML", async () => {
             var markdown = await loadlib("markdown");
@@ -13,7 +13,7 @@ describe("stdlib", () => {
             expect(html).to.equal("<p><em>bold</em></p>\n");
         });
     });
-    
+
     describe("path", () => {
         it("should expose NodeJS path functions", async () => {
             var path = await loadlib("path");
@@ -54,7 +54,7 @@ describe("stdlib", () => {
             expect(math.sqrt).to.equal(Math.sqrt);
             expect(math.tan).to.equal(Math.tan);
             expect(math.tanh).to.equal(Math.tanh);
-            expect(math.trunc).to.equal(Math.trunc);    
+            expect(math.trunc).to.equal(Math.trunc);
         });
     });
 
@@ -66,61 +66,61 @@ describe("stdlib", () => {
             expect(json.stringify({a:1}, 2)).to.equal(`{\n  "a": 1\n}`);
         });
     });
-    
+
     describe("text", () => {
-        
+
         describe("text.find(str, subStr)", () => {
-            
+
             it("should return the first index of subStr in str", async () => {
                 var text = await loadlib("text");
-                expect(await text.find("__Abc__def__Abc", "Abc")).to.equal(2);                
+                expect(await text.find("__Abc__def__Abc", "Abc")).to.equal(2);
             });
-            
+
             it("should return -1 if no match is found", async () => {
                 var text = await loadlib("text");
-                expect(await text.find("__Abc__def__Abc", "xxx")).to.equal(-1);                
-            });            
+                expect(await text.find("__Abc__def__Abc", "xxx")).to.equal(-1);
+            });
         });
 
         describe("text.rfind(str, subStr)", () => {
-            
+
             it("should return the last index of subStr in str", async () => {
                 var text = await loadlib("text");
-                expect(await text.rfind("__Abc__def__Abc", "Abc")).to.equal(12);                
+                expect(await text.rfind("__Abc__def__Abc", "Abc")).to.equal(12);
             });
-            
+
             it("should return -1 if no match is found", async () => {
                 var text = await loadlib("text");
-                expect(await text.rfind("__Abc__def__Abc", "xxx")).to.equal(-1);                
-            });            
+                expect(await text.rfind("__Abc__def__Abc", "xxx")).to.equal(-1);
+            });
         });
 
         describe("text.lower(str)", () => {
-            
+
             it("should return the given string converted to lower case characters", async () => {
                 var text = await loadlib("text");
-                expect(await text.lower("AbcDef")).to.equal("abcdef");                
+                expect(await text.lower("AbcDef")).to.equal("abcdef");
             });
         });
-        
+
         describe("text.upper(str)", () => {
-            
+
             it("should return the given string converted to upper case characters", async () => {
                 var text = await loadlib("text");
-                expect(await text.upper("AbcDef")).to.equal("ABCDEF");                
+                expect(await text.upper("AbcDef")).to.equal("ABCDEF");
             });
         });
-        
+
         describe("text.char(...charCodes)", () => {
-            
+
             it("should return the string made of the given UTF char codes", async () => {
                 var text = await loadlib("text");
                 expect(await text.char(65, 98, 99)).to.equal("Abc");
             });
         });
-        
+
         describe("text.code(str)", () => {
-            
+
             it("should return the list of UTF char codes of the given string", async () => {
                 var text = await loadlib("text");
                 expect(await text.code("Abc")).to.deep.equal([65, 98, 99]);
@@ -128,7 +128,7 @@ describe("stdlib", () => {
         });
 
         describe("text.slice(str, firstIndex, lastIndex)", () => {
-            
+
             it("should return a slice of the given string from firstIndex to lastIndex", async () => {
                 var text = await loadlib("text");
                 expect(await text.slice("0123456789", 2, 5)).to.equal("234");
@@ -146,7 +146,7 @@ describe("stdlib", () => {
         });
 
         describe("text.split(str, divider)", () => {
-            
+
             it("should return the list of `str` substrings between `divider` substrings", async () => {
                 var text = await loadlib("text");
                 expect(await text.split("Abc,def,hij", ",")).to.deep.equal(["Abc", "def", "hij"]);
@@ -154,7 +154,7 @@ describe("stdlib", () => {
         });
 
         describe("text.replace(str, subStr, newSubStr)", () => {
-            
+
             it("should replace all the occurencies of `subStr` with `newSubStr`", async () => {
                 var text = await loadlib("text");
                 expect(await text.replace("abcXYdefXYghi", "XY", "Z")).to.equal("abcZdefZghi");
@@ -163,35 +163,35 @@ describe("stdlib", () => {
     });
 
     describe("list", () => {
-        
+
         describe("list.find(list, item)", () => {
-            
+
             it("should return the first index of subStr in str", async () => {
                 var list = await loadlib("list");
-                expect(await list.find([0,10,20,10,20], 20)).to.equal(2);                
+                expect(await list.find([0,10,20,10,20], 20)).to.equal(2);
             });
-            
+
             it("should return -1 if no match is found", async () => {
                 var list = await loadlib("list");
-                expect(await list.find([0,10,20,10,20], 50)).to.equal(-1);                
-            });            
+                expect(await list.find([0,10,20,10,20], 50)).to.equal(-1);
+            });
         });
 
         describe("text.rfind(str, subStr)", () => {
-            
+
             it("should return the first index of subStr in str", async () => {
                 var list = await loadlib("list");
-                expect(await list.rfind([0,10,20,10,20], 20)).to.equal(4);                
+                expect(await list.rfind([0,10,20,10,20], 20)).to.equal(4);
             });
-            
+
             it("should return -1 if no match is found", async () => {
                 var list = await loadlib("list");
-                expect(await list.rfind([0,10,20,10,20], 50)).to.equal(-1);                
-            });            
+                expect(await list.rfind([0,10,20,10,20], 50)).to.equal(-1);
+            });
         });
 
         describe("text.slice(list, firstIndex, lastIndex)", () => {
-            
+
             it("should return a slice of the given string from firstIndex to lastIndex", async () => {
                 var list = await loadlib("list");
                 expect(await list.slice([0,10,20,30,40,50,60], 2, 5)).to.deep.equal([20,30,40]);
@@ -209,7 +209,7 @@ describe("stdlib", () => {
         });
 
         describe("text.reverse(list)", () => {
-            
+
             it("should return a copy of the passed list, in reversed order", async () => {
                 var list = await loadlib("list");
                 var l1 = [1,2,3,4,5];
@@ -220,7 +220,7 @@ describe("stdlib", () => {
         });
 
         describe("text.join(list, separator)", () => {
-            
+
             it("should return a string obtaining by concatenating the list item with interposed separator", async () => {
                 var list = await loadlib("list");
                 expect(await list.join(["a","b","c"],",")).to.equal("a,b,c");
@@ -228,11 +228,12 @@ describe("stdlib", () => {
         });
     });
 
-    describe("http", () => {
-        
-        describe("http.get(url, options)", () => {
-            
-            it("should fetch the text at the given url", async () => {
+    describe("http", function () {
+
+        describe("http.get(url, options)", function () {
+
+            it("should fetch the text at the given url", async function () {
+                this.timeout(500);
                 var http = await loadlib("http");
                 var url = "https://raw.githubusercontent.com/onlabsorg/olojs/master/README.md";
                 var response = await fetch(url);
@@ -250,6 +251,6 @@ describe("stdlib", () => {
                     expect(error.message).to.equal("404");
                 }
             });
-        });        
+        });
     });
 });
