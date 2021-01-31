@@ -1,6 +1,6 @@
 var expect = require("chai").expect;
 var T = require("../lib/types");
-var {parse, createContext, createTuple} = require("../index");
+var {parse, createContext, createTuple, defineModule} = require("../index");
 var evaluate = (source, context) => parse(source)(context);
 var createEvaluator = context => source => evaluate(source, createContext(context));
 
@@ -3025,17 +3025,17 @@ describe("expression", () => {
         });
     });
 
-    describe("require modulePath", () => {
+    describe("require and defineModule", () => {
 
         it("should delegate to the loader, defined with define, mathching the modlePath", async () => {
-            var loader = require('../lib/lib-loader');
+            var context = createContext();
             var mod1={}, mod2={};
-            loader.define('path/to/mod1', () => mod1);
-            loader.define('/path/to/mod2', () => mod2);
-            expect(await loader.require('path/to/mod1')).to.equal(mod1);
-            expect(await loader.require('/path/to/mod1')).to.equal(mod1);
-            expect(await loader.require('path/to/mod2')).to.equal(mod2);
-            expect(await loader.require('/path/to/mod2')).to.equal(mod2);
+            defineModule('path/to/mod1', () => mod1);
+            defineModule('/path/to/mod2', () => mod2);
+            expect(await context.require('path/to/mod1')).to.equal(mod1);
+            expect(await context.require('/path/to/mod1')).to.equal(mod1);
+            expect(await context.require('path/to/mod2')).to.equal(mod2);
+            expect(await context.require('/path/to/mod2')).to.equal(mod2);
         });
     });
 

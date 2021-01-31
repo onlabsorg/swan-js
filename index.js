@@ -521,7 +521,7 @@ function buildErrorStack (error) {
  *    all the properties of the passed namespace, added in order.
  */
 const expression_globals = {
-    'require': require('./lib/lib-loader').require
+    'require': require('./lib/modules').require
 };
 exports.createContext = (...namespaces) => {
     var ctx = context.$extend(expression_globals);
@@ -530,6 +530,23 @@ exports.createContext = (...namespaces) => {
     }
     return ctx;
 }
+
+
+
+/**
+ *  swan.defineModule - function
+ *  ----------------------------------------------------------------------------
+ *  Adds a module to the swan library. The module can be then loaded with
+ *  the built-in `require` function.
+ *
+ *  ```js
+ *  context = swan.defineModule(modulePath, moduleLoader)
+ *  ```
+ *
+ *  - `modulePath` a `/-separated` path that identifies the module
+ *  - `moduleLoader` an asynchronous function that returns the module
+ */
+ exports.defineModule = require('./lib/modules').define;
 
 
 /**

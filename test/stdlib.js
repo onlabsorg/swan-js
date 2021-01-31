@@ -1,5 +1,5 @@
 var expect = require("chai").expect;
-var loadlib = require("../lib/lib-loader").require;
+var loadlib = require("../lib/modules").require;
 var swan = require("..");
 const apply = (f, ...args) => swan.O.apply(f, swan.T.createTuple(...args));
 
