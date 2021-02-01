@@ -104,7 +104,7 @@ It returns the milliseconds of a given date, in the loacal timezone.
 ms = date.milliseconds(dt)
 ```
   
-date - function
+date.UTC - function
 ------------------------------------------------------------------------
 Creates a date given all the date components expressed in the UTC-0
 timezone.
