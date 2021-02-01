@@ -16,7 +16,7 @@ Given a path `p`, it returns the terminal segment.
 name = path.fullName(p)
 ```
   
-path.ext - function
+path.name - function
 ------------------------------------------------------------------------
 Given a path `p`, it returns the terminal segment, without extension.
 ```
@@ -46,7 +46,7 @@ concatenating them.
 jPath = path.join(p1, p2, p3, ...)
 ```
   
-path.normalize - function
+path.resolve - function
 ------------------------------------------------------------------------
 Given a tuple of paths, it resolves a sequence of paths or path segments
 into an absolute path.
