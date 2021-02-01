@@ -1146,7 +1146,7 @@ describe("expression", () => {
             expect(await evaluate("str{a=1,b=2,c=3}", ctx)).to.equal("[[Namespace of 3 items]]");
         });
 
-        it("should return X.__str__(X) if it exists and it is a function", async () => {
+        it("should return str(X.__str__(X)) if it exists and it is a function", async () => {
             var evaluate = createEvaluator({
                 ns: {
                     s: "ns string",
@@ -1154,6 +1154,14 @@ describe("expression", () => {
                 }
             });
             expect(await evaluate("str ns")).to.equal("ns string");
+
+            var evaluate = createEvaluator({
+                ns: {
+                    b: true,
+                    __str__: ns => ns.b
+                }
+            });
+            expect(await evaluate("str ns")).to.equal("TRUE");
         });
 
         it("should concatenate the serialized item if X is a tuple", async () => {
