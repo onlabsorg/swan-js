@@ -12,6 +12,14 @@
     "build": "bin/build",
     "test": "mocha test/index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/onlabsorg/swan-js.git"
+  },
+  "homepage": "https://github.com/onlabsorg/swan-js#readme",
+  "bugs": {
+    "url": "https://github.com/onlabsorg/swan-js/issues"
+  },
   "author": "Marcello Del Buono (m.delbuono@gmail.com)",
   "license": "MIT",
   "devDependencies": {

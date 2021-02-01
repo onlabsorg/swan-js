@@ -21,8 +21,8 @@ npm install @onlabsorg/swan-js
 Syntax
 --------------------------------------------------------------------------------
 
-A Swan expression is simply a sequence of binary operations 
-(operand operator operand operator operand ...), eventually grouped with 
+A Swan expression is simply a sequence of binary operations
+(operand operator operand operator operand ...), eventually grouped with
 parenthesis (...), square braces [...] or curly braces {...}.
 
 The available binary operations are:
@@ -30,7 +30,7 @@ The available binary operations are:
 - Arithmetic operations: `x + y`, `x - y`, `x * y`, `x / y`, `x % y`, `x ^ y`
 - Comparison operations: `x == y`, `x != y`, `x > y`, `x >= y`, `x < y`, `x <= y`
 - Logic operations: `x & y`, `x | y`
-- Conditional and alternative operations: `x ? y`, `x ; y`, or combined `x ? y ; z` 
+- Conditional and alternative operations: `x ? y`, `x ; y`, or combined `x ? y ; z`
 - Pairing operation: `x , y`
 - Application (function call or item reference): `x y`
 - Function definition: `x -> y`
@@ -55,7 +55,7 @@ The data types defined in swan are:
 - Function: `names -> expression`
 - Tuple: `x1, x2, x3, ...`
 
-The swan built-in functions are: 
+The swan built-in functions are:
 - `bool x`, converts x to boolean
 - `enum x`, returns the tuple of the items contained in x
 - `error msg`, throws an error
@@ -65,9 +65,9 @@ The swan built-in functions are:
 - `not x`, return `FALSE` if `bool x` is true, otherwise `TRUE`
 - `range n`, returns the list of numbers between `0` and `n`
 - `reduce f x`, reduces the tuple `x` to a single value via the reducer function `f`
-- `require x`, loads a standard library module 
+- `require x`, loads a standard library module
 - `size x`, returns the number of items in `x`
-- `str x`, converts `x` to a string 
+- `str x`, converts `x` to a string
 - `type x`, returns the type name of `x`
 
 
@@ -82,3 +82,9 @@ Learn more
 License
 --------------------------------------------------------------------------------
 [MIT](https://opensource.org/licenses/MIT)
+
+
+Related projects
+--------------------------------------------------------------------------------
+- [olojs](https://github.com/onlabsorg/olojs) is a template engine and
+  content management system that uses swan as inline expression language
