@@ -10,7 +10,7 @@ In all the other cases it returns `TRUE`.
   
 enum x
 ----------------------------------------------------------------------------
-It returns the tuple of the item contained in x. In particular:
+It returns the tuple of the items contained in x. In particular:
 - if x is a list like `[x1, x2, x3, ...]`, it returns the tuple `(x1, x2, x3, ...)`
 - if x is a string like `"abc..."`, it returns the tuple `('a', 'b', 'c', ...)`
 - if x is a namespace like `{name1:val1, name2:val2, ...}`, it returns the tuple `('name1', 'name2', ...)`

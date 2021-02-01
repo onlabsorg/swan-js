@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-echo "Building built-in functions documentation"
-bin/gen-doc lib/builtin-functions.js > docs/builtin-functions.md
-
-echo "Building API documentation"
-bin/gen-doc index.js > docs/api.md
