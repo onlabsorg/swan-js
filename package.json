@@ -1,10 +1,15 @@
 {
   "name": "@onlabsorg/swan-js",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "A simple yet powerful expression language written in JavaScript",
   "keywords": [
-      "functional", "sandboxed", "expression", "engine",
-      "async", "promise", "immutable"
+    "functional",
+    "sandboxed",
+    "expression",
+    "engine",
+    "async",
+    "promise",
+    "immutable"
   ],
   "main": "index.js",
   "directories": {

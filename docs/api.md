@@ -39,7 +39,7 @@ swan.defineModule - function
 Adds a module to the swan library. The module can be then loaded with
 the built-in `require` function.
 ```js
-context = swan.defineModule(modulePath, moduleLoader)
+swan.defineModule(modulePath, moduleLoader)
 ```
 - `modulePath` a `/-separated` path that identifies the module
 - `moduleLoader` an asynchronous function that returns the module

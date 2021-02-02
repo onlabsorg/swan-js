@@ -540,7 +540,7 @@ exports.createContext = (...namespaces) => {
  *  the built-in `require` function.
  *
  *  ```js
- *  context = swan.defineModule(modulePath, moduleLoader)
+ *  swan.defineModule(modulePath, moduleLoader)
  *  ```
  *
  *  - `modulePath` a `/-separated` path that identifies the module
