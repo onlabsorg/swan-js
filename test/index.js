@@ -441,14 +441,11 @@ describe("expression", () => {
             it("should delegate to `X.__apply__` if it exists and it is a function", async () => {
                 var ctx = createContext();
 
-                var val = await evaluate("{__apply__ = s -> ['val of', s]}('x')", ctx);
+                var val = await evaluate("{__apply__ = self -> s -> ['val of', s]}('x')", ctx);
                 expect(val).to.deep.equal(["val of", "x"]);
 
-                var val = await evaluate("{__apply__ = (x,y) -> ['val:', y, x]}(10,20)", ctx);
+                var val = await evaluate("{__apply__ = self -> (x,y) -> ['val:', y, x]}(10,20)", ctx);
                 expect(val).to.deep.equal(["val:", 20, 10]);
-
-                val = await evaluate("{__apply__=1, a=2}('a')", ctx);
-                expect(val).to.equal(2);
             });
         });
 
@@ -1146,7 +1143,7 @@ describe("expression", () => {
             expect(await evaluate("str{a=1,b=2,c=3}", ctx)).to.equal("[[Namespace of 3 items]]");
         });
 
-        it("should return str(X.__str__(X)) if it exists and it is a function", async () => {
+        it("should return X.__str__(X) if it exists and it is a function", async () => {
             var evaluate = createEvaluator({
                 ns: {
                     s: "ns string",
@@ -1154,14 +1151,6 @@ describe("expression", () => {
                 }
             });
             expect(await evaluate("str ns")).to.equal("ns string");
-
-            var evaluate = createEvaluator({
-                ns: {
-                    b: true,
-                    __str__: ns => ns.b
-                }
-            });
-            expect(await evaluate("str ns")).to.equal("TRUE");
         });
 
         it("should concatenate the serialized item if X is a tuple", async () => {
