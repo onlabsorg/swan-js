@@ -453,6 +453,26 @@ inside a namespace. In the example above, the expression `ns.z` will indeed
 resolve to the value of `z` inside the namespace `ns`.
 
 
+Mapping operator
+--------------------------------------------------------------------------------
+The mapping operator `t => f` takes a tuple `t = (a, b, c, ...)` and a callable
+`f` and returns the tuple `f(a), f(b), f(c), ...`. For example:
+
+```
+(1,2,3) => x -> 2*x     # returns (2,4,6)
+```
+
+Notice that when the mapping function `f` returns an empty tuple `()`, its value 
+will be ignored in the mapped tuple, because that's just how tuples work. This 
+means that the mapping operator can be also used to filter tuples. For example:
+
+```
+isEven = x -> x % 2 == 0            # returns TRUE if x is an even number
+ifEven = x -> isEven(x) ? x ; ()    # returns x if it is an even number, or esle ()
+(1,2,3,4,5) => ifEven               # returns (2,4) 
+```
+
+
 Composition operators
 --------------------------------------------------------------------------------
 The composition operation `g << f` returns the function `x -> g(f x)`.
@@ -476,7 +496,8 @@ order.
 9. `->`
 10. `=` , `:`
 11. `<<`, `>>` 
-12. `,`
+12. `=>`
+13. `,`
 
 If the expression contains two or more operators with the same rank, the
 leftmost operation gets executed first.
