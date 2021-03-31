@@ -13,13 +13,9 @@ describe("SWAN LANGUAGE", () => {
 
             await parse("x+1,\nf1 = x -> 2/x")(ctx);
             await parse("`aaa ${f2 = x -> f1 x + 1} bbb`")(ctx)
-            try {
-                await parse("f2 [1,2,3]")(ctx);
-                throw DidNotThrow();
-            } catch (error) {
-                expect(error).to.be.not.instanceof(DidNotThrow);
-                expect(error.failureStack).to.equal(`@ f2 [1,2,3]\n    ^\n@ f2 = x -> f1 x + 1\n              ^\n@ f1 = x -> 2/x\n             ^\n`);
-            }
+            const error = await parse("f2 [1,2,3]")(ctx);
+            expect(error).to.be.instanceof(Error);
+            expect(error.failureStack).to.equal(`@ f2 [1,2,3]\n    ^\n@ f2 = x -> f1 x + 1\n              ^\n@ f1 = x -> 2/x\n             ^\n`);
         });
     });
 
