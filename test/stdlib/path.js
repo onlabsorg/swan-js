@@ -1,5 +1,4 @@
 var expect = require("chai").expect;
-var swan = require("../..");
 var path = require("../../lib/stdlib/path");
 
 

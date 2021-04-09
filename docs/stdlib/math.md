@@ -61,7 +61,7 @@ Returns the largest integer less than or equal to a number.
   
 math.log - function
 ------------------------------------------------------------------------
-Returns the natural logarithm (㏒e, also, ㏑) of a number.
+Returns the natural logarithm of a number.
   
 math.log10 - function
 ------------------------------------------------------------------------

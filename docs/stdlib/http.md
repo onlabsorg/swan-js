@@ -5,7 +5,8 @@ The http library exposes methods to use the HTTP protocol.
 http.get - asynchronous function
 ----------------------------------------------------------------------------
 Sends an HTTP GET request to the given URL and returns the response body as
-text. In case of error, it throws the HTTP status code.
+text. In case of error, it throws the HTTP status code (in js) or returns
+an Undefined value (in swan).
 ```
 text = await http.get(url, options)
 ```

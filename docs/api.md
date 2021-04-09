@@ -1,20 +1,17 @@
 swan
 ============================================================================
 The swan JavaScript API include a `parse` function and a `createContext`
-function. The parse function compiles an expression string to a function that
-takes a context (created with `createdContext`) and asynchronously returns
-the expression value.
-Example:
-```js
-evaluate = swan.parse( "3 * x" );
-context = swan.createContext({x:10});
-value = await evaluate(context);         // 30
-```
+function to parse and evaluate expressions. 
+Furthermore, it contains a `defineModule` to add custom javascript modules 
+to the swan standard library and the types `Tuple` and `Undefined` which
+are the only two swan types that do not correspond to a javascript negative
+type.
   
 swan.parse - function
 ----------------------------------------------------------------------------
 Parses a swan expression and returns a function that maps a context to an
 expression value.
+
 ```js
 evaluate = swan.parse(expression);
 value = await evaluate(context);
@@ -44,10 +41,20 @@ swan.defineModule(modulePath, moduleLoader)
 - `modulePath` a `/-separated` path that identifies the module
 - `moduleLoader` an asynchronous function that returns the module
   
-Internals
+swan.Tuple - function
 ----------------------------------------------------------------------------
-- `swan.T` is an object containing types-realted functions.
-- `swan.F` is an object exposing to JavaScript the swan built-in functions
-- `swan.O` is an object exposing to JavaScript the swan binary operations
+This function creates a swan tuple object.
+```js
+tuple = Tuple(item1, item2, ...)
+tuple instanceof Tuple      // true
+```
+  
+swan.Undefined - function
+----------------------------------------------------------------------------
+This function creates a swan undefined object.
+```js
+undef = Undefined(...args)
+undef instanceof Undefined      // true
+```
   
 

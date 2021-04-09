@@ -48,7 +48,7 @@ cList = text.code(str)
   
 text.slice - function
 ----------------------------------------------------------------------------
-Given a string, returns the sub-string between a start index and an end index.
+Given a string, it returns the sub-string between a start index and an end index.
 ```
 subStr = text.slice(str, startIndex, endIndex)
 ```
@@ -58,7 +58,7 @@ subStr = text.slice(str, startIndex, endIndex)
   
 text.split - function
 ----------------------------------------------------------------------------
-Given a string and a separato, returns the list of the strings between the
+Given a string and a separator, it returns the list of the strings between the
 separator.
 ```
 subStr = text.split(str, separator)
@@ -74,7 +74,7 @@ rStr = text.replace(s, searchStr, replacentStr)
   
 text.trim - function
 ----------------------------------------------------------------------------
-Given a string `s`, returns a new string obtained by replacing both the
+Given a string `s`, it returns a new string obtained by replacing both the
 leading and trailing spaces.
 ```
 ts = text.trim(s)
@@ -82,7 +82,7 @@ ts = text.trim(s)
   
 text.trimStart - function
 ----------------------------------------------------------------------------
-Given a string `s`, returns a new string obtained by replacing the leading
+Given a string `s`, it returns a new string obtained by replacing the leading
 spaces.
 ```
 ts = text.trimStart(s)
@@ -90,7 +90,7 @@ ts = text.trimStart(s)
   
 text.trimEnd - function
 ----------------------------------------------------------------------------
-Given a string `s`, returns a new string obtained by replacing the trailing
+Given a string `s`, it returns a new string obtained by replacing the trailing
 spaces.
 ```
 ts = text.trimEnd(s)

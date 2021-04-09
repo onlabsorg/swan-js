@@ -14,4 +14,4 @@ The standard library contains the following modules:
 - [list](./stdlib/list.md): contains functions to manipulate swan lists
 - [math](./stdlib/math.md): contains mathematical functions
 - [path](./stdlib/path.md): contains functions to manipulate unix-like file paths
-- [text](./stdlib/text.md): contains functions to manipulate swan strings
+- [text](./stdlib/text.md): contains functions to manipulate strings

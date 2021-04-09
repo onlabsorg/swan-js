@@ -1,4 +1,4 @@
-describe("stdlib", () => {
+describe("STANDARD LIBRARY", () => {
     require('./stdlib/path');
     require('./stdlib/text');
     require('./stdlib/json');
