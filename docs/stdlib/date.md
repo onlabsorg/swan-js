@@ -2,12 +2,12 @@ date - swan stdlib module
 ============================================================================
 Contains functions to handle date and time.
   
-date.create - function
+date.\_\_apply\_\_ - function
 ------------------------------------------------------------------------
 Creates a date given all the date components expressed in the local
 timezone.
 ```
-dt = date.create(y, m, d, h, min, s, ms)
+dt = date(y, m, d, h, min, s, ms)
 ```
 - `y` is the year in the local timezone
 - `m` is the month in the local timezone (1:January, ..., 12:December)
@@ -104,7 +104,7 @@ It returns the milliseconds of a given date, in the loacal timezone.
 ms = date.milliseconds(dt)
 ```
   
-date.UTC.create - function
+date.UTC.\_\_apply\_\_ - function
 ------------------------------------------------------------------------
 Creates a date given all the date components expressed in the UTC-0
 timezone.
