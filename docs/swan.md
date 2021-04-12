@@ -719,6 +719,7 @@ The `str` function convers any parameter `X` to a string as follows:
   of items in the list
 - if `X` is a namespace, it resolves to `"[[Namespace of n items]]"`, where
   `n` is the number of names contained in the namespace
+- if `X` is a namespace and `X.__str__` is a string, it resolves to `X.__str__`
 - if `X` is a function, it resolves to `"[[Function]]"`
 - if `X` is undefined, it resolves to `"[[Undefined]]"`
 

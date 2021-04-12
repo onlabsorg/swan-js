@@ -709,9 +709,14 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await evaluate("str[1,2,'abc']")).to.equal("[[List of 3 items]]")
         });
 
-        it("should return '[[Namespace of n items]]' when n is the number of items", async () => {
+        it("should return '[[Namespace of n items]]' when X is a namestpace with n items", async () => {
             expect(await evaluate("str{a=1,b=2,c=3}")).to.equal("[[Namespace of 3 items]]");
             expect(await evaluate("str ns", {ns:{a:1,b:2,c:3,$d:4}})).to.equal("[[Namespace of 3 items]]");
+        });
+        
+        it("shoulr return `X.__str__` if `X` is a namespace and `X.__str__` is a string", async () => {
+            expect(await evaluate("str{__str__:'custom string'}")).to.equal("custom string");
+            expect(await evaluate("str{a=1,b=2,__str__=3}")).to.equal("[[Namespace of 3 items]]");            
         });
         
         it("Should return String(X) if X is Undefined", async () => {
