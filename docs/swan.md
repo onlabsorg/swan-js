@@ -274,6 +274,13 @@ tuple-values to tuple-names assignment:
 * in `((x,y)->x+y)(1,2,3)` the parameter `x` will be `1` and the parameter `y` 
   will be `(2,3)`
   
+If the function `F` throws an error, the application operation resolves to
+`undefined('failure', error)`.
+  
+**When F is a namespace and `F.__apply__` is a function**, the application
+operation will call the `F.__apply__` function and resolve its return value or
+`undefined('failure', error)` in case of error.
+  
 **When F is not a function**, the `F X` operation returns `undefined('application', F)`.
 
 **When F is a tuple `(f1, f2, ...)`**, the `F X` operation returns the tuple

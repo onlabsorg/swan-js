@@ -317,50 +317,87 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
     });
     
     describe("'apply' operation: F X`", () => {
+        
+        describe("when `F` is a function", () => {
+            
+            it("should call F with the parameter X and return its return value", async () => {
+                var presets = {
+                    double: x => 2 * x,
+                    sum: (x,y) => x + y
+                };
+                expect(await evaluate("(x -> [x]) 10", presets)).to.deep.equal([10]);
+                expect(await evaluate("((x, y) -> [y,x])(10, 20)", presets)).to.deep.equal([20,10]);
+                expect(await evaluate("double 25", presets)).to.equal(50);
+                expect(await evaluate("sum(10, 20)", presets)).to.equal(30);
+            });
 
-        it("should call the function F with the parameter X and return its return value", async () => {
-            var presets = {
-                double: x => 2 * x,
-                sum: (x,y) => x + y
-            };
-            expect(await evaluate("(x -> [x]) 10", presets)).to.deep.equal([10]);
-            expect(await evaluate("((x, y) -> [y,x])(10, 20)", presets)).to.deep.equal([20,10]);
-            expect(await evaluate("double 25", presets)).to.equal(50);
-            expect(await evaluate("sum(10, 20)", presets)).to.equal(30);
+            it("should return Undefined if F throws an error", async () => {
+                var error = new Error('Test error');
+                var presets = {fn: x => {throw error}};
+                var u = await evaluate('fn 10', presets);
+                expect(u).to.be.Undefined('failure', error);
+            });
+
+            it("should return Undefined if F returns Undefined", async () => {
+                var un = new Undefined();
+                var presets = {fn: x => un};
+                expect(await evaluate('fn 10', presets)).to.equal(un);
+            });
         });
         
-        it("should return Undefined if F throws an error", async () => {
-            var error = new Error('Test error');
-            var presets = {fn: x => {throw error}};
-            var u = await evaluate('fn 10', presets);
-            expect(u).to.be.Undefined('failure', error);
+        describe("when `F` is a namespace and `F.__apply__` is a function", () => {
+            
+            it("should call F with the parameter X and return its return value", async () => {
+                var presets = {
+                    double: {__apply__: x => 2 * x},
+                    sum: {__apply__: (x,y) => x + y}
+                };
+                expect(await evaluate("(x -> [x]) 10", presets)).to.deep.equal([10]);
+                expect(await evaluate("((x, y) -> [y,x])(10, 20)", presets)).to.deep.equal([20,10]);
+                expect(await evaluate("double 25", presets)).to.equal(50);
+                expect(await evaluate("sum(10, 20)", presets)).to.equal(30);
+            });
+
+            it("should return Undefined if F.__apply__ throws an error", async () => {
+                var error = new Error('Test error');
+                var presets = {fn: {__apply__: x => {throw error}}};
+                var u = await evaluate('fn 10', presets);
+                expect(u).to.be.Undefined('failure', error);
+            });
+
+            it("should return Undefined if F returns Undefined", async () => {
+                var un = new Undefined();
+                var presets = {fn: {__apply__: x => un}};
+                expect(await evaluate('fn 10', presets)).to.equal(un);
+            });
         });
 
-        it("should return Undefined if F returns Undefined", async () => {
-            var un = new Undefined();
-            var presets = {fn: x => un};
-            expect(await evaluate('fn 10', presets)).to.equal(un);
+        describe("when F is of any other type", () => {
+
+            it("should return Undefined", async () => {
+                for (let F of [true, false, 10, "abc", [1,2,3], {a:1}, {__apply__:'not a func'}, new Undefined]) {
+                    expect(await evaluate("F(1)", {F})).to.be.Undefined('application', F);
+                    expect(await evaluate("F(1,2,3)", {F})).to.be.Undefined('application', F);
+                }
+            });            
         });
         
-        it("should return Undefined if F is not a function", async () => {
-            for (let F of [true, false, 10, "abc", [1,2,3], {a:1}, new Undefined]) {
-                expect(await evaluate("F(1)", {F})).to.be.Undefined('application', F);
-                expect(await evaluate("F(1,2,3)", {F})).to.be.Undefined('application', F);
-            }
+        describe("when F is a tuple", () => {
+            
+            it("should return a tuple obtained applying each item of F to X", async () => {
+                var presets = {
+                    f2: x => 2*x,
+                    f3: {__apply__: x => 3*x},
+                    s: 'abc'
+                };
+                var tuple = await evaluate("(f2, f3, s)(2)", presets);
+                expect(tuple).to.be.instanceof(Tuple);
+                expect(Array.from(tuple)[0]).to.equal(4);
+                expect(Array.from(tuple)[1]).to.equal(6);
+                expect(Array.from(tuple)[2]).to.be.Undefined('application', presets.s);
+            });
         });
 
-        it("should return a tuple obtained applying each item of F to X, if F is a tuple", async () => {
-            var presets = {
-                f2: x => 2*x,
-                f3: x => 3*x,
-                s: 'abc'
-            };
-            var tuple = await evaluate("(f2, f3, s)(2)", presets);
-            expect(tuple).to.be.instanceof(Tuple);
-            expect(Array.from(tuple)[0]).to.equal(4);
-            expect(Array.from(tuple)[1]).to.equal(6);
-            expect(Array.from(tuple)[2]).to.be.Undefined('application', presets.s);
-        });
     });
 
     describe("tuple mapping operation: X => Y", () => {
