@@ -2224,6 +2224,14 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             var presets = {u: new Undefined()};
             expect(await evaluate('u ?> 10', presets)).to.be.Undefined("application", 10);
         });
+        
+        it("should apply the operator to each item if X is a tuple", async () => {
+            var presets = {
+                f: (operation, ...operands) => ['f result', operation, ...operands],
+                u: new Undefined('op', 1, 2, 3)
+            };
+            expect(await evaluate(`(10, u, 20) ?> f`, presets)).to.be.Tuple([10, ['f result', 'op', 1, 2, 3], 20]);            
+        });
     });
 
     describe("operators precedence and grouping", () => {

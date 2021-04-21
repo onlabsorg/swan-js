@@ -24,7 +24,7 @@ The following binary operators are defined in swan (see also the
 - [Comparison operators](#comparison-operators): `==`, `!=`, `>`, `>=`, `<`, `<=`
 - [Logic operators](#logic-operators): `&`, `|`
 - [Selection operators](#selection-operators): `?`, `;`
-- [Undefined inspection operator](#undefined-data-type): `?>`
+- [Selective undefined mapping operator](#undefined-data-type): `?>`
 - [Pairing operator](#tuple-data-type-and-pairing-operator): `,`
 - [Application operator](#application-operator) (empty operator): ` `
 - [Function definition operator](#function-data-type): `->`
@@ -235,8 +235,8 @@ The undefined arguments can be totally arbitrary, but normally the first argumen
 is an operation identifier and it is followed by a tuple of operands.
 For example, an undefined sum `X+Y` will return `undefined('sum', X, Y)`.
 
-The arguments of an undefined value can be accessed via the undefined inspection 
-operator `?>`. The `X ?> F` operation returns `X` if it is not undefined,
+The arguments of an undefined value can be accessed via the selective undefined 
+mapping operator `?>`. The `X ?> F` operation returns `X` if it is not undefined,
 otherwise it calls the function `F` with the arguments of `X`. For example:
 
 ```
@@ -250,6 +250,10 @@ returns 0 if the sum operation is undefined.
 ```
 x + y %> args -> 0
 ```
+
+If `X` is a tuple `(x1, x2, ...)`, the `X ?> F` operation resolves to  
+`(x1 ?> F, x2 ?> F, ...)`.
+
 
 ## Application operator
 A missing operator (two operands next to each other: `F X`), defines an 
