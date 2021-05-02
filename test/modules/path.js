@@ -1,5 +1,5 @@
 var expect = require("chai").expect;
-var path = require("../../lib/stdlib/path");
+var path = require("../../lib/modules/path");
 
 
 describe("path module", () => {

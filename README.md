@@ -71,7 +71,7 @@ The swan built-in functions are:
 Learn more
 --------------------------------------------------------------------------------
 - [Swan expression language guide](./docs/swan.md)
-- [Standard library](./docs/stdlib.md)
+- [Standard library](./docs/modules.md)
 - [JavaScript API](./docs/api.md)
 
 

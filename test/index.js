@@ -19,5 +19,5 @@ describe("SWAN LANGUAGE", () => {
         });
     });
 
-    require('./stdlib');
+    require('./modules');
 });

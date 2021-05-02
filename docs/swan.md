@@ -43,7 +43,7 @@ The swan built-in functions are:
 - [str](#str-function): converts its argument to a string
 - [type](#type-function): returns the type name of its argument
 - [undefined](#undefined-data-type): generates an undefined value
-- [require](#require-function): loads a [standard library](./stdlib.md) module
+- [require](#require-function): loads a [standard library](./modules.md) module
 
 The swan pre-defined constants are:
 
@@ -756,7 +756,7 @@ empty tuple, `type X` returns `()`.
 
 
 ## require function
-Swan has a [standard library](./stdlib.md) containing javascript modules that 
+Swan has a [standard library](./modules.md) containing javascript modules that 
 can be imported in the expression scope as namespaces using the `require` 
 function. For example, the swan expression `require 'math'` returns the exports 
 of the standard-lib `math` JavaScript module.

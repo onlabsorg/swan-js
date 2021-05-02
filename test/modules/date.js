@@ -1,5 +1,5 @@
 var expect = require("chai").expect;
-var date = require('../../lib/stdlib/date');
+var date = require('../../lib/modules/date');
 
 describe("date module", function () {
 
