@@ -15,3 +15,4 @@ The standard library contains the following modules:
 - [math](./modules/math.md): contains mathematical functions
 - [path](./modules/path.md): contains functions to manipulate unix-like file paths
 - [text](./modules/text.md): contains functions to manipulate strings
+- [debug](./modules/debug.md): contains functions to debug swan expressions

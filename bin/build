@@ -24,3 +24,4 @@ generate-documentation modules/list
 generate-documentation modules/math
 generate-documentation modules/path
 generate-documentation modules/text
+generate-documentation modules/debug

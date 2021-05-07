@@ -6,4 +6,5 @@ describe("STANDARD LIBRARY", () => {
     require('./modules/math');
     require('./modules/date');
     require('./modules/http');
+    require('./modules/debug');
 });
