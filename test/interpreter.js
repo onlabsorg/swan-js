@@ -2338,13 +2338,5 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(u).to.be.instanceof(Undefined);
             expect(u.args).to.be.Tuple(['name', 1,2,3]);
         });
-        
-        it("should contain the source location of the undefined operation", async () => {
-            var u = await evaluate("\n12 / () * 3 + 4\n");
-            expect(u).to.be.instanceof(Undefined);
-            expect(u.line).to.equal("12 / () * 3 + 4");
-            expect(u.row).to.equal(1);
-            expect(u.column).to.equal(12);
-        });
     });   
 });

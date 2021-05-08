@@ -97,8 +97,7 @@ describe("debug module", function () {
                 data: [
                     {type:"Number", data:10},
                     {type:"String", data:'abc'}
-                ],
-                location: {}
+                ]
             });            
         });
     });
