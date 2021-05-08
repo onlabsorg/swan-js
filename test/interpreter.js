@@ -756,12 +756,10 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await evaluate("str{a=1,b=2,__str__=3}")).to.equal("[[Namespace of 3 items]]");            
         });
         
-        it("Should return String(X) if X is Undefined", async () => {
-            var presets = {un: new Undefined("test", null)};
-            expect(await evaluate("str un", presets)).to.equal("[[Undefined]]");
-            
-            presets.un.toString = () => "My undefined serialization";
-            expect(await evaluate("str un", presets)).to.equal("My undefined serialization");
+        it("Should return '[[Undefined]]' if X is Undefined", async () => {
+            var presets = {un: new Undefined("test", 10, [1,2,3])};
+            console.log(await evaluate("str un", presets));
+            expect(await evaluate("str un", presets)).to.equal("[[Undefined: test, 10, [[List of 3 items]]]]");
         });
 
         it("should concatenate the serialized item if X is a tuple", async () => {
