@@ -125,20 +125,12 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
         });
 
         it("should throw an error if an invalid name is used", async () => {
-            class ExceptionExpected extends Error {};
-            try {
-                await evaluate("$a", {$a:1});
-                throw new ExceptionExpected();
-            } catch (e) {
-                expect(e).to.not.be.instanceof(ExceptionExpected);
-            }
-
-            try {
-                expect(await evaluate("1x")).to.equal(10);
-                throw new ExceptionExpected();
-            } catch (e) {
-                expect(e).to.not.be.instanceof(ExceptionExpected);
-            }
+            const u = await evaluate("$a", {$a:1});
+            expect(u).to.be.instanceof(Undefined);
+            const args = Array.from(u.args);
+            expect(args[0]).to.equal("failure");
+            expect(args[1]).to.be.instanceof(Error);
+            expect(args[1].message).to.equal("Unexpected character '$' at pos 0");
         });
 
         it("should not return properties inherited from javascript Object", async () => {
@@ -2339,4 +2331,77 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(u.args).to.be.Tuple(['name', 1,2,3]);
         });
     });   
+    
+    describe("lexer and parser errors", () => {
+        
+        it("should resolve an undefined value on lexer errors", async () => {
+
+            // missing closing quote
+            var u = await evaluate("'abc", {});
+            expect(u).to.be.instanceof(Undefined);
+            var args = Array.from(u.args);
+            expect(args[0]).to.equal("failure");
+            expect(args[1]).to.be.instanceof(Error);
+            expect(args[1].message).to.equal("Closing quote expected at pos 4");            
+
+            // missing exponent
+            var u = await evaluate("123E+", {});
+            expect(u).to.be.instanceof(Undefined);
+            var args = Array.from(u.args);
+            expect(args[0]).to.equal("failure");
+            expect(args[1]).to.be.instanceof(Error);
+            expect(args[1].message).to.equal("Expected exponent value at pos 5");            
+            
+            // invalid number
+            var u = await evaluate("1abc", {});
+            expect(u).to.be.instanceof(Undefined);
+            var args = Array.from(u.args);
+            expect(args[0]).to.equal("failure");
+            expect(args[1]).to.be.instanceof(Error);
+            expect(args[1].message).to.equal("Invalid number at pos 0");            
+
+            // unexpected period
+            var u = await evaluate("12.34.56", {});
+            expect(u).to.be.instanceof(Undefined);
+            var args = Array.from(u.args);
+            expect(args[0]).to.equal("failure");
+            expect(args[1]).to.be.instanceof(Error);
+            expect(args[1].message).to.equal("Unexpected period at pos 5");
+
+            // invalid name identifier
+            var u = await evaluate("$a", {$a:1});
+            expect(u).to.be.instanceof(Undefined);
+            var args = Array.from(u.args);
+            expect(args[0]).to.equal("failure");
+            expect(args[1]).to.be.instanceof(Error);
+            expect(args[1].message).to.equal("Unexpected character '$' at pos 0");            
+        });
+        
+        it("should resolve an undefined value on parser errors", async () => {
+            
+            // operand expected
+            var u = await evaluate("125 +", {});
+            expect(u).to.be.instanceof(Undefined);
+            var args = Array.from(u.args);
+            expect(args[0]).to.equal("failure");
+            expect(args[1]).to.be.instanceof(Error);
+            expect(args[1].message).to.equal("Operand expected at pos 5");
+
+            // operand expected
+            var u = await evaluate("(125 +", {});
+            expect(u).to.be.instanceof(Undefined);
+            var args = Array.from(u.args);
+            expect(args[0]).to.equal("failure");
+            expect(args[1]).to.be.instanceof(Error);
+            expect(args[1].message).to.equal("Operand expected at pos 6");
+
+            // operand expected
+            var u = await evaluate("125 + *", {});
+            expect(u).to.be.instanceof(Undefined);
+            var args = Array.from(u.args);
+            expect(args[0]).to.equal("failure");
+            expect(args[1]).to.be.instanceof(Error);
+            expect(args[1].message).to.equal("Operand expected at pos 6");
+        });
+    });
 });
