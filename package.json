@@ -1,6 +1,6 @@
 {
   "name": "@onlabsorg/swan-js",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "A simple yet powerful expression language written in JavaScript",
   "keywords": [
     "functional",
