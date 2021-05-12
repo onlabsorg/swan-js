@@ -130,7 +130,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             const args = Array.from(u.args);
             expect(args[0]).to.equal("failure");
             expect(args[1]).to.be.instanceof(Error);
-            expect(args[1].message).to.equal("Unexpected character '$' at pos 0");
+            expect(args[1].message).to.equal("Unexpected character '$' @1:0");
         });
 
         it("should not return properties inherited from javascript Object", async () => {
@@ -2337,12 +2337,12 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
         it("should resolve an undefined value on lexer errors", async () => {
 
             // missing closing quote
-            var u = await evaluate("'abc", {});
+            var u = await evaluate("\n'abc", {});
             expect(u).to.be.instanceof(Undefined);
             var args = Array.from(u.args);
             expect(args[0]).to.equal("failure");
             expect(args[1]).to.be.instanceof(Error);
-            expect(args[1].message).to.equal("Closing quote expected at pos 4");            
+            expect(args[1].message).to.equal("Closing quote expected @2:4");            
 
             // missing exponent
             var u = await evaluate("123E+", {});
@@ -2350,7 +2350,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             var args = Array.from(u.args);
             expect(args[0]).to.equal("failure");
             expect(args[1]).to.be.instanceof(Error);
-            expect(args[1].message).to.equal("Expected exponent value at pos 5");            
+            expect(args[1].message).to.equal("Expected exponent value @1:5");            
             
             // invalid number
             var u = await evaluate("1abc", {});
@@ -2358,7 +2358,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             var args = Array.from(u.args);
             expect(args[0]).to.equal("failure");
             expect(args[1]).to.be.instanceof(Error);
-            expect(args[1].message).to.equal("Invalid number at pos 0");            
+            expect(args[1].message).to.equal("Invalid number @1:0");            
 
             // unexpected period
             var u = await evaluate("12.34.56", {});
@@ -2366,7 +2366,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             var args = Array.from(u.args);
             expect(args[0]).to.equal("failure");
             expect(args[1]).to.be.instanceof(Error);
-            expect(args[1].message).to.equal("Unexpected period at pos 5");
+            expect(args[1].message).to.equal("Unexpected period @1:5");
 
             // invalid name identifier
             var u = await evaluate("$a", {$a:1});
@@ -2374,7 +2374,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             var args = Array.from(u.args);
             expect(args[0]).to.equal("failure");
             expect(args[1]).to.be.instanceof(Error);
-            expect(args[1].message).to.equal("Unexpected character '$' at pos 0");            
+            expect(args[1].message).to.equal("Unexpected character '$' @1:0");
         });
         
         it("should resolve an undefined value on parser errors", async () => {
@@ -2385,7 +2385,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             var args = Array.from(u.args);
             expect(args[0]).to.equal("failure");
             expect(args[1]).to.be.instanceof(Error);
-            expect(args[1].message).to.equal("Operand expected at pos 5");
+            expect(args[1].message).to.equal("Operand expected @1:5");
 
             // operand expected
             var u = await evaluate("(125 +", {});
@@ -2393,7 +2393,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             var args = Array.from(u.args);
             expect(args[0]).to.equal("failure");
             expect(args[1]).to.be.instanceof(Error);
-            expect(args[1].message).to.equal("Operand expected at pos 6");
+            expect(args[1].message).to.equal("Operand expected @1:6");
 
             // operand expected
             var u = await evaluate("125 + *", {});
@@ -2401,7 +2401,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             var args = Array.from(u.args);
             expect(args[0]).to.equal("failure");
             expect(args[1]).to.be.instanceof(Error);
-            expect(args[1].message).to.equal("Operand expected at pos 6");
+            expect(args[1].message).to.equal("Operand expected @1:6");
         });
     });
 });
