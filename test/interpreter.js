@@ -3,9 +3,11 @@ var chai = require("chai"), expect = chai.expect;
 var interpreter = require("../lib/interpreter");
 var Tuple = interpreter.Tuple;
 var Undefined = interpreter.Undefined;
+var Position = require('../lib/lexer').Position;
 var parse = expression => context => interpreter.parse(expression)(context).then(tuple => Tuple(tuple).normalize());
 var context = interpreter.context;
 var evaluate = (expression, presets={}) => parse(expression)(context.$extend(presets));
+
 
 chai.use(function (chai, utils) {
     chai.Assertion.addMethod('Tuple', function (itemArray) {
@@ -327,7 +329,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 var error = new Error('Test error');
                 var presets = {fn: x => {throw error}};
                 var u = await evaluate('fn 10', presets);
-                expect(u).to.be.Undefined('failure', error);
+                expect(u).to.be.Undefined('failure', error, new Position("fn 10", 2));
             });
 
             it("should return Undefined if F returns Undefined", async () => {
@@ -354,7 +356,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 var error = new Error('Test error');
                 var presets = {fn: {__apply__: x => {throw error}}};
                 var u = await evaluate('fn 10', presets);
-                expect(u).to.be.Undefined('failure', error);
+                expect(u).to.be.Undefined('failure', error, new Position("fn 10", 2));
             });
 
             it("should return Undefined if F returns Undefined", async () => {
@@ -368,8 +370,8 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
 
             it("should return Undefined", async () => {
                 for (let F of [true, false, 10, "abc", [1,2,3], {a:1}, {__apply__:'not a func'}, new Undefined]) {
-                    expect(await evaluate("F(1)", {F})).to.be.Undefined('application', F);
-                    expect(await evaluate("F(1,2,3)", {F})).to.be.Undefined('application', F);
+                    expect(await evaluate("F(1)", {F})).to.be.Undefined('application', F, new Position("F(1)", 1));
+                    expect(await evaluate("F(1,2,3)", {F})).to.be.Undefined('application', F, new Position("F(1,2,3)", 1));
                 }
             });            
         });
@@ -382,11 +384,12 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                     f3: {__apply__: x => 3*x},
                     s: 'abc'
                 };
-                var tuple = await evaluate("(f2, f3, s)(2)", presets);
+                var source = "(f2, f3, s)(2)";
+                var tuple = await evaluate(source, presets);
                 expect(tuple).to.be.instanceof(Tuple);
                 expect(Array.from(tuple)[0]).to.equal(4);
                 expect(Array.from(tuple)[1]).to.equal(6);
-                expect(Array.from(tuple)[2]).to.be.Undefined('application', presets.s);
+                expect(Array.from(tuple)[2]).to.be.Undefined('application', presets.s, new Position(source, 10));
             });
         });
 
@@ -484,7 +487,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             
             it("should return Undefined", async () => {
                 for (let X of [true, false, 10, x=>x, new Undefined()]) {
-                    expect(await evaluate("X@(1)", {X})).to.be.Undefined('referencing', X, 1);
+                    expect(await evaluate("X@(1)", {X})).to.be.Undefined('referencing', X, 1, new Position("X@(1)", 1));
                 }
             });
         });
@@ -497,11 +500,12 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                     ls: [10,20,30,40,50],
                     b: true
                 };
-                var tuple = await evaluate("(s, ls, b)@(2)", presets);
+                var source = "(s, ls, b)@(2)";
+                var tuple = await evaluate(source, presets);
                 expect(tuple).to.be.instanceof(Tuple);
                 expect(Array.from(tuple)[0]).to.equal('c');
                 expect(Array.from(tuple)[1]).to.equal(30);
-                expect(Array.from(tuple)[2]).to.be.Undefined('referencing', presets.b, 2);
+                expect(Array.from(tuple)[2]).to.be.Undefined('referencing', presets.b, 2, new Position(source, 10));
             });
         });
     });
@@ -535,10 +539,10 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
         });
 
         it("should return Undefined if 'X' is of any other type", async () => {
-            expect(await evaluate("(10).name")).to.be.Undefined("subcontexting", 10);
-            expect(await evaluate("[].name")).to.be.Undefined("subcontexting", []);
+            expect(await evaluate("(10).name")).to.be.Undefined("subcontexting", 10, new Position("(10).name", 4));
+            expect(await evaluate("[].name")).to.be.Undefined("subcontexting", [], new Position("[].name", 2));
             var presets = {fn: x=>2*x}
-            expect(await evaluate("fn.name", presets)).to.be.Undefined("subcontexting", presets.fn);
+            expect(await evaluate("fn.name", presets)).to.be.Undefined("subcontexting", presets.fn, new Position("fn.name", 2));
         });
         
         it("should return a tuple of items, one for each item of X if X is a tuple of namespaces", async () => {
@@ -748,10 +752,10 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await evaluate("str{a=1,b=2,__str__=3}")).to.equal("[[Namespace of 3 items]]");            
         });
         
-        it("Should return '[[Undefined]]' if X is Undefined", async () => {
-            var presets = {un: new Undefined("test", 10, [1,2,3])};
+        it("Should return '[[Undefined: arg1, arg2, ...]]' if X is Undefined", async () => {
+            var presets = {un: new Undefined("test", 10, [1,2,3], new Position("\n1+2", 2))};
             console.log(await evaluate("str un", presets));
-            expect(await evaluate("str un", presets)).to.equal("[[Undefined: test, 10, [[List of 3 items]]]]");
+            expect(await evaluate("str un", presets)).to.equal("[[Undefined: test, 10, [[List of 3 items]], @2:1]]");
         });
 
         it("should concatenate the serialized item if X is a tuple", async () => {
@@ -1149,7 +1153,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 
                 var LType = context.type(L);
                 var RType = context.type(R);
-                expect(await evaluate("L + R", {L,R})).to.be.Undefined('sum', L, R);
+                expect(await evaluate("L + R", {L,R})).to.be.Undefined('sum', L, R, new Position("L + R", 2));
             }
         });
         
@@ -1162,11 +1166,12 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(Array.from(await evaluate("(1, 2, 3) + 10", presets))).to.deep.equal([11, 2, 3])
                         
             // partial exception
-            var tuple = await evaluate("(10,20,30) + (1,2,[])");
+            var source = "(10,20,30) + (1,2,[])";
+            var tuple = await evaluate(source);
             expect(tuple).to.be.instanceof(Tuple);
             expect(Array.from(tuple)[0]).to.equal(11);
             expect(Array.from(tuple)[1]).to.equal(22);
-            expect(Array.from(tuple)[2]).to.be.Undefined('sum', 30, []);
+            expect(Array.from(tuple)[2]).to.be.Undefined('sum', 30, [], new Position(source, 11));
         });
     });
 
@@ -1188,7 +1193,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
         it("should return Undefined if X is nothing", async () => {
             for (let R of [true, false, 10, 'abc', [1,2,3], {a:1}, x=>x]) {
                 var RType = context.type(R);
-                expect(await evaluate("() - R", {R})).to.be.Undefined('subtraction', R);
+                expect(await evaluate("() - R", {R})).to.be.Undefined('subtraction', R, new Position("() - R", 3));
             }
         });
         
@@ -1213,7 +1218,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 
                 var LType = context.type(L);
                 var RType = context.type(R);
-                expect(await evaluate("L - R", {L,R})).to.be.Undefined('subtraction', L, R);
+                expect(await evaluate("L - R", {L,R})).to.be.Undefined('subtraction', L, R, new Position("L - R", 2));
             }            
         });
 
@@ -1224,11 +1229,12 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(Array.from(await evaluate("(10,20,30) - 1", presets))).to.deep.equal([9,20,30]);
 
             // partial exception
-            var tuple = await evaluate("(10,20,30) - (1,2,[])");
+            var source = "(10,20,30) - (1,2,[])";
+            var tuple = await evaluate(source);
             expect(tuple).to.be.instanceof(Tuple);
             expect(Array.from(tuple)[0]).to.equal(9);
             expect(Array.from(tuple)[1]).to.equal(18);
-            expect(Array.from(tuple)[2]).to.be.Undefined('subtraction', 30, []);
+            expect(Array.from(tuple)[2]).to.be.Undefined('subtraction', 30, [], new Position(source, 11));
         });
     });
 
@@ -1321,7 +1327,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 
                 var LType = context.type(L);
                 var RType = context.type(R);
-                expect(await evaluate("L * R", {L,R})).to.be.Undefined('product', L, R);
+                expect(await evaluate("L * R", {L,R})).to.be.Undefined('product', L, R, new Position("L * R", 2));
             }                        
         });
  
@@ -1335,11 +1341,12 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await evaluate("(10,20,30) * 2",presets)).to.equal(20);
             
             // partial exception
-            var tuple = await evaluate("(10,20,30) * (1,2,{})");
+            var source = "(10,20,30) * (1,2,{})";
+            var tuple = await evaluate(source);
             expect(tuple).to.be.instanceof(Tuple);
             expect(Array.from(tuple)[0]).to.equal(10);
             expect(Array.from(tuple)[1]).to.equal(40);
-            expect(Array.from(tuple)[2]).to.be.Undefined('product', 30, {});            
+            expect(Array.from(tuple)[2]).to.be.Undefined('product', 30, {}, new Position(source, 11));
         });
     });
 
@@ -1360,7 +1367,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
         it("should return Undefined if Y is NOTHING", async () => {
             for (let L of [true, false, 10, 'abc', [1,2,3], {x:1}, x=>x]) {
                 var LType = context.type(L);
-                expect(await evaluate("L / ()", {L})).to.be.Undefined('division', L);
+                expect(await evaluate("L / ()", {L})).to.be.Undefined('division', L, new Position("L / ()", 2));
             }
         });
 
@@ -1384,7 +1391,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 
                 var LType = context.type(L);
                 var RType = context.type(R);
-                expect(await evaluate("L / R", {L,R})).to.be.Undefined('division', L, R);
+                expect(await evaluate("L / R", {L,R})).to.be.Undefined('division', L, R, new Position("L / R", 2));
             }                        
         });
 
@@ -1395,11 +1402,12 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await evaluate("() / (2,4,3)")).to.equal(null);
             
             // partial exception
-            var tuple = await evaluate("(10,20,30) / (2,5)");
+            var source = "(10,20,30) / (2,5)";
+            var tuple = await evaluate(source);
             expect(tuple).to.be.instanceof(Tuple);
             expect(Array.from(tuple)[0]).to.equal(5);
             expect(Array.from(tuple)[1]).to.equal(4);
-            expect(Array.from(tuple)[2]).to.be.Undefined('division', 30);
+            expect(Array.from(tuple)[2]).to.be.Undefined('division', 30, new Position(source, 11));
         });
     });
 
@@ -1420,7 +1428,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
         it("should return Undefined if Y is NOTHING", async () => {
             for (let L of [true, false, 10, 'abc', [1,2,3], {x:1}, x=>x]) {
                 var LType = context.type(L);
-                expect(await evaluate("L % ()", {L})).to.be.Undefined('modulo', L);
+                expect(await evaluate("L % ()", {L})).to.be.Undefined('modulo', L, new Position("L % ()", 2));
             }
         });
 
@@ -1443,7 +1451,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 
                 var LType = context.type(L);
                 var RType = context.type(R);
-                expect(await evaluate("L % R", {L,R})).to.be.Undefined('modulo', L, R);
+                expect(await evaluate("L % R", {L,R})).to.be.Undefined('modulo', L, R, new Position("L % R", 2));
             }            
         });
 
@@ -1454,11 +1462,12 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await evaluate("() % (4,7,8)")).to.equal(null);
 
             // partial exception
-            var tuple = await evaluate("(10,20,30) % (3,6)");
+            var source = "(10,20,30) % (3,6)";
+            var tuple = await evaluate(source);
             expect(tuple).to.be.instanceof(Tuple);
             expect(Array.from(tuple)[0]).to.equal(1);
             expect(Array.from(tuple)[1]).to.equal(2);
-            expect(Array.from(tuple)[2]).to.be.Undefined('modulo', 30);
+            expect(Array.from(tuple)[2]).to.be.Undefined('modulo', 30, new Position(source, 11));
         });
     });
 
@@ -1479,7 +1488,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
         it("should return Undefined if Y is NOTHING", async () => {
             for (let L of [true, false, 10, 'abc', [1,2,3], {x:1}, x=>x]) {
                 var LType = context.type(L);
-                expect(await evaluate("L ^ ()", {L})).to.be.Undefined('exponentiation', L);
+                expect(await evaluate("L ^ ()", {L})).to.be.Undefined('exponentiation', L, new Position("L ^ ()", 2));
             }
         });
 
@@ -1503,7 +1512,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 
                 var LType = context.type(L);
                 var RType = context.type(R);
-                expect(await evaluate("L ^ R", {L,R})).to.be.Undefined('exponentiation', L, R);
+                expect(await evaluate("L ^ R", {L,R})).to.be.Undefined('exponentiation', L, R, new Position("L ^ R", 2));
             }
         });
 
@@ -1514,11 +1523,12 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await evaluate("() ^ (2,3,4)")).to.equal(null);
             
             // partial exception
-            var tuple = await evaluate("(2,3,4) ^ (2,3)");
+            var source = "(2,3,4) ^ (2,3)";
+            var tuple = await evaluate(source);
             expect(tuple).to.be.instanceof(Tuple);
             expect(Array.from(tuple)[0]).to.equal(4);
             expect(Array.from(tuple)[1]).to.equal(27);
-            expect(Array.from(tuple)[2]).to.be.Undefined("exponentiation", 4);                        
+            expect(Array.from(tuple)[2]).to.be.Undefined("exponentiation", 4, new Position(source, 8));
         });
     });
 
@@ -1801,7 +1811,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 
                 var LType = context.type(L);
                 var RType = context.type(R);
-                expect(await evaluate("L < R", {L,R})).to.be.Undefined('comparison', L, R);
+                expect(await evaluate("L < R", {L,R})).to.be.Undefined('comparison', L, R, new Position("L < R", 2));
             }                        
         });
 
@@ -1905,7 +1915,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 
                 var LType = context.type(L);
                 var RType = context.type(R);
-                expect(await evaluate("L >= R", {L,R})).to.be.Undefined("comparison", L, R);
+                expect(await evaluate("L >= R", {L,R})).to.be.Undefined("comparison", L, R, new Position("L >= R", 2));
             }                        
         });
 
@@ -2009,7 +2019,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 
                 var LType = context.type(L);
                 var RType = context.type(R);
-                expect(await evaluate("L > R", {L,R})).to.be.Undefined('comparison', L, R);
+                expect(await evaluate("L > R", {L,R})).to.be.Undefined('comparison', L, R, new Position("L > R", 2));
             }                        
         });
 
@@ -2113,7 +2123,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 
                 var LType = context.type(L);
                 var RType = context.type(R);
-                expect(await evaluate("L <= R", {L,R})).to.be.Undefined("comparison", L, R);
+                expect(await evaluate("L <= R", {L,R})).to.be.Undefined("comparison", L, R, new Position("L <= R", 2));
             }                        
         });
 
