@@ -18,7 +18,8 @@ The operands of a swan expression can be of any of the following types:
 - [Tuple](#tuple-data-type-and-pairing-operator) (the swan product type; everything in swan is a tuple)
 
 The following binary operators are defined in swan (see also the 
-[operators precedence](#operators-precedence)):
+[operators precedence](#operators-precedence)), while the only 
+[unary operators](#unary-operators) are `+` and `-`.
 
 - [Arithmetic operators](#arithmetic-operators): `+`, `-`, `*`, `/`, `%`, `^`
 - [Comparison operators](#comparison-operators): `==`, `!=`, `>`, `>=`, `<`, `<=`
@@ -341,6 +342,16 @@ tuple `()`.
 
 **When C and R are of any other type**, the `C @ R` operation returns 
 `undefined('referencing', C, R)`.
+
+
+## Unary operators
+Swan defines two binary operators: `+` and `-`. 
+
+The `+X` expression is equivalent to just `X`. 
+
+The `-X` expression returns `-1*X` is X is a number and Undefined in all the 
+other cases. If `X` is a tuple `(x1, x2, ...)`, the `-X` operation returns
+`(-x1, -x2, ...)`.
 
 
 ## Arithmetic operators

@@ -902,6 +902,40 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(Array.from(size)[2]).to.be.Undefined('size', 10);
         });
     });
+    
+    
+    // UNARY OPERATORS
+    
+    describe("+X", () => {
+        
+        it("should return X", async () => {
+            for (let operand of [true, false, "abc", [1,2,3], {x:1}, x=>x, new Undefined(), Tuple(1,2,3), null]) {
+                expect(await evaluate("+operand", {operand})).to.equal(operand);
+            }
+        });
+    });
+    
+    describe("-X", () => {
+        
+        it("should return -1*X if X is a number", async () => {
+            expect(await evaluate("-3")).to.equal(-3);
+            expect(await evaluate("-x", {x:10})).to.equal(-10);
+        });
+        
+        it("should return Undefined if X is not a number", async () => {
+            for (let operand of [true, false, "abc", [1,2,3], {x:1}, x=>x, new Undefined()]) {
+                expect(await evaluate("-operand", {operand})).to.be.Undefined('negation', operand, new Position("-operand", 0));
+            }
+        });
+        
+        it("should apply the operator to each item of X if X is a Tuple", async () => {
+            var tuple = await evaluate("-(3, x, s)", {x:-10, s:'abc'});
+            expect(tuple).to.be.instanceof(Tuple);
+            expect(Array.from(tuple)[0]).to.equal(-3);
+            expect(Array.from(tuple)[1]).to.equal(10);
+            expect(Array.from(tuple)[2]).to.be.Undefined('negation', "abc", new Position("-(3, x, s)", 0));
+        });
+    });
 
 
     // LOGIC OPERATORS
