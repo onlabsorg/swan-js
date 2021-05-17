@@ -345,7 +345,7 @@ tuple `()`.
 
 
 ## Unary operators
-Swan defines two binary operators: `+` and `-`. 
+Swan defines two unary operators: `+` and `-`. 
 
 The `+X` expression is equivalent to just `X`. 
 
