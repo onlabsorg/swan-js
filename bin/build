@@ -19,6 +19,7 @@ bin/gen-doc index.js > docs/api.md
 
 generate-documentation modules/date
 generate-documentation modules/http
+generate-documentation modules/dict
 generate-documentation modules/json
 generate-documentation modules/list
 generate-documentation modules/math

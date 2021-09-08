@@ -80,17 +80,38 @@ console.log("Parser time: ", parser_time);
 
 
 
-const evaluate = parse(source);
-async function run_eval() {
+async function evaluate(source, loops, presets={}) {
+    let evaluate = parse(source);
+    let ctx = Object.assign(Object.create(context), presets);
     let t0 = Date.now();
     for (let i=0; i<loops; i++) {
-        await evaluate(context);
+        await evaluate(ctx);
     }
     return Date.now() - t0;
 }
-run_eval().then((eval_time) => {
-    console.log("Eval time: ", eval_time);    
-})
+
+async function test_evaluator () {
+    var t;
+    
+    t = await evaluate(source, loops);
+    console.log("Eval time: ", t);    
+    
+    t = await evaluate(`2+1`, loops);
+    console.log("X+Y: ", t);    
+
+    t = await evaluate(`2*1`, loops);
+    console.log("X*Y: ", t);
+
+    t = await evaluate(`f 1`, loops, {f:x=>x});
+    console.log("X Y: ", t);
+}
+
+test_evaluator();
+
+
+
+
+
 
 
 

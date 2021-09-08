@@ -10,6 +10,7 @@ The standard library contains the following modules:
 
 - [date](./modules/date.md): contains functions to operate with dates and time
 - [http](./modules/http.md): contains functions for data transfer over HTTP
+- [dict](./modules/dict.md): contains functions for creating associative arrays
 - [json](./modules/json.md): contains functions to serialize and deserialize json objects
 - [list](./modules/list.md): contains functions to manipulate swan lists
 - [math](./modules/math.md): contains mathematical functions

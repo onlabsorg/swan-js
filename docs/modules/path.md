@@ -40,7 +40,7 @@ nPath = path.normalize(p)
   
 path.join - function
 ------------------------------------------------------------------------
-Given a tuple of paths, it returns a signle path obtained by
+Given a tuple of paths, it returns a single path obtained by
 concatenating them.
 ```
 jPath = path.join(p1, p2, p3, ...)
