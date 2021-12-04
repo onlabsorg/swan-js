@@ -11,11 +11,10 @@ chai.use(function (chai, utils) {
         expect(obj[Symbol.iterator]).to.be.a("function");
         expect(Array.from(obj)).to.deep.equal(itemArray);
     });
-    chai.Assertion.addMethod('Undefined', function (nodeName, valuesCount) {
+    chai.Assertion.addMethod('Undefined', function (type) {
         var obj = utils.flag(this, 'object');
         expect(obj).to.be.instanceof(Undefined);
-        expect(obj.nodeName).to.equal(nodeName);
-        expect(obj.values.length).to.equal(valuesCount);
+        expect(obj.type).to.equal(type);
     });
 });
 
@@ -99,18 +98,18 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
     
         it("should return `Undefined NameReference` if the name is not mapped", async () => {
             const undef = await parse("undefined_key")({a:10, _b:20});
-            expect(undef).to.be.Undefined("NameReference", 1);
-            expect(undef.values[0]).to.equal("undefined_key");
+            expect(undef).to.be.Undefined("NameReference");
+            expect(undef.children[0]).to.equal("undefined_key");
         });
     
         it("should return `Undefined NameReference` if name is a property inherited from Object", async () => {
             var undef = await parse("isPrototypeOf")({});
-            expect(undef).to.be.Undefined("NameReference", 1);
-            expect(undef.values[0]).to.equal("isPrototypeOf");
+            expect(undef).to.be.Undefined("NameReference");
+            expect(undef.children[0]).to.equal("isPrototypeOf");
             
             var undef = await parse("hasOwnProperty")({});
-            expect(undef).to.be.Undefined("NameReference", 1);
-            expect(undef.values[0]).to.equal("hasOwnProperty");
+            expect(undef).to.be.Undefined("NameReference");
+            expect(undef.children[0]).to.equal("hasOwnProperty");
         });
     
         describe("name resolution in a child context", () => {
@@ -128,8 +127,8 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             it("should return `Undefined NameReference` if the name is not mapped in the child context nor in the parent context", async () => {
                 var context = Object.assign(Object.create({a:10, b:20}), {a:100});
                 const undef = await parse("undefined_key")(context);
-                expect(undef).to.be.Undefined("NameReference", 1);
-                expect(undef.values[0]).to.equal("undefined_key");
+                expect(undef).to.be.Undefined("NameReference");
+                expect(undef.children[0]).to.equal("undefined_key");
             });
         });
     });
@@ -201,18 +200,18 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 var context = {};
                 
                 var undef = await parse("'abc' : 2")(context);
-                expect(undef).to.be.Undefined('LabellingOperation', 2);
-                expect(undef.values[0]).to.be.Undefined('StringLiteral', 1)
-                expect(undef.values[1].unwrap()).to.equal(2);
+                expect(undef).to.be.Undefined('LabellingOperation');
+                expect(undef.children[0]).to.be.Undefined('StringLiteral')
+                expect(undef.children[1].unwrap()).to.equal(2);
 
                 var undef = await parse("3*2 : 2")(context);
-                expect(undef).to.be.Undefined('LabellingOperation', 2);
-                expect(undef.values[0]).to.be.Undefined('MulOperation', 2)
-                expect(undef.values[0].values[0]).to.be.Undefined('NumberLiteral',1);
-                expect(undef.values[0].values[0].values[0]).to.equal(3);
-                expect(undef.values[0].values[1]).to.be.Undefined('NumberLiteral',1);
-                expect(undef.values[0].values[1].values[0]).to.equal(2);
-                expect(undef.values[1].unwrap()).to.equal(2);
+                expect(undef).to.be.Undefined('LabellingOperation');
+                expect(undef.children[0]).to.be.Undefined('MulOperation')
+                expect(undef.children[0].children[0]).to.be.Undefined('NumberLiteral');
+                expect(undef.children[0].children[0].value).to.equal(3);
+                expect(undef.children[0].children[1]).to.be.Undefined('NumberLiteral');
+                expect(undef.children[0].children[1].value).to.equal(2);
+                expect(undef.children[1].unwrap()).to.equal(2);
             });
         });
     });
@@ -284,18 +283,18 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 var context = {};
                 
                 var undef = await parse("'abc' = 2")(context);
-                expect(undef).to.be.Undefined('AssignmentOperation', 2);
-                expect(undef.values[0]).to.be.Undefined('StringLiteral', 1)
-                expect(undef.values[1].unwrap()).to.equal(2);
+                expect(undef).to.be.Undefined('AssignmentOperation');
+                expect(undef.children[0]).to.be.Undefined('StringLiteral')
+                expect(undef.children[1].unwrap()).to.equal(2);
 
                 var undef = await parse("3*2 = 2")(context);
-                expect(undef).to.be.Undefined('AssignmentOperation', 2);
-                expect(undef.values[0]).to.be.Undefined('MulOperation', 2)
-                expect(undef.values[0].values[0]).to.be.Undefined('NumberLiteral',1);
-                expect(undef.values[0].values[0].values[0]).to.equal(3);
-                expect(undef.values[0].values[1]).to.be.Undefined('NumberLiteral',1);
-                expect(undef.values[0].values[1].values[0]).to.equal(2);
-                expect(undef.values[1].unwrap()).to.equal(2);
+                expect(undef).to.be.Undefined('AssignmentOperation');
+                expect(undef.children[0]).to.be.Undefined('MulOperation')
+                expect(undef.children[0].children[0]).to.be.Undefined('NumberLiteral');
+                expect(undef.children[0].children[0].value).to.equal(3);
+                expect(undef.children[0].children[1]).to.be.Undefined('NumberLiteral');
+                expect(undef.children[0].children[1].value).to.equal(2);
+                expect(undef.children[1].unwrap()).to.equal(2);
             });
         });
     });
@@ -362,10 +361,8 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 var error = new Error('Test error');
                 var context = {fn: x => {throw error}};
                 var undef = await parse('fn 10')(context);
-                expect(undef).to.be.Undefined('ApplyOperation', 3);
-                expect(undef.values[0].unwrap()).to.equal(context.fn);
-                expect(undef.values[1].unwrap()).to.equal(10);
-                expect(undef.values[2]).to.equal(error);
+                expect(undef).to.be.Undefined('Term');
+                expect(undef.value).to.equal(error);
             });
     
             it("should return Undefined if F returns Undefined", async () => {
