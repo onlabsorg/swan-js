@@ -618,63 +618,81 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
     //     });
     // });
     // 
-    // describe("sub-contexting: namespace.expression", () => {
-    // 
-    //     it("should evaluate 'Y' in the 'X' context if 'X' is a namespace", async () => {
-    //         var ctx = context.$extend({x:10});
-    //         await parse("ns = {y=20, z=30, _h=40}")(ctx);
-    //         expect(await parse("ns.y")(ctx)).to.equal(20);
-    //         expect(await parse("ns.[1,y,z]")(ctx)).to.deep.equal([1,20,30]);
-    //         expect(await parse("ns.x")(ctx)).to.equal(10);
-    //         expect(await parse("ns._h")(ctx)).to.equal(40);
-    // 
-    //         var ctx = context.$extend({ns:{x:10,y:20,z:30}});
-    //         expect(await parse("ns.[x,y,z]")(ctx)).to.deep.equal([10,20,30]);
-    //     });
-    // 
-    //     it("should see the global contexts", async () => {
-    //         var ctx = context.$extend({x:10});
-    //         await parse("ns = {y=20}")(ctx);
-    //         expect(await parse("ns.x")(ctx)).to.equal(10);
-    //         expect(await parse("ns.y")(ctx)).to.equal(20);
-    //     });
-    // 
-    //     it("should see the function parameters in a function expressions", async () => {
-    //         var ctx = context.$extend({x:10});
-    //         await parse("ns = {x=10}, nsp = {x=20}")(ctx);
-    //         await parse("f = nsp -> nsp.x")(ctx);
-    //         expect(await parse("f ns")(ctx)).to.equal(10);
-    //     });
-    // 
-    //     it("should return Undefined if 'X' is of any other type", async () => {
-    //         expect(await evaluate("(10).name")).to.be.Undefined("subcontexting", 10, new Position("(10).name", 4));
-    //         expect(await evaluate("[].name")).to.be.Undefined("subcontexting", [], new Position("[].name", 2));
-    //         var presets = {fn: x=>2*x}
-    //         expect(await evaluate("fn.name", presets)).to.be.Undefined("subcontexting", presets.fn, new Position("fn.name", 2));
-    //     });
-    // 
-    //     it("should return a tuple of items, one for each item of X if X is a tuple of namespaces", async () => {
-    //         expect(await evaluate(`({a:1},{a:2},{a:3}).a`)).to.be.Tuple([1,2,3]);
-    //     });
-    // });
-    // 
-    // describe("comments", () => {
-    // 
-    //     it("should ignore the text following the `#` character up to the end of the line or of the expression", async () => {
-    //         var expression = `
-    //             # this is a comment
-    //             12.345 # this is another comment
-    //             # this is the last comment`
-    //         expect(await evaluate(expression)).to.equal(12.345);
-    //     });
-    // 
-    //     it("should not parse `#` characters in a string as comments", async () => {
-    //         expect(await evaluate("'this # is a string'")).to.equal("this # is a string");
-    //         expect(await evaluate(`"this # is a string"`)).to.equal("this # is a string");
-    //     });
-    // });
-    // 
-    // 
+    
+    describe("sub-contexting: X.Y", () => {
+    
+        describe("when X is a namespace", () => {
+            
+            it("should evaluate 'Y' in the 'X' context if 'X' is a namespace", async () => {
+                var context = {x: 10};
+                await parse("ns = {y=20, z=30, _h=40}")(context);
+                expect(await parse("ns.y"      )(context)).to.equal(20);
+                expect(await parse("ns.[1,y,z]")(context)).to.deep.equal([1,20,30]);
+                expect(await parse("ns.x"      )(context)).to.equal(10);
+                expect(await parse("ns._h"     )(context)).to.equal(40);
+        
+                var context = { ns:{x:10,y:20,z:30} };
+                expect(await parse("ns.[x,y,z]")(context)).to.deep.equal([10,20,30]);
+            });
+        
+            it("should see the global contexts", async () => {
+                var context = {x:10};
+                await parse("ns = {y=20}")(context);
+                expect(await parse("ns.x")(context)).to.equal(10);
+                expect(await parse("ns.y")(context)).to.equal(20);
+            });
+        
+            it("should see the function parameters in a function expressions", async () => {
+                var context = {x:10};
+                await parse("ns = {x=10}, nsp = {x=20}")(context);
+                await parse("f = nsp -> nsp.x")(context);
+                expect(await parse("f ns")(context)).to.equal(10);
+            });            
+        });
+    
+        describe("when X is of any other type", () => {
+            
+            it("should return Undefined SubcontextingOperation", async () => {
+                var undef = await parse("(10).name")({});
+                expect(undef).to.be.Undefined("SubcontextingOperation");
+                expect(undef.children[0].unwrap()).to.equal(10);
+                
+                var undef = await parse("[].name")({});
+                expect(undef).to.be.Undefined("SubcontextingOperation");
+                expect(undef.children[0].unwrap()).to.deep.equal([]);
+                
+                var context = {fn: x=>2*x};
+                var undef = await parse("fn.name")(context);
+                expect(undef).to.be.Undefined("SubcontextingOperation");
+                expect(undef.children[0].unwrap()).to.equal(context.fn);
+            });
+        });
+
+        describe("when X is a tuple", () => {
+            
+            it("should return a tuple of items, one for each item of X", async () => {
+                expect(await parse(`({a:1},{a:2},{a:3}).a`)({})).to.be.Tuple([1,2,3]);
+            });
+        });
+    });
+    
+    describe.skip("comments", () => {
+    
+        it("should ignore the text following the `#` character up to the end of the line or of the expression", async () => {
+            var expression = `
+                # this is a comment
+                12.345 # this is another comment
+                # this is the last comment`
+            expect(await evaluate(expression)).to.equal(12.345);
+        });
+    
+        it("should not parse `#` characters in a string as comments", async () => {
+            expect(await evaluate("'this # is a string'")).to.equal("this # is a string");
+            expect(await evaluate(`"this # is a string"`)).to.equal("this # is a string");
+        });
+    });
+    
+    
     // // CONSTANTS
     // 
     // describe("TRUE constant", () => {
