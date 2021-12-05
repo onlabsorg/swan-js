@@ -342,9 +342,9 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
         });
     });
     
-    describe("'apply' operation: F X`", () => {
+    describe("'apply' operation: Y X`", () => {
     
-        describe("when `F` is a function", () => {
+        describe("when `Y` is a function", () => {
     
             it("should call F with the parameter X and return its return value", async () => {
                 var context = {
@@ -371,58 +371,134 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 expect(await parse('fn 10')(context)).to.equal(undef);
             });
         });
+        
+        describe("when `Y` is a string", () => {
+            
+            it("should return the X-th character if X is an integer", async () => {
+                expect(await parse("'abcdef' 2")({})).to.equal('c');
+            });
     
-        describe.skip("when `F` is a namespace and `F.__apply__` is a function", () => {
+            it("should consider only the integer part of X if X is a decimal number", async () => {
+                expect(await parse("'abcdef' 2.3")({})).to.equal('c');
+            });
     
-            it("should call F with the parameter X and return its return value", async () => {
-                var presets = {
-                    double: {__apply__: x => 2 * x},
-                    sum: {__apply__: (x,y) => x + y}
+            it("should consider negative indexes as relative to the string end", async () => {
+                expect(await parse("'abcdef'(i)")({i:-2})).to.equal('e');
+            });
+    
+            it("should return an empty string if X is an out of range number or not a number", async () => {
+                expect(await parse("'abcdef'(i)")({i:100 })).to.equal("");
+                expect(await parse("'abcdef'(i)")({i:-100})).to.equal("");
+                expect(await parse("'abcdef'(i)")({i:'1' })).to.equal("");
+                expect(await parse("'abcdef'(i)")({i:[]  })).to.equal("");
+                expect(await parse("'abcdef'(i)")({i:{}  })).to.equal("");
+            });
+    
+            it("should return an tuple ot characters if X is a tuple", async () => {
+                expect(await parse("'abcdef'(1,'x',3)")({})).to.be.Tuple(['b','','d']);
+            });            
+        })
+        
+        describe("when `Y` is a list", () => {
+            
+            it("should return the X-th item if X is an integer", async () => {
+                const context = {
+                    list: [10, 20, 30, 40, 50, 60]
+                }
+                expect(await parse("list 2")(context)).to.equal(30);
+            });
+    
+            it("should consider only the integer part of X if X is a decimal number", async () => {
+                const context = {
+                    list: [10, 20, 30, 40, 50, 60]
+                }
+                expect(await parse("list 2.3")(context)).to.equal(30);
+            });
+    
+            it("should consider negative indexes as relative to the list end", async () => {
+                const context = {
+                    list: [10, 20, 30, 40, 50, 60],
+                    i: -2
+                }
+                expect(await parse("list(i)")(context)).to.equal(50);
+            });
+    
+            it("should return () if X is an out of range number or not a number", async () => {
+                const context = {
+                    list: [10, 20, 30, 40, 50, 60],
+                    i:-100
+                }
+                expect(await parse("list(100)")(context)).to.be.null;
+                expect(await parse("list(i)"  )(context)).to.be.null;
+                expect(await parse("list('1')")(context)).to.be.null;
+                expect(await parse("list([])" )(context)).to.be.null;
+                expect(await parse("list({i})")(context)).to.be.null;
+            });
+    
+            it("should return a tuple of list items if X is a tuple", async () => {
+                const context = {
+                    list: [10, 20, 30, 40, 50, 60],
+                }
+                expect(await parse("list(1,'x',3)")(context)).to.be.Tuple([20,40]);
+            });            
+        })
+        
+        describe("when `Y` is a namespace", () => {
+            
+            it("should return the value mapped to X if X is a valid name", async () => {
+                var context = {
+                    ns: {abc:10, def:20}
                 };
-                expect(await evaluate("(x -> [x]) 10", presets)).to.deep.equal([10]);
-                expect(await evaluate("((x, y) -> [y,x])(10, 20)", presets)).to.deep.equal([20,10]);
-                expect(await evaluate("double 25", presets)).to.equal(50);
-                expect(await evaluate("sum(10, 20)", presets)).to.equal(30);
+                expect(await parse("ns 'abc'" )(context)).to.equal(10);
+                expect(await parse("ns('def')")(context)).to.equal(20);
             });
-    
-            it("should return Undefined if F.__apply__ throws an error", async () => {
-                var error = new Error('Test error');
-                var presets = {fn: {__apply__: x => {throw error}}};
-                var u = await evaluate('fn 10', presets);
-                expect(u).to.be.Undefined('failure', error, new Position("fn 10", 2));
+            
+            it("shoudl return () if X is not a valid name or a name not mapped to a value", async () => {
+                var context = {
+                    ns: {abc:10, def:20}
+                };
+                expect(await parse("ns '123'"  )(context)).to.be.null;
+                expect(await parse("ns 123"    )(context)).to.be.null;
+                expect(await parse("ns [1,2,3]")(context)).to.be.null;
             });
-    
-            it("should return Undefined if F returns Undefined", async () => {
-                var un = new Undefined();
-                var presets = {fn: {__apply__: x => un}};
-                expect(await evaluate('fn 10', presets)).to.equal(un);
+
+            it("shoudl return () if X is a name inherited from Object", async () => {
+                var context = {
+                    ns: {abc:10, def:20}
+                };
+                expect(await parse("ns 'isPrototypeOf'" )(context)).to.be.null;
+                expect(await parse("ns 'hasOwnProperty'")(context)).to.be.null;
+            });
+
+            it("shoudl return a tuple of value if X is a tuple with more than one item", async () => {
+                var context = {
+                    ns: {abc:10, def:20}
+                };
+                expect(await parse("ns('abc',2,'def')" )(context)).to.be.Tuple([10, 20]);
             });
         });
     
-        describe.skip("when F is of any other type", () => {
+        describe("when Y is of any other type", () => {
     
-            it("should return Undefined", async () => {
-                for (let F of [true, false, 10, "abc", [1,2,3], {a:1}, {__apply__:'not a func'}, new Undefined]) {
-                    expect(await evaluate("F(1)", {F})).to.be.Undefined('application', F, new Position("F(1)", 1));
-                    expect(await evaluate("F(1,2,3)", {F})).to.be.Undefined('application', F, new Position("F(1,2,3)", 1));
+            it("should return Undefined ApplyOperation", async () => {
+                for (let Y of [true, false, 10, new Undefined]) {
+                    const undef = await parse("Y(1)")({Y});
+                    expect(undef).to.be.Undefined('ApplyOperation');
+                    expect(undef.children[0].unwrap()).to.equal(Y);
+                    expect(undef.children[1].unwrap()).to.equal(1);
                 }
             });            
         });
     
-        describe.skip("when F is a tuple", () => {
+        describe("when Y is a tuple", () => {
     
-            it("should return a tuple obtained applying each item of F to X", async () => {
-                var presets = {
-                    f2: x => 2*x,
-                    f3: {__apply__: x => 3*x},
+            it("should return a tuple obtained applying each item of Y to X", async () => {
+                var context = {
+                    f: (x,y) => x+y,
                     s: 'abc'
                 };
-                var source = "(f2, f3, s)(2)";
-                var tuple = await evaluate(source, presets);
-                expect(tuple).to.be.instanceof(Tuple);
-                expect(Array.from(tuple)[0]).to.equal(4);
-                expect(Array.from(tuple)[1]).to.equal(6);
-                expect(Array.from(tuple)[2]).to.be.Undefined('application', presets.s, new Position(source, 10));
+                var tuple = await parse('(f,s)(1,2)')(context);
+                expect(tuple).to.be.Tuple([3,'b','c']);
             });
         });
     });
