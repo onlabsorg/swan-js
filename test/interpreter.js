@@ -1,7 +1,7 @@
 const chai = require("chai"), expect = chai.expect;
 
 const {parse} = require("../lib/interpreter");
-const {Undefined, Tuple} = require("../lib/types");
+const {Bool, Undefined, Tuple, wrap, unwrap} = require("../lib/types");
 const Lexer = require("../lib/lexer");
 
 
@@ -514,110 +514,6 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
     //         expect(Array.from(tuple)[2]).to.be.Undefined('application', "abcdef");
     //     });
     // });
-    // 
-    // describe("referencing operation: X @ Y", () => {
-    // 
-    //     describe("when X is a string", async () => {
-    // 
-    //         it("should return the Y-th character if Y is an integer", async () => {
-    //             expect(await evaluate("'abcdef' @ 2")).to.equal('c');
-    //         });
-    // 
-    //         it("should consider only the integer part of Y if Y is a decimal number", async () => {
-    //             expect(await evaluate("'abcdef' @ 2.3")).to.equal('c');
-    //         });
-    // 
-    //         it("should consider negative indexes as relative to the string end", async () => {
-    //             expect(await evaluate("'abcdef' @ (-2)")).to.equal('e');
-    //         });
-    // 
-    //         it("should return an empty string if Y is an out of range number or not a number", async () => {
-    //             expect(await evaluate("'abcdef' @ 100")).to.equal("");
-    //             expect(await evaluate("'abcdef' @ (-100)")).to.equal("");
-    //             expect(await evaluate("'abcdef' @ ('1')")).to.equal("");
-    //             expect(await evaluate("'abcdef' @ ([])")).to.equal("");
-    //             expect(await evaluate("'abcdef' @ ({})")).to.equal("");
-    //         });
-    // 
-    //         it("should return a tuple of charcters if Y is a tuple of numbers", async () => {
-    //             expect(await evaluate("'abcdef' @ (1,'x',-1)")).to.be.Tuple(['b','','f']);
-    //         });
-    //     });
-    // 
-    //     describe("when X is a list", () => {
-    // 
-    //         it("shoudl return the Y-th item if Y is an integer", async () => {
-    //             expect(await evaluate("['a','b','c','d','e','f'] @ 2")).to.equal('c');
-    //         });
-    // 
-    //         it("should consider only the integer part of Y if it is a decimal number", async () => {
-    //             expect(await evaluate("['a','b','c','d','e','f'] @ 2.3")).to.equal('c');
-    //         });
-    // 
-    //         it("should consider a negative indexe Y as relative to the list end", async () => {
-    //             expect(await evaluate("['a','b','c','d','e','f'] @ (-2)")).to.equal('e');
-    //         });
-    // 
-    //         it("should return null if the index Y is an out of range number or not a number", async () => {
-    //             expect(await evaluate("['a','b','c','d','e','f'] @ 100")).to.equal(null);
-    //             expect(await evaluate("['a','b','c','d','e','f'] @ (-100)")).to.equal(null);
-    //             expect(await evaluate("['a','b','c','d','e','f'] @ ('1')")).to.equal(null);
-    //             expect(await evaluate("['a','b','c','d','e','f'] @ ([])")).to.equal(null);
-    //             expect(await evaluate("['a','b','c','d','e','f'] @ ({})")).to.equal(null);
-    //         });
-    // 
-    //         it("should return a tuple of values if Y is a tuple of numbers", async () => {
-    //             expect(await evaluate("['a','b','c','d','e','f'] @ (1,'x',-1)")).to.be.Tuple(['b','f']);
-    //         });
-    //     });
-    // 
-    //     describe("when X is a namespace", () => {
-    // 
-    //         it("should return the value mapped to the name Y", async () => {
-    //             expect(await evaluate("{a=1,b=2,c=3} @ 'c'")).to.equal(3);
-    //         });
-    // 
-    //         it("should return null if Y is not a valid name", async () => {
-    //             expect(await evaluate("{a=1,b=2,c=3} @ 1")).to.equal(null);
-    //             expect(await evaluate("{a=1,b=2,c=3} @ '$key'")).to.equal(null);
-    //         });
-    // 
-    //         it("should return null if Y is a name not mapped to any value", async () => {
-    //             expect(await evaluate("{a=1,b=2,c=3} @ 'd'")).to.equal(null);
-    //         });
-    // 
-    //         it("should return multiple values if Y is a tuple of names", async () => {
-    //             expect(await evaluate("{a:1,b:2,c:3}@('a',1,'c')")).to.be.Tuple([1,3]);
-    //         });
-    //     });
-    // 
-    //     describe("when X is of any other type", () => {
-    // 
-    //         it("should return Undefined", async () => {
-    //             for (let X of [true, false, 10, x=>x, new Undefined()]) {
-    //                 expect(await evaluate("X@(1)", {X})).to.be.Undefined('referencing', X, 1, new Position("X@(1)", 1));
-    //             }
-    //         });
-    //     });
-    // 
-    //     describe("when X is a tuple", () => {
-    // 
-    //         it("should return a tuple obtained referencing each item to X if X is a tuple", async () => {
-    //             var presets = {
-    //                 s: "abcdef",
-    //                 ls: [10,20,30,40,50],
-    //                 b: true
-    //             };
-    //             var source = "(s, ls, b)@(2)";
-    //             var tuple = await evaluate(source, presets);
-    //             expect(tuple).to.be.instanceof(Tuple);
-    //             expect(Array.from(tuple)[0]).to.equal('c');
-    //             expect(Array.from(tuple)[1]).to.equal(30);
-    //             expect(Array.from(tuple)[2]).to.be.Undefined('referencing', presets.b, 2, new Position(source, 10));
-    //         });
-    //     });
-    // });
-    // 
     
     describe("sub-contexting: X.Y", () => {
     
@@ -694,9 +590,8 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
 
 
 
-    // 
-    // // UNARY OPERATORS
-    //
+    // UNARY OPERATORS
+
     describe("+X", () => {
     
         it("should return X", async () => {
@@ -732,6 +627,111 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(Array.from(tuple)[2].children[0].unwrap()).to.equal('abc');
         });
     });
+
+    
+    
+    // LOGIC OPERATORS
+    
+    describe("X | Y", () => {
+    
+        it("should return X if it booleanizes to true", async () => {
+            const context = {TRUE:true, FALSE:false};
+    
+            // true or true
+            expect(await parse("TRUE | TRUE")(context)).to.equal(true);
+            expect(await parse("TRUE | 10"  )(context)).to.equal(true);
+            expect(await parse("10 | TTRUE" )(context)).to.equal(10);
+            expect(await parse("10 | 10"    )(context)).to.equal(10);
+    
+            // true or false
+            expect(await parse("TRUE | FALSE")(context)).to.equal(true);
+            expect(await parse("TRUE | 0"    )(context)).to.equal(true);
+            expect(await parse("10 | FALSE"  )(context)).to.equal(10);
+            expect(await parse("10 | 0"      )(context)).to.equal(10);    
+        })
+    
+        it("should return Y if X booleanizes to false", async () => {
+            const context = {TRUE:true, FALSE:false};
+    
+            // false or true
+            expect(await parse("FALSE | TRUE")(context)).to.equal(true);
+            expect(await parse("FALSE | 10"  )(context)).to.equal(10);
+            expect(await parse("0 | TRUE"    )(context)).to.equal(true);
+            expect(await parse("0 | 10"      )(context)).to.equal(10);
+    
+            // false or false
+            expect(await parse("FALSE | FALSE")(context)).to.equal(false);
+            expect(await parse("FALSE | 0"    )(context)).to.equal(0);
+            expect(await parse("0 | FALSE"    )(context)).to.equal(false);
+            expect(await parse("0 | 0"        )(context)).to.equal(0);
+        })
+    });
+    
+    describe("X & Y", () => {
+    
+        it("should return Y if X booleanizes to true", async () => {
+            const context = {TRUE:true, FALSE:false};
+    
+            // true or true
+            expect(await parse("TRUE & TRUE")(context)).to.equal(true);
+            expect(await parse("TRUE & 10"  )(context)).to.equal(10);
+            expect(await parse("10 & TRUE"  )(context)).to.equal(true);
+            expect(await parse("10 & 10"    )(context)).to.equal(10);
+    
+            // true or false
+            expect(await parse("TRUE & FALSE")(context)).to.equal(false);
+            expect(await parse("TRUE & 0"    )(context)).to.equal(0);
+            expect(await parse("10 & FALSE"  )(context)).to.equal(false);
+            expect(await parse("10 & 0"      )(context)).to.equal(0);
+        });
+    
+        it("should return X if it booleanizes to false", async () => {
+            const context = {TRUE:true, FALSE:false};
+    
+            // false or true
+            expect(await parse("FALSE & TRUE")(context)).to.equal(false);
+            expect(await parse("FALSE & 10"  )(context)).to.equal(false);
+            expect(await parse("0 & TRUE"    )(context)).to.equal(0);
+            expect(await parse("0 & 10"      )(context)).to.equal(0);
+    
+            // false or false
+            expect(await parse("FALSE & FALSE")(context)).to.equal(false);
+            expect(await parse("FALSE & 0"    )(context)).to.equal(false);
+            expect(await parse("0 & FALSE"    )(context)).to.equal(0);
+            expect(await parse("0 & 0"        )(context)).to.equal(0);
+        });
+    });
+    
+    describe("X ? Y", () => {
+    
+        it("should return Y is X booleanizes to true", async () => {
+            const context = {TRUE:true, FALSE:false};
+
+            expect(await parse("TRUE ? [1,2,3]")(context)).to.deep.equal([1,2,3]);
+            expect(await parse("10 ? [1,2,3]"  )(context)).to.deep.equal([1,2,3]);
+        });
+    
+        it("should return null if X booleanizes to false", async () => {
+            const context = {TRUE:true, FALSE:false};
+
+            expect(await parse("FALSE ? [1,2,3]")(context)).to.be.null;
+            expect(await parse("0 ? [1,2,3]"    )(context)).to.be.null;
+        });
+    });
+    
+    describe("X ; Y", () => {
+    
+        it("should return X if it is not ()", async () => {
+            expect(await parse("[1,2,3] ; [3,4,5]")({})).to.deep.equal([1,2,3]);
+        });
+    
+        it("should return Y if X is ()", async () => {
+            expect(await parse("() ; [3,4,5]")({})).to.deep.equal([3,4,5]);
+        });
+    });
+    
+    
+    
     
     
     // // CONSTANTS
@@ -1072,163 +1072,6 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
     // 
     
     
-    // // LOGIC OPERATORS
-    // 
-    // describe("X | Y", () => {
-    // 
-    //     it("should return X if `bool X` is true", async () => {
-    // 
-    //         // true or true
-    //         expect(await evaluate("TRUE | TRUE")).to.equal(true);
-    //         expect(await evaluate("TRUE | 10")).to.equal(true);
-    //         expect(await evaluate("10 | TTRUE")).to.equal(10);
-    //         expect(await evaluate("10 | 10")).to.equal(10);
-    // 
-    //         // true or false
-    //         expect(await evaluate("TRUE | FALSE")).to.equal(true);
-    //         expect(await evaluate("TRUE | 0")).to.equal(true);
-    //         expect(await evaluate("10 | FALSE")).to.equal(10);
-    //         expect(await evaluate("10 | 0")).to.equal(10);
-    // 
-    //         // true or Undefined
-    //         var presets = {un: new Undefined()};
-    //         expect(await evaluate("TRUE | un", presets)).to.equal(true);
-    //         expect(await evaluate("10 | un", presets)).to.equal(10);
-    //     })
-    // 
-    //     it("should return Y if `bool X` is false", async () => {
-    // 
-    //         // false or true
-    //         expect(await evaluate("FALSE | TRUE")).to.equal(true);
-    //         expect(await evaluate("FALSE | 10")).to.equal(10);
-    //         expect(await evaluate("0 | TRUE")).to.equal(true);
-    //         expect(await evaluate("0 | 10")).to.equal(10);
-    // 
-    //         // false or false
-    //         expect(await evaluate("FALSE | FALSE")).to.equal(false);
-    //         expect(await evaluate("FALSE | 0")).to.equal(0);
-    //         expect(await evaluate("0 | FALSE")).to.equal(false);
-    //         expect(await evaluate("0 | 0")).to.equal(0);
-    // 
-    //         // false or Undefined
-    //         var presets = {un: new Undefined()};
-    //         expect(await evaluate("FALSE | un", presets)).to.equal(presets.un);
-    //         expect(await evaluate("0 | un", presets)).to.equal(presets.un);
-    //     })
-    // 
-    //     it("should return bool(X) if it is Undefined", async () => {
-    //         var presets = {
-    //             un1: new Undefined("Test exception 1"),
-    //             un2: new Undefined("Test exception 2"),
-    //         };
-    //         expect(await evaluate("un1 | 1", presets)).to.be.Undefined('booleanization', presets.un1);
-    //         expect(await evaluate("un1 | un2", presets)).to.be.Undefined('booleanization', presets.un1);
-    //     });
-    // });
-    // 
-    // describe("X & Y", () => {
-    // 
-    //     it("should return Y if `bool X` is true", async () => {
-    // 
-    //         // true or true
-    //         expect(await evaluate("TRUE & TRUE")).to.equal(true);
-    //         expect(await evaluate("TRUE & 10")).to.equal(10);
-    //         expect(await evaluate("10 & TRUE")).to.equal(true);
-    //         expect(await evaluate("10 & 10")).to.equal(10);
-    // 
-    //         // true or false
-    //         expect(await evaluate("TRUE & FALSE")).to.equal(false);
-    //         expect(await evaluate("TRUE & 0")).to.equal(0);
-    //         expect(await evaluate("10 & FALSE")).to.equal(false);
-    //         expect(await evaluate("10 & 0")).to.equal(0);
-    // 
-    //         // true and Undefined
-    //         var presets = {un: new Undefined("Test exception")};
-    //         expect(await evaluate("TRUE & un", presets)).to.equal(presets.un);
-    //         expect(await evaluate("1 & un", presets)).to.equal(presets.un);
-    //     });
-    // 
-    //     it("should return X if `bool X` is false", async () => {
-    // 
-    //         // false or true
-    //         expect(await evaluate("FALSE & TRUE")).to.equal(false);
-    //         expect(await evaluate("FALSE & 10")).to.equal(false);
-    //         expect(await evaluate("0 & TRUE")).to.equal(0);
-    //         expect(await evaluate("0 & 10")).to.equal(0);
-    // 
-    //         // false or false
-    //         expect(await evaluate("FALSE & FALSE")).to.equal(false);
-    //         expect(await evaluate("FALSE & 0")).to.equal(false);
-    //         expect(await evaluate("0 & FALSE")).to.equal(0);
-    //         expect(await evaluate("0 & 0")).to.equal(0);
-    // 
-    //         // false or Undefined
-    //         var presets = {un: new Undefined("Test exception")};
-    //         expect(await evaluate("FALSE & un", presets)).to.equal(false);            
-    //         expect(await evaluate("0 & un", presets)).to.equal(0);            
-    //     });
-    // 
-    //     it("should return bool(X) if it is Undefined", async () => {
-    //         var presets = {
-    //             un1: new Undefined("Test exception 1"),
-    //             un2: new Undefined("Test exception 2"),
-    //         };
-    //         expect(await evaluate("un1 & 1", presets)).to.be.Undefined('booleanization', presets.un1);
-    //         expect(await evaluate("un1 & un2", presets)).to.be.Undefined('booleanization', presets.un1);
-    //     });
-    // });
-    // 
-    // describe("X ? Y", () => {
-    // 
-    //     it("should return Y is `bool X` is true", async () => {
-    //         expect(await evaluate("TRUE ? [1,2,3]")).to.deep.equal([1,2,3]);
-    //         expect(await evaluate("10 ? [1,2,3]")).to.deep.equal([1,2,3]);
-    // 
-    //         // true ? Undefined
-    //         var presets = {un: new Undefined()};
-    //         expect(await evaluate("TRUE ? un", presets)).to.equal(presets.un);
-    //         expect(await evaluate("1 ? un", presets)).to.equal(presets.un);            
-    //     });
-    // 
-    //     it("should return null if `bool X` is false", async () => {
-    //         expect(await evaluate("FALSE ? [1,2,3]")).to.be.null;
-    //         expect(await evaluate("0 ? [1,2,3]")).to.be.null;
-    // 
-    //         // false ? Undefined
-    //         var presets = {un: new Undefined()};
-    //         expect(await evaluate("FALSE ? un", presets)).to.equal(null);
-    //         expect(await evaluate("0 ? un", presets)).to.equal(null);            
-    //     });
-    // 
-    //     it("should return `bool(X)` if it is Undefined", async () => {
-    //         var presets = {
-    //             un1: new Undefined("Test exception 1"),
-    //             un2: new Undefined("Test exception 2"),
-    //         };
-    //         expect(await evaluate("un1 ? 1", presets)).to.be.Undefined('booleanization', presets.un1);
-    //         expect(await evaluate("un1 ? un2", presets)).to.be.Undefined('booleanization', presets.un1);
-    //     });
-    // });
-    // 
-    // describe("X ; Y", () => {
-    // 
-    //     it("should return X if it is not `null`", async () => {
-    //         expect(await evaluate("[1,2,3] ; [3,4,5]")).to.deep.equal([1,2,3]);
-    // 
-    //         var presets = {un: new Undefined()};
-    //         expect(await evaluate("10 ; un", presets)).to.equal(10);
-    //         expect(await evaluate("un ; 10", presets)).to.equal(presets.un);
-    //     });
-    // 
-    //     it("should return Y if X is `null`", async () => {
-    //         expect(await evaluate("() ; [3,4,5]")).to.deep.equal([3,4,5]);
-    // 
-    //         var presets = {un: new Undefined()};
-    //         expect(await evaluate("() ; un", presets)).to.equal(presets.un);
-    //     });
-    // });
-    // 
-    // 
     // // ARITHMETIC OPERATORS
     // 
     // describe("X + Y", () => {
