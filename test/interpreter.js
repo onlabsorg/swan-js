@@ -730,6 +730,475 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
         });
     });
     
+        
+    
+    // ARITHMETIC OPERATORS
+    
+    describe("X + Y", () => {
+    
+        it("should return Y if X is nothing", async () => {
+            var context = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false,
+                    un: new Undefined()};
+            expect(await parse("() + ()"   )(context)).to.equal(null);
+            expect(await parse("() + T"    )(context)).to.equal(true);
+            expect(await parse("() + F"    )(context)).to.equal(false);
+            expect(await parse("() + 10"   )(context)).to.equal(10);
+            expect(await parse("() + 'abc'")(context)).to.equal("abc");
+            expect(await parse("() + fn"   )(context)).to.equal(context.fn);
+            expect(await parse("() + ls"   )(context)).to.deep.equal([1,2,3]);
+            expect(await parse("() + ns"   )(context)).to.deep.equal({a:1,b:2,c:3});
+            expect(await parse("() + un"   )(context)).to.deep.equal(context.un);
+            expect(await parse("() + (1,2)")(context)).to.be.Tuple([1,2]);
+        });
+    
+        it("should return X if Y is nothing", async () => {
+            var context = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false,
+                    un: new Undefined()};
+            expect(await parse("() + ()"   )(context)).to.equal(null);
+            expect(await parse("T + ()"    )(context)).to.equal(true);
+            expect(await parse("F + ()"    )(context)).to.equal(false);
+            expect(await parse("10 + ()"   )(context)).to.equal(10);
+            expect(await parse("'abc' + ()")(context)).to.equal("abc");
+            expect(await parse("fn + ()"   )(context)).to.equal(context.fn);
+            expect(await parse("ls + ()"   )(context)).to.deep.equal([1,2,3]);
+            expect(await parse("ns + ()"   )(context)).to.deep.equal({a:1,b:2,c:3});
+            expect(await parse("un + ()"   )(context)).to.deep.equal(context.un);
+            expect(await parse("(1,2) + ()")(context)).to.be.Tuple([1,2]);
+        });
+    
+        it("should return `X||Y` if both X and Y are booleans", async () => {
+            var context = {T:true, F:false};
+            expect(await parse("T + T")(context)).to.be.true;
+            expect(await parse("T + F")(context)).to.be.true;
+            expect(await parse("F + T")(context)).to.be.true;
+            expect(await parse("F + F")(context)).to.be.false;
+        });
+    
+        it("should return `X+Y` if both X and Y are numbers", async () => {
+            expect(await parse("10 + 1"   )()).to.equal(11);
+            expect(await parse("10 + 0"   )()).to.equal(10);
+            expect(await parse("10 + (-2)")()).to.equal(8);
+        });
+    
+        it("should concatenate X and Y if they are both strings", async () => {
+            expect(await parse("'abc' + 'def'")()).to.equal("abcdef");
+            expect(await parse("'abc' + ''"   )()).to.equal("abc");
+            expect(await parse("'' + 'def'"   )()).to.equal("def");
+        });
+    
+        it("should concatenate X and Y if they are both lists", async () => {
+            expect(await parse("[1,2,3] + [4,5,6]")()).to.deep.equal([1,2,3,4,5,6]);
+            expect(await parse("[1,2,3] + []"     )()).to.deep.equal([1,2,3]);
+            expect(await parse("[] + [4,5,6]"     )()).to.deep.equal([4,5,6]);
+        });
+    
+        it("should merge X and Y if they are both namespaces", async () => {
+            expect(await parse("{a=1,b=2} + {b=20,c=30}")()).to.deep.equal({a:1,b:20,c:30});
+            expect(await parse("{a=1,b=2} + {}"         )()).to.deep.equal({a:1,b:2});
+            expect(await parse("{} + {b=20,c=30}"       )()).to.deep.equal({b:20,c:30});
+    
+            var context = {
+                ns1: {a:1, un: new Undefined()},
+                ns2: {b:2, un: new Undefined()},
+            }
+            expect(await parse("ns1 + ns2")(context)).to.deep.equal({a:1, b:2, un:context.ns2.un});
+        });
+    
+        it("should return Undefined for all the other type combinations", async () => {
+            var T=true, F=false, n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x, u=new Undefined();
+            for (let [L,R] of [
+                    [T,n], [T,s], [T,ls], [T,ns], [T,fn], [T,u],
+                    [F,n], [F,s], [F,ls], [F,ns], [F,fn], [F, u],
+                    [n,T], [n,F], [n,s], [n,ls], [n,ns], [n,fn], [n,u],
+                    [s,T], [s,F], [s,n], [s,ls], [s,ns], [s,fn], [s,u],
+                    [ls,T], [ls,F], [ls,n], [ls,s], [ls,ns], [ls,fn], [ls,u],
+                    [ns,T], [ns,F], [ns,n], [ns,s], [ns,ls], [ns,fn], [ns,u],
+                    [fn,T], [fn,F], [fn,n], [fn,s], [fn,ls], [fn,ns], [fn,u],
+                    [u,T], [u,F], [u,n], [u,s], [u,ls], [u,ns], [u,fn], [u,u] ]) {
+    
+                const undef = await parse("L + R")({L,R});
+                expect(undef).to.be.Undefined('SumOperation');
+                expect(undef.children[0].unwrap()).to.deep.equal(L);
+                expect(undef.children[1].unwrap()).to.deep.equal(R);
+            }
+        });
+    
+        it("should return (x1+y1, x2+y2, ...) if X and/or Y is a tuple", async () => {
+            var context = {T:true, F:false};
+            expect(await parse("(T, 1, 'a', [1], {a=1}) + (F, 2, 'b', [2], {b=2})")(context)).to.be.Tuple([true, 3, "ab", [1,2], {a:1,b:2}])
+            expect(await parse("(T, 1, 'a', [1], {a=1}) + (F, 2, 'b')"            )(context)).to.be.Tuple([true, 3, "ab", [1], {a:1}])
+            expect(await parse("(T, 1, 'a') + (F, 2, 'b', [2], {b=2})"            )(context)).to.be.Tuple([true, 3, "ab", [2], {b:2}])
+            expect(await parse("10 + (1, 2, 3)"                                   )(context)).to.be.Tuple([11, 2, 3])
+            expect(await parse("(1, 2, 3) + 10"                                   )(context)).to.be.Tuple([11, 2, 3])
+            
+            // partial exception
+            var tuple = await parse("(10,20,30) + (1,2,[])")();
+            expect(Array.from(tuple)[0]).to.equal(11);
+            expect(Array.from(tuple)[1]).to.equal(22);
+            expect(Array.from(tuple)[2]).to.be.Undefined('SumOperation');
+            expect(Array.from(tuple)[2].children[0].unwrap()).to.equal(30);
+            expect(Array.from(tuple)[2].children[1].unwrap()).to.deep.equal([]);
+        });
+    });
+    
+    describe.skip("X - Y", () => {
+    
+        it("should return X if Y is nothing", async () => {
+            var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
+            expect(await evaluate("() - ()", presets)).to.equal(null);
+            expect(await evaluate("T - ()", presets)).to.equal(true);
+            expect(await evaluate("F - ()", presets)).to.equal(false);
+            expect(await evaluate("10 - ()", presets)).to.equal(10);
+            expect(await evaluate("'abc' - ()", presets)).to.equal("abc");
+            expect(await evaluate("fn - ()", presets)).to.equal(presets.fn);
+            expect(await evaluate("ls - ()", presets)).to.deep.equal(presets.ls);
+            expect(await evaluate("ns - ()", presets)).to.deep.equal(presets.ns);
+            expect(Array.from(await evaluate("(1,2,3) - ()", presets))).to.deep.equal([1,2,3]);
+        });
+    
+        it("should return Undefined if X is nothing", async () => {
+            for (let R of [true, false, 10, 'abc', [1,2,3], {a:1}, x=>x]) {
+                var RType = context.type(R);
+                expect(await evaluate("() - R", {R})).to.be.Undefined('subtraction', R, new Position("() - R", 3));
+            }
+        });
+    
+        it("should return `X-Y` if both X and Y are numbers", async () => {
+            var presets = {T:true, F:false};
+            expect(await evaluate("10 - 1", presets)).to.equal(9);
+            expect(await evaluate("20 - 0", presets)).to.equal(20);
+            expect(await evaluate("10 - (-7)", presets)).to.equal(17);
+        });
+    
+        it("should return Undefined for all the other type combinations", async () => {
+            var T=true, F=false, n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x, u=new Undefined();
+            for (let [L,R] of [
+                    [T,n], [T,s], [T,ls], [T,ns], [T,fn], [T,u],
+                    [F,n], [F,s], [F,ls], [F,ns], [F,fn], [F,u],
+                    [n,T], [n,F], [n,s], [n,ls], [n,ns], [n,fn], [n,u],
+                    [s,T], [s,F], [s,n], [s,ls], [s,ns], [s,fn], [s,u],
+                    [ls,T], [ls,F], [ls,n], [ls,s], [ls,ns], [ls,fn], [ls,u],
+                    [ns,T], [ns,F], [ns,n], [ns,s], [ns,ls], [ns,fn], [ns,u],
+                    [fn,T], [fn,F], [fn,n], [fn,s], [fn,ls], [fn,ns], [fn,u],
+                    [u,T], [u,F], [u,n], [u,s], [u,ls], [u,ns], [u,fn], [u,u] ]) {
+    
+                var LType = context.type(L);
+                var RType = context.type(R);
+                expect(await evaluate("L - R", {L,R})).to.be.Undefined('subtraction', L, R, new Position("L - R", 2));
+            }            
+        });
+    
+        it("should return (x1-y1, x2-y2, ...) if X and/or Y is a tuple", async () => {
+            var presets = {};
+            expect(Array.from(await evaluate("(10,20,30) - (1,2,3)", presets))).to.deep.equal([9,18,27]);
+            expect(Array.from(await evaluate("(10,20,30) - (1,2)", presets))).to.deep.equal([9,18,30]);
+            expect(Array.from(await evaluate("(10,20,30) - 1", presets))).to.deep.equal([9,20,30]);
+    
+            // partial exception
+            var source = "(10,20,30) - (1,2,[])";
+            var tuple = await evaluate(source);
+            expect(tuple).to.be.instanceof(Tuple);
+            expect(Array.from(tuple)[0]).to.equal(9);
+            expect(Array.from(tuple)[1]).to.equal(18);
+            expect(Array.from(tuple)[2]).to.be.Undefined('subtraction', 30, [], new Position(source, 11));
+        });
+    });
+    
+    describe.skip("X * Y", () => {
+    
+        it("should return () if either X or Y is nothing", async () => {
+            var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false,
+                    un: new Undefined()};
+    
+            expect(await evaluate("() * ()", presets)).to.equal(null);
+            expect(await evaluate("() * T", presets)).to.equal(null);
+            expect(await evaluate("() * F", presets)).to.equal(null);
+            expect(await evaluate("() * 10", presets)).to.equal(null);
+            expect(await evaluate("() * 'abc'", presets)).to.equal(null);
+            expect(await evaluate("() * fn", presets)).to.equal(null);
+            expect(await evaluate("() * ls", presets)).to.equal(null);
+            expect(await evaluate("() * ns", presets)).to.equal(null);
+            expect(await evaluate("() * (1,2,3)", presets)).to.equal(null);
+            expect(await evaluate("() * un", presets)).to.equal(null);
+    
+            expect(await evaluate("() * ()", presets)).to.equal(null);
+            expect(await evaluate("T * ()", presets)).to.equal(null);
+            expect(await evaluate("F * ()", presets)).to.equal(null);
+            expect(await evaluate("10 * ()", presets)).to.equal(null);
+            expect(await evaluate("'abc' * ()", presets)).to.equal(null);
+            expect(await evaluate("fn * ()", presets)).to.equal(null);
+            expect(await evaluate("ls * ()", presets)).to.equal(null);
+            expect(await evaluate("ns * ()", presets)).to.equal(null);
+            expect(await evaluate("(1,2,3) * ()", presets)).to.equal(null);
+            expect(await evaluate("un * ()", presets)).to.equal(null);
+        });
+    
+        it("should return `X&&Y` if both X and Y are booleans", async () => {
+            var presets = {T:true, F:false};
+            expect(await evaluate("T * T", presets)).to.equal(true);
+            expect(await evaluate("T * F", presets)).to.equal(false);
+            expect(await evaluate("F * T", presets)).to.equal(false);
+            expect(await evaluate("F * F", presets)).to.equal(false);
+        });
+    
+        it("should return `X*Y` if both X and Y are numbers", async () => {
+            expect(await evaluate("10 * 2")).to.equal(20);
+            expect(await evaluate("10 * 0")).to.equal(0);
+            expect(await evaluate("10 * (-2)")).to.equal(-20);
+        });
+    
+        it("should concatenate X times Y if X is a number and Y is a string", async () => {
+            expect(await evaluate("3 * 'Abc'")).to.equal("AbcAbcAbc");
+            expect(await evaluate("3.1 * 'Abc'")).to.equal("AbcAbcAbc");
+            expect(await evaluate("3.9 * 'Abc'")).to.equal("AbcAbcAbc");
+            expect(await evaluate("0 * 'Abc'")).to.equal("");
+            expect(await evaluate("-2 * 'Abc'")).to.equal("");
+        });
+    
+        it("should concatenate Y times X if Y is a number and X is a string", async () => {
+            expect(await evaluate("'Abc' * 3")).to.equal("AbcAbcAbc");
+            expect(await evaluate("'Abc' * 3.1")).to.equal("AbcAbcAbc");
+            expect(await evaluate("'Abc' * 3.9")).to.equal("AbcAbcAbc");
+            expect(await evaluate("'Abc' * 0")).to.equal("");
+            expect(await evaluate("'Abc' * (-2)")).to.equal("");
+        });
+    
+        it("should concatenate X times Y if X is a number and Y is a list", async () => {
+            expect(await evaluate("3 * [1,2,3]")).to.deep.equal([1,2,3,1,2,3,1,2,3]);
+            expect(await evaluate("3.1 * [1,2,3]")).to.deep.equal([1,2,3,1,2,3,1,2,3]);
+            expect(await evaluate("3.9 * [1,2,3]")).to.deep.equal([1,2,3,1,2,3,1,2,3]);
+            expect(await evaluate("0 * [1,2,3]")).to.deep.equal([]);
+            expect(await evaluate("-2 * [1,2,3]")).to.deep.equal([]);
+        });
+    
+        it("should concatenate Y times X if Y is a number and X is a list", async () => {
+            expect(await evaluate("[1,2,3] * 3")).to.deep.equal([1,2,3,1,2,3,1,2,3]);
+            expect(await evaluate("[1,2,3] * 3.1")).to.deep.equal([1,2,3,1,2,3,1,2,3]);
+            expect(await evaluate("[1,2,3] * 3.9")).to.deep.equal([1,2,3,1,2,3,1,2,3]);
+            expect(await evaluate("[1,2,3] * 0")).to.deep.equal([]);
+            expect(await evaluate("[1,2,3] * (-2)")).to.deep.equal([]);
+        });
+    
+        it("should return Undefined for all the other type combinations", async () => {
+            var T=true, F=false, n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x, u=new Undefined();
+            for (let [L,R] of [
+                    [T,n], [T,s], [T,ls], [T,ns], [T,fn], [T,u],
+                    [F,n], [F,s], [F,ls], [F,ns], [F,fn], [F,u],
+                    [n,T], [n,F], [n,ns], [n,fn], [n,u],
+                    [s,T], [s,F], [s,ls], [s,ns], [s,fn], [s,u],
+                    [ls,T], [ls,F], [ls,s], [ls,ns], [ls,fn], [ls,u],
+                    [ns,T], [ns,F], [ns,n], [ns,s], [ns,ls], [ns,fn], [ns,u],
+                    [fn,T], [fn,F], [fn,n], [fn,s], [fn,ls], [fn,ns], [fn,u],
+                    [u,T], [u,F], [u,n], [u,s], [u,ls], [u,ns], [u,fn], [u,u] ]) {
+    
+                var LType = context.type(L);
+                var RType = context.type(R);
+                expect(await evaluate("L * R", {L,R})).to.be.Undefined('product', L, R, new Position("L * R", 2));
+            }                        
+        });
+    
+        it("should return (x1*y1, x2*y2, ...) if X and/or Y is a tuple", async () => {
+            var presets = {T:true, F:false};
+            expect(Array.from(await evaluate("(T, 3, 'a', [1]) * (F, 2, 2, 2)",presets))).to.deep.equal([false, 6, "aa", [1,1]]);
+            expect(Array.from(await evaluate("(10,20,30) * (2,3,4)",presets))).to.deep.equal([20,60,120]);
+            expect(Array.from(await evaluate("(10,20,30) * (2,3)",presets))).to.deep.equal([20,60]);
+            expect(Array.from(await evaluate("(10,20) * (2,3,4)",presets))).to.deep.equal([20,60]);
+            expect(await evaluate("10 * (2,3,4)",presets)).to.equal(20);
+            expect(await evaluate("(10,20,30) * 2",presets)).to.equal(20);
+    
+            // partial exception
+            var source = "(10,20,30) * (1,2,{})";
+            var tuple = await evaluate(source);
+            expect(tuple).to.be.instanceof(Tuple);
+            expect(Array.from(tuple)[0]).to.equal(10);
+            expect(Array.from(tuple)[1]).to.equal(40);
+            expect(Array.from(tuple)[2]).to.be.Undefined('product', 30, {}, new Position(source, 11));
+        });
+    });
+    
+    describe.skip("X / Y", () => {
+    
+        it("should return nothing if X is nothing", async () => {
+            var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
+            expect(await evaluate("() / ()", presets)).to.equal(null);
+            expect(await evaluate("() / T", presets)).to.equal(null);
+            expect(await evaluate("() / F", presets)).to.equal(null);
+            expect(await evaluate("() / 10", presets)).to.equal(null);
+            expect(await evaluate("() / 'abc'", presets)).to.equal(null);
+            expect(await evaluate("() / fn", presets)).to.equal(null);
+            expect(await evaluate("() / ls", presets)).to.equal(null);
+            expect(await evaluate("() / ns", presets)).to.equal(null);
+        });
+    
+        it("should return Undefined if Y is NOTHING", async () => {
+            for (let L of [true, false, 10, 'abc', [1,2,3], {x:1}, x=>x]) {
+                var LType = context.type(L);
+                expect(await evaluate("L / ()", {L})).to.be.Undefined('division', L, new Position("L / ()", 2));
+            }
+        });
+    
+        it("should return `X/Y` if both X and Y are numbers", async () => {
+            expect(await evaluate("10 / 2")).to.equal(5);
+            expect(await evaluate("20 / 0")).to.equal(Infinity);
+            expect(await evaluate("10 / (-2)")).to.equal(-5);
+        });
+    
+        it("should return Undefined for all the other type combinations", async () => {
+            var T=true, F=false, n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x, u=new Undefined();
+            for (let [L,R] of [
+                    [T,n], [T,s], [T,ls], [T,ns], [T,fn], [T,u],
+                    [F,n], [F,s], [F,ls], [F,ns], [F,fn], [F,u],
+                    [n,T], [n,F], [n,s], [n,ns], [n,fn], [n,u],
+                    [s,T], [s,F], [s,n], [s,ls], [s,ns], [s,fn], [s,u],
+                    [ls,T], [ls,F], [ls,n], [ls,s], [ls,ns], [ls,fn], [ls,u],
+                    [ns,T], [ns,F], [ns,n], [ns,s], [ns,ls], [ns,fn], [ns,u],
+                    [fn,T], [fn,F], [fn,n], [fn,s], [fn,ls], [fn,ns], [fn,u],
+                    [u,T], [u,F], [u,n], [u,s], [u,ls], [u,ns], [u,fn], [u,u] ]) {
+    
+                var LType = context.type(L);
+                var RType = context.type(R);
+                expect(await evaluate("L / R", {L,R})).to.be.Undefined('division', L, R, new Position("L / R", 2));
+            }                        
+        });
+    
+        it("should return (x1/y1, x2/y2, ...) if X and/or Y is a tuple", async () => {
+            expect(Array.from(await evaluate("(10,20,30) / (2,5,3)"))).to.deep.equal([5,4,10]);
+            expect(Array.from(await evaluate("(10,20) / (2,5,3)"))).to.deep.equal([5,4]);
+            expect(await evaluate("10 / (2,5,3)")).to.equal(5);
+            expect(await evaluate("() / (2,4,3)")).to.equal(null);
+    
+            // partial exception
+            var source = "(10,20,30) / (2,5)";
+            var tuple = await evaluate(source);
+            expect(tuple).to.be.instanceof(Tuple);
+            expect(Array.from(tuple)[0]).to.equal(5);
+            expect(Array.from(tuple)[1]).to.equal(4);
+            expect(Array.from(tuple)[2]).to.be.Undefined('division', 30, new Position(source, 11));
+        });
+    });
+    
+    describe.skip("X % Y", () => {
+    
+        it("should return NOTHING if X is nothing", async () => {
+            var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
+            expect(await evaluate("() % ()", presets)).to.equal(null);
+            expect(await evaluate("() % T", presets)).to.equal(null);
+            expect(await evaluate("() % F", presets)).to.equal(null);
+            expect(await evaluate("() % 10", presets)).to.equal(null);
+            expect(await evaluate("() % 'abc'", presets)).to.equal(null);
+            expect(await evaluate("() % fn", presets)).to.equal(null);
+            expect(await evaluate("() % ls", presets)).to.equal(null);
+            expect(await evaluate("() % ns", presets)).to.equal(null);
+        });
+    
+        it("should return Undefined if Y is NOTHING", async () => {
+            for (let L of [true, false, 10, 'abc', [1,2,3], {x:1}, x=>x]) {
+                var LType = context.type(L);
+                expect(await evaluate("L % ()", {L})).to.be.Undefined('modulo', L, new Position("L % ()", 2));
+            }
+        });
+    
+        it("should return `X%Y` if both X and Y are numbers", async () => {
+            expect(await evaluate("10 % 4")).to.equal(2);
+            expect(await evaluate("10 % (-4)")).to.equal(2);
+        });
+    
+        it("should return Undefined for all the other type combinations", async () => {
+            var T=true, F=false, n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x, u=new Undefined();
+            for (let [L,R] of [
+                    [T,n], [T,s], [T,ls], [T,ns], [T,fn], [T,u],
+                    [F,n], [F,s], [F,ls], [F,ns], [F,fn], [F,u],
+                    [n,T], [n,F], [n,s], [n,ns], [n,fn], [n,u],
+                    [s,T], [s,F], [s,n], [s,ls], [s,ns], [s,fn], [s,u],
+                    [ls,T], [ls,F], [ls,n], [ls,s], [ls,ns], [ls,fn], [ls,u],
+                    [ns,T], [ns,F], [ns,n], [ns,s], [ns,ls], [ns,fn], [ns,u],
+                    [fn,T], [fn,F], [fn,n], [fn,s], [fn,ls], [fn,ns], [fn,u],
+                    [u,T], [u,F], [u,n], [u,s], [u,ls], [u,ns], [u,fn], [u,u] ]) {
+    
+                var LType = context.type(L);
+                var RType = context.type(R);
+                expect(await evaluate("L % R", {L,R})).to.be.Undefined('modulo', L, R, new Position("L % R", 2));
+            }            
+        });
+    
+        it("should return (x1/y1, x2/y2, ...) if X and/or Y is a tuple", async () => {
+            expect(Array.from(await evaluate("(10,20,30) % (4,7,8)"))).to.deep.equal([2,6,6]);
+            expect(Array.from(await evaluate("(10,20) % (4,7,8)"))).to.deep.equal([2,6]);
+            expect(await evaluate("10 % (4,7,8)")).to.equal(2);
+            expect(await evaluate("() % (4,7,8)")).to.equal(null);
+    
+            // partial exception
+            var source = "(10,20,30) % (3,6)";
+            var tuple = await evaluate(source);
+            expect(tuple).to.be.instanceof(Tuple);
+            expect(Array.from(tuple)[0]).to.equal(1);
+            expect(Array.from(tuple)[1]).to.equal(2);
+            expect(Array.from(tuple)[2]).to.be.Undefined('modulo', 30, new Position(source, 11));
+        });
+    });
+    
+    describe.skip("X ^ Y", () => {
+    
+        it("should return nothing if X is nothing", async () => {
+            var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
+            expect(await evaluate("() ^ ()", presets)).to.equal(null);
+            expect(await evaluate("() ^ T", presets)).to.equal(null);
+            expect(await evaluate("() ^ F", presets)).to.equal(null);
+            expect(await evaluate("() ^ 10", presets)).to.equal(null);
+            expect(await evaluate("() ^ 'abc'", presets)).to.equal(null);
+            expect(await evaluate("() ^ fn", presets)).to.equal(null);
+            expect(await evaluate("() ^ ls", presets)).to.equal(null);
+            expect(await evaluate("() ^ ns", presets)).to.equal(null);
+        });
+    
+        it("should return Undefined if Y is NOTHING", async () => {
+            for (let L of [true, false, 10, 'abc', [1,2,3], {x:1}, x=>x]) {
+                var LType = context.type(L);
+                expect(await evaluate("L ^ ()", {L})).to.be.Undefined('exponentiation', L, new Position("L ^ ()", 2));
+            }
+        });
+    
+        it("should return `X**Y` if both X and Y are numbers", async () => {
+            expect(await evaluate("10 ^ 2")).to.equal(100);
+            expect(await evaluate("20 ^ 0")).to.equal(1);
+            expect(await evaluate("10 ^ (-2)")).to.equal(0.01);
+        });
+    
+        it("should return Undefined for all the other type combinations", async () => {
+            var T=true, F=false, n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x, u=new Undefined();
+            for (let [L,R] of [
+                    [T,n], [T,s], [T,ls], [T,ns], [T,fn], [T,u],
+                    [F,n], [F,s], [F,ls], [F,ns], [F,fn], [F,u],
+                    [n,T], [n,F], [n,s], [n,ns], [n,fn], [n,u],
+                    [s,T], [s,F], [s,n], [s,ls], [s,ns], [s,fn], [s,u],
+                    [ls,T], [ls,F], [ls,n], [ls,s], [ls,ns], [ls,fn], [ls,u],
+                    [ns,T], [ns,F], [ns,n], [ns,s], [ns,ls], [ns,fn], [ns,u],
+                    [fn,T], [fn,F], [fn,n], [fn,s], [fn,ls], [fn,ns], [fn,u],
+                    [u,T], [u,F], [u,n], [u,s], [u,ls], [u,ns], [u,fn], [u,u] ]) {
+    
+                var LType = context.type(L);
+                var RType = context.type(R);
+                expect(await evaluate("L ^ R", {L,R})).to.be.Undefined('exponentiation', L, R, new Position("L ^ R", 2));
+            }
+        });
+    
+        it("should return (x1^y1, x2^y2, ...) if X and/or Y is a tuple", async () => {
+            expect(Array.from(await evaluate("(10,20,30) ^ (2,3,4)"))).to.deep.equal([10**2,20**3,30**4]);
+            expect(Array.from(await evaluate("(10,20) ^ (2,3,4)"))).to.deep.equal([10**2,20**3]);
+            expect(await evaluate("10 ^ (2,3,4)")).to.equal(10**2);
+            expect(await evaluate("() ^ (2,3,4)")).to.equal(null);
+    
+            // partial exception
+            var source = "(2,3,4) ^ (2,3)";
+            var tuple = await evaluate(source);
+            expect(tuple).to.be.instanceof(Tuple);
+            expect(Array.from(tuple)[0]).to.equal(4);
+            expect(Array.from(tuple)[1]).to.equal(27);
+            expect(Array.from(tuple)[2]).to.be.Undefined("exponentiation", 4, new Position(source, 8));
+        });
+    });
+        
+    
     
     
     
@@ -1072,478 +1541,6 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
     // 
     
     
-    // // ARITHMETIC OPERATORS
-    // 
-    // describe("X + Y", () => {
-    // 
-    //     it("should return Y if X is nothing", async () => {
-    //         var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false,
-    //                 un: new Undefined()};
-    //         expect(await evaluate("() + ()", presets)).to.equal(null);
-    //         expect(await evaluate("() + T", presets)).to.equal(true);
-    //         expect(await evaluate("() + F", presets)).to.equal(false);
-    //         expect(await evaluate("() + 10", presets)).to.equal(10);
-    //         expect(await evaluate("() + 'abc'", presets)).to.equal("abc");
-    //         expect(await evaluate("() + fn", presets)).to.equal(presets.fn);
-    //         expect(await evaluate("() + ls", presets)).to.deep.equal([1,2,3]);
-    //         expect(await evaluate("() + ns", presets)).to.deep.equal({a:1,b:2,c:3});
-    //         expect(await evaluate("() + un", presets)).to.deep.equal(presets.un);
-    // 
-    //         var tuple = await evaluate("() + (1,2,3)", presets);
-    //         expect(tuple instanceof Tuple).to.be.true;
-    //         expect(Array.from(tuple)).to.deep.equal([1,2,3]);
-    //     });
-    // 
-    //     it("should return X if Y is nothing", async () => {
-    //         var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false,
-    //                 un: new Undefined()};
-    //         expect(await evaluate("() + ()", presets)).to.equal(null);
-    //         expect(await evaluate("T + ()", presets)).to.equal(true);
-    //         expect(await evaluate("F + ()", presets)).to.equal(false);
-    //         expect(await evaluate("10 + ()", presets)).to.equal(10);
-    //         expect(await evaluate("'abc' + ()", presets)).to.equal("abc");
-    //         expect(await evaluate("fn + ()", presets)).to.equal(presets.fn);
-    //         expect(await evaluate("ls + ()", presets)).to.deep.equal([1,2,3]);
-    //         expect(await evaluate("ns + ()", presets)).to.deep.equal({a:1,b:2,c:3});
-    //         expect(await evaluate("un + ()", presets)).to.deep.equal(presets.un);
-    // 
-    //         var tuple = await evaluate("(1,2,3) + ()", presets);
-    //         expect(tuple instanceof Tuple).to.be.true;
-    //         expect(Array.from(tuple)).to.deep.equal([1,2,3]);
-    //     });
-    // 
-    //     it("should return `X||Y` if both X and Y are booleans", async () => {
-    //         var presets = {T:true, F:false};
-    //         expect(await evaluate("T + T", presets)).to.be.true;
-    //         expect(await evaluate("T + F", presets)).to.be.true;
-    //         expect(await evaluate("F + T", presets)).to.be.true;
-    //         expect(await evaluate("F + F", presets)).to.be.false;
-    //     });
-    // 
-    //     it("should return `X+Y` if both X and Y are numbers", async () => {
-    //         expect(await evaluate("10 + 1")).to.equal(11);
-    //         expect(await evaluate("10 + 0")).to.equal(10);
-    //         expect(await evaluate("10 + (-2)")).to.equal(8);
-    //     });
-    // 
-    //     it("should concatenate X and Y if they are both strings", async () => {
-    //         expect(await evaluate("'abc' + 'def'")).to.equal("abcdef");
-    //         expect(await evaluate("'abc' + ''")).to.equal("abc");
-    //         expect(await evaluate("'' + 'def'")).to.equal("def");
-    //     });
-    // 
-    //     it("should concatenate X and Y if they are both lists", async () => {
-    //         expect(await evaluate("[1,2,3] + [4,5,6]")).to.deep.equal([1,2,3,4,5,6]);
-    //         expect(await evaluate("[1,2,3] + []")).to.deep.equal([1,2,3]);
-    //         expect(await evaluate("[] + [4,5,6]")).to.deep.equal([4,5,6]);
-    //     });
-    // 
-    //     it("should merge X and Y if they are both namespaces", async () => {
-    //         expect(await evaluate("{a=1,b=2} + {b=20,c=30}")).to.deep.equal({a:1,b:20,c:30});
-    //         expect(await evaluate("{a=1,b=2} + {}")).to.deep.equal({a:1,b:2});
-    //         expect(await evaluate("{} + {b=20,c=30}")).to.deep.equal({b:20,c:30});
-    // 
-    //         var presets = {
-    //             ns1: {a:1, un: new Undefined()},
-    //             ns2: {b:2, un: new Undefined()},
-    //         }
-    //         expect(await evaluate("ns1 + ns2", presets)).to.deep.equal({a:1, b:2, un:presets.ns2.un});
-    //     });
-    // 
-    //     it("should return Undefined for all the other type combinations", async () => {
-    //         var T=true, F=false, n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x, u=new Undefined();
-    //         for (let [L,R] of [
-    //                 [T,n], [T,s], [T,ls], [T,ns], [T,fn], [T,u],
-    //                 [F,n], [F,s], [F,ls], [F,ns], [F,fn], [F, u],
-    //                 [n,T], [n,F], [n,s], [n,ls], [n,ns], [n,fn], [n,u],
-    //                 [s,T], [s,F], [s,n], [s,ls], [s,ns], [s,fn], [s,u],
-    //                 [ls,T], [ls,F], [ls,n], [ls,s], [ls,ns], [ls,fn], [ls,u],
-    //                 [ns,T], [ns,F], [ns,n], [ns,s], [ns,ls], [ns,fn], [ns,u],
-    //                 [fn,T], [fn,F], [fn,n], [fn,s], [fn,ls], [fn,ns], [fn,u],
-    //                 [u,T], [u,F], [u,n], [u,s], [u,ls], [u,ns], [u,fn], [u,u] ]) {
-    // 
-    //             var LType = context.type(L);
-    //             var RType = context.type(R);
-    //             expect(await evaluate("L + R", {L,R})).to.be.Undefined('sum', L, R, new Position("L + R", 2));
-    //         }
-    //     });
-    // 
-    //     it("should return (x1+y1, x2+y2, ...) if X and/or Y is a tuple", async () => {
-    //         var presets = {T:true, F:false};
-    //         expect(Array.from(await evaluate("(T, 1, 'a', [1], {a=1}) + (F, 2, 'b', [2], {b=2})", presets))).to.deep.equal([true, 3, "ab", [1,2], {a:1,b:2}])
-    //         expect(Array.from(await evaluate("(T, 1, 'a', [1], {a=1}) + (F, 2, 'b')", presets))).to.deep.equal([true, 3, "ab", [1], {a:1}])
-    //         expect(Array.from(await evaluate("(T, 1, 'a') + (F, 2, 'b', [2], {b=2})", presets))).to.deep.equal([true, 3, "ab", [2], {b:2}])
-    //         expect(Array.from(await evaluate("10 + (1, 2, 3)", presets))).to.deep.equal([11, 2, 3])
-    //         expect(Array.from(await evaluate("(1, 2, 3) + 10", presets))).to.deep.equal([11, 2, 3])
-    // 
-    //         // partial exception
-    //         var source = "(10,20,30) + (1,2,[])";
-    //         var tuple = await evaluate(source);
-    //         expect(tuple).to.be.instanceof(Tuple);
-    //         expect(Array.from(tuple)[0]).to.equal(11);
-    //         expect(Array.from(tuple)[1]).to.equal(22);
-    //         expect(Array.from(tuple)[2]).to.be.Undefined('sum', 30, [], new Position(source, 11));
-    //     });
-    // });
-    // 
-    // describe("X - Y", () => {
-    // 
-    //     it("should return X if Y is nothing", async () => {
-    //         var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
-    //         expect(await evaluate("() - ()", presets)).to.equal(null);
-    //         expect(await evaluate("T - ()", presets)).to.equal(true);
-    //         expect(await evaluate("F - ()", presets)).to.equal(false);
-    //         expect(await evaluate("10 - ()", presets)).to.equal(10);
-    //         expect(await evaluate("'abc' - ()", presets)).to.equal("abc");
-    //         expect(await evaluate("fn - ()", presets)).to.equal(presets.fn);
-    //         expect(await evaluate("ls - ()", presets)).to.deep.equal(presets.ls);
-    //         expect(await evaluate("ns - ()", presets)).to.deep.equal(presets.ns);
-    //         expect(Array.from(await evaluate("(1,2,3) - ()", presets))).to.deep.equal([1,2,3]);
-    //     });
-    // 
-    //     it("should return Undefined if X is nothing", async () => {
-    //         for (let R of [true, false, 10, 'abc', [1,2,3], {a:1}, x=>x]) {
-    //             var RType = context.type(R);
-    //             expect(await evaluate("() - R", {R})).to.be.Undefined('subtraction', R, new Position("() - R", 3));
-    //         }
-    //     });
-    // 
-    //     it("should return `X-Y` if both X and Y are numbers", async () => {
-    //         var presets = {T:true, F:false};
-    //         expect(await evaluate("10 - 1", presets)).to.equal(9);
-    //         expect(await evaluate("20 - 0", presets)).to.equal(20);
-    //         expect(await evaluate("10 - (-7)", presets)).to.equal(17);
-    //     });
-    // 
-    //     it("should return Undefined for all the other type combinations", async () => {
-    //         var T=true, F=false, n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x, u=new Undefined();
-    //         for (let [L,R] of [
-    //                 [T,n], [T,s], [T,ls], [T,ns], [T,fn], [T,u],
-    //                 [F,n], [F,s], [F,ls], [F,ns], [F,fn], [F,u],
-    //                 [n,T], [n,F], [n,s], [n,ls], [n,ns], [n,fn], [n,u],
-    //                 [s,T], [s,F], [s,n], [s,ls], [s,ns], [s,fn], [s,u],
-    //                 [ls,T], [ls,F], [ls,n], [ls,s], [ls,ns], [ls,fn], [ls,u],
-    //                 [ns,T], [ns,F], [ns,n], [ns,s], [ns,ls], [ns,fn], [ns,u],
-    //                 [fn,T], [fn,F], [fn,n], [fn,s], [fn,ls], [fn,ns], [fn,u],
-    //                 [u,T], [u,F], [u,n], [u,s], [u,ls], [u,ns], [u,fn], [u,u] ]) {
-    // 
-    //             var LType = context.type(L);
-    //             var RType = context.type(R);
-    //             expect(await evaluate("L - R", {L,R})).to.be.Undefined('subtraction', L, R, new Position("L - R", 2));
-    //         }            
-    //     });
-    // 
-    //     it("should return (x1-y1, x2-y2, ...) if X and/or Y is a tuple", async () => {
-    //         var presets = {};
-    //         expect(Array.from(await evaluate("(10,20,30) - (1,2,3)", presets))).to.deep.equal([9,18,27]);
-    //         expect(Array.from(await evaluate("(10,20,30) - (1,2)", presets))).to.deep.equal([9,18,30]);
-    //         expect(Array.from(await evaluate("(10,20,30) - 1", presets))).to.deep.equal([9,20,30]);
-    // 
-    //         // partial exception
-    //         var source = "(10,20,30) - (1,2,[])";
-    //         var tuple = await evaluate(source);
-    //         expect(tuple).to.be.instanceof(Tuple);
-    //         expect(Array.from(tuple)[0]).to.equal(9);
-    //         expect(Array.from(tuple)[1]).to.equal(18);
-    //         expect(Array.from(tuple)[2]).to.be.Undefined('subtraction', 30, [], new Position(source, 11));
-    //     });
-    // });
-    // 
-    // describe("X * Y", () => {
-    // 
-    //     it("should return () if either X or Y is nothing", async () => {
-    //         var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false,
-    //                 un: new Undefined()};
-    // 
-    //         expect(await evaluate("() * ()", presets)).to.equal(null);
-    //         expect(await evaluate("() * T", presets)).to.equal(null);
-    //         expect(await evaluate("() * F", presets)).to.equal(null);
-    //         expect(await evaluate("() * 10", presets)).to.equal(null);
-    //         expect(await evaluate("() * 'abc'", presets)).to.equal(null);
-    //         expect(await evaluate("() * fn", presets)).to.equal(null);
-    //         expect(await evaluate("() * ls", presets)).to.equal(null);
-    //         expect(await evaluate("() * ns", presets)).to.equal(null);
-    //         expect(await evaluate("() * (1,2,3)", presets)).to.equal(null);
-    //         expect(await evaluate("() * un", presets)).to.equal(null);
-    // 
-    //         expect(await evaluate("() * ()", presets)).to.equal(null);
-    //         expect(await evaluate("T * ()", presets)).to.equal(null);
-    //         expect(await evaluate("F * ()", presets)).to.equal(null);
-    //         expect(await evaluate("10 * ()", presets)).to.equal(null);
-    //         expect(await evaluate("'abc' * ()", presets)).to.equal(null);
-    //         expect(await evaluate("fn * ()", presets)).to.equal(null);
-    //         expect(await evaluate("ls * ()", presets)).to.equal(null);
-    //         expect(await evaluate("ns * ()", presets)).to.equal(null);
-    //         expect(await evaluate("(1,2,3) * ()", presets)).to.equal(null);
-    //         expect(await evaluate("un * ()", presets)).to.equal(null);
-    //     });
-    // 
-    //     it("should return `X&&Y` if both X and Y are booleans", async () => {
-    //         var presets = {T:true, F:false};
-    //         expect(await evaluate("T * T", presets)).to.equal(true);
-    //         expect(await evaluate("T * F", presets)).to.equal(false);
-    //         expect(await evaluate("F * T", presets)).to.equal(false);
-    //         expect(await evaluate("F * F", presets)).to.equal(false);
-    //     });
-    // 
-    //     it("should return `X*Y` if both X and Y are numbers", async () => {
-    //         expect(await evaluate("10 * 2")).to.equal(20);
-    //         expect(await evaluate("10 * 0")).to.equal(0);
-    //         expect(await evaluate("10 * (-2)")).to.equal(-20);
-    //     });
-    // 
-    //     it("should concatenate X times Y if X is a number and Y is a string", async () => {
-    //         expect(await evaluate("3 * 'Abc'")).to.equal("AbcAbcAbc");
-    //         expect(await evaluate("3.1 * 'Abc'")).to.equal("AbcAbcAbc");
-    //         expect(await evaluate("3.9 * 'Abc'")).to.equal("AbcAbcAbc");
-    //         expect(await evaluate("0 * 'Abc'")).to.equal("");
-    //         expect(await evaluate("-2 * 'Abc'")).to.equal("");
-    //     });
-    // 
-    //     it("should concatenate Y times X if Y is a number and X is a string", async () => {
-    //         expect(await evaluate("'Abc' * 3")).to.equal("AbcAbcAbc");
-    //         expect(await evaluate("'Abc' * 3.1")).to.equal("AbcAbcAbc");
-    //         expect(await evaluate("'Abc' * 3.9")).to.equal("AbcAbcAbc");
-    //         expect(await evaluate("'Abc' * 0")).to.equal("");
-    //         expect(await evaluate("'Abc' * (-2)")).to.equal("");
-    //     });
-    // 
-    //     it("should concatenate X times Y if X is a number and Y is a list", async () => {
-    //         expect(await evaluate("3 * [1,2,3]")).to.deep.equal([1,2,3,1,2,3,1,2,3]);
-    //         expect(await evaluate("3.1 * [1,2,3]")).to.deep.equal([1,2,3,1,2,3,1,2,3]);
-    //         expect(await evaluate("3.9 * [1,2,3]")).to.deep.equal([1,2,3,1,2,3,1,2,3]);
-    //         expect(await evaluate("0 * [1,2,3]")).to.deep.equal([]);
-    //         expect(await evaluate("-2 * [1,2,3]")).to.deep.equal([]);
-    //     });
-    // 
-    //     it("should concatenate Y times X if Y is a number and X is a list", async () => {
-    //         expect(await evaluate("[1,2,3] * 3")).to.deep.equal([1,2,3,1,2,3,1,2,3]);
-    //         expect(await evaluate("[1,2,3] * 3.1")).to.deep.equal([1,2,3,1,2,3,1,2,3]);
-    //         expect(await evaluate("[1,2,3] * 3.9")).to.deep.equal([1,2,3,1,2,3,1,2,3]);
-    //         expect(await evaluate("[1,2,3] * 0")).to.deep.equal([]);
-    //         expect(await evaluate("[1,2,3] * (-2)")).to.deep.equal([]);
-    //     });
-    // 
-    //     it("should return Undefined for all the other type combinations", async () => {
-    //         var T=true, F=false, n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x, u=new Undefined();
-    //         for (let [L,R] of [
-    //                 [T,n], [T,s], [T,ls], [T,ns], [T,fn], [T,u],
-    //                 [F,n], [F,s], [F,ls], [F,ns], [F,fn], [F,u],
-    //                 [n,T], [n,F], [n,ns], [n,fn], [n,u],
-    //                 [s,T], [s,F], [s,ls], [s,ns], [s,fn], [s,u],
-    //                 [ls,T], [ls,F], [ls,s], [ls,ns], [ls,fn], [ls,u],
-    //                 [ns,T], [ns,F], [ns,n], [ns,s], [ns,ls], [ns,fn], [ns,u],
-    //                 [fn,T], [fn,F], [fn,n], [fn,s], [fn,ls], [fn,ns], [fn,u],
-    //                 [u,T], [u,F], [u,n], [u,s], [u,ls], [u,ns], [u,fn], [u,u] ]) {
-    // 
-    //             var LType = context.type(L);
-    //             var RType = context.type(R);
-    //             expect(await evaluate("L * R", {L,R})).to.be.Undefined('product', L, R, new Position("L * R", 2));
-    //         }                        
-    //     });
-    // 
-    //     it("should return (x1*y1, x2*y2, ...) if X and/or Y is a tuple", async () => {
-    //         var presets = {T:true, F:false};
-    //         expect(Array.from(await evaluate("(T, 3, 'a', [1]) * (F, 2, 2, 2)",presets))).to.deep.equal([false, 6, "aa", [1,1]]);
-    //         expect(Array.from(await evaluate("(10,20,30) * (2,3,4)",presets))).to.deep.equal([20,60,120]);
-    //         expect(Array.from(await evaluate("(10,20,30) * (2,3)",presets))).to.deep.equal([20,60]);
-    //         expect(Array.from(await evaluate("(10,20) * (2,3,4)",presets))).to.deep.equal([20,60]);
-    //         expect(await evaluate("10 * (2,3,4)",presets)).to.equal(20);
-    //         expect(await evaluate("(10,20,30) * 2",presets)).to.equal(20);
-    // 
-    //         // partial exception
-    //         var source = "(10,20,30) * (1,2,{})";
-    //         var tuple = await evaluate(source);
-    //         expect(tuple).to.be.instanceof(Tuple);
-    //         expect(Array.from(tuple)[0]).to.equal(10);
-    //         expect(Array.from(tuple)[1]).to.equal(40);
-    //         expect(Array.from(tuple)[2]).to.be.Undefined('product', 30, {}, new Position(source, 11));
-    //     });
-    // });
-    // 
-    // describe("X / Y", () => {
-    // 
-    //     it("should return nothing if X is nothing", async () => {
-    //         var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
-    //         expect(await evaluate("() / ()", presets)).to.equal(null);
-    //         expect(await evaluate("() / T", presets)).to.equal(null);
-    //         expect(await evaluate("() / F", presets)).to.equal(null);
-    //         expect(await evaluate("() / 10", presets)).to.equal(null);
-    //         expect(await evaluate("() / 'abc'", presets)).to.equal(null);
-    //         expect(await evaluate("() / fn", presets)).to.equal(null);
-    //         expect(await evaluate("() / ls", presets)).to.equal(null);
-    //         expect(await evaluate("() / ns", presets)).to.equal(null);
-    //     });
-    // 
-    //     it("should return Undefined if Y is NOTHING", async () => {
-    //         for (let L of [true, false, 10, 'abc', [1,2,3], {x:1}, x=>x]) {
-    //             var LType = context.type(L);
-    //             expect(await evaluate("L / ()", {L})).to.be.Undefined('division', L, new Position("L / ()", 2));
-    //         }
-    //     });
-    // 
-    //     it("should return `X/Y` if both X and Y are numbers", async () => {
-    //         expect(await evaluate("10 / 2")).to.equal(5);
-    //         expect(await evaluate("20 / 0")).to.equal(Infinity);
-    //         expect(await evaluate("10 / (-2)")).to.equal(-5);
-    //     });
-    // 
-    //     it("should return Undefined for all the other type combinations", async () => {
-    //         var T=true, F=false, n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x, u=new Undefined();
-    //         for (let [L,R] of [
-    //                 [T,n], [T,s], [T,ls], [T,ns], [T,fn], [T,u],
-    //                 [F,n], [F,s], [F,ls], [F,ns], [F,fn], [F,u],
-    //                 [n,T], [n,F], [n,s], [n,ns], [n,fn], [n,u],
-    //                 [s,T], [s,F], [s,n], [s,ls], [s,ns], [s,fn], [s,u],
-    //                 [ls,T], [ls,F], [ls,n], [ls,s], [ls,ns], [ls,fn], [ls,u],
-    //                 [ns,T], [ns,F], [ns,n], [ns,s], [ns,ls], [ns,fn], [ns,u],
-    //                 [fn,T], [fn,F], [fn,n], [fn,s], [fn,ls], [fn,ns], [fn,u],
-    //                 [u,T], [u,F], [u,n], [u,s], [u,ls], [u,ns], [u,fn], [u,u] ]) {
-    // 
-    //             var LType = context.type(L);
-    //             var RType = context.type(R);
-    //             expect(await evaluate("L / R", {L,R})).to.be.Undefined('division', L, R, new Position("L / R", 2));
-    //         }                        
-    //     });
-    // 
-    //     it("should return (x1/y1, x2/y2, ...) if X and/or Y is a tuple", async () => {
-    //         expect(Array.from(await evaluate("(10,20,30) / (2,5,3)"))).to.deep.equal([5,4,10]);
-    //         expect(Array.from(await evaluate("(10,20) / (2,5,3)"))).to.deep.equal([5,4]);
-    //         expect(await evaluate("10 / (2,5,3)")).to.equal(5);
-    //         expect(await evaluate("() / (2,4,3)")).to.equal(null);
-    // 
-    //         // partial exception
-    //         var source = "(10,20,30) / (2,5)";
-    //         var tuple = await evaluate(source);
-    //         expect(tuple).to.be.instanceof(Tuple);
-    //         expect(Array.from(tuple)[0]).to.equal(5);
-    //         expect(Array.from(tuple)[1]).to.equal(4);
-    //         expect(Array.from(tuple)[2]).to.be.Undefined('division', 30, new Position(source, 11));
-    //     });
-    // });
-    // 
-    // describe("X % Y", () => {
-    // 
-    //     it("should return NOTHING if X is nothing", async () => {
-    //         var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
-    //         expect(await evaluate("() % ()", presets)).to.equal(null);
-    //         expect(await evaluate("() % T", presets)).to.equal(null);
-    //         expect(await evaluate("() % F", presets)).to.equal(null);
-    //         expect(await evaluate("() % 10", presets)).to.equal(null);
-    //         expect(await evaluate("() % 'abc'", presets)).to.equal(null);
-    //         expect(await evaluate("() % fn", presets)).to.equal(null);
-    //         expect(await evaluate("() % ls", presets)).to.equal(null);
-    //         expect(await evaluate("() % ns", presets)).to.equal(null);
-    //     });
-    // 
-    //     it("should return Undefined if Y is NOTHING", async () => {
-    //         for (let L of [true, false, 10, 'abc', [1,2,3], {x:1}, x=>x]) {
-    //             var LType = context.type(L);
-    //             expect(await evaluate("L % ()", {L})).to.be.Undefined('modulo', L, new Position("L % ()", 2));
-    //         }
-    //     });
-    // 
-    //     it("should return `X%Y` if both X and Y are numbers", async () => {
-    //         expect(await evaluate("10 % 4")).to.equal(2);
-    //         expect(await evaluate("10 % (-4)")).to.equal(2);
-    //     });
-    // 
-    //     it("should return Undefined for all the other type combinations", async () => {
-    //         var T=true, F=false, n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x, u=new Undefined();
-    //         for (let [L,R] of [
-    //                 [T,n], [T,s], [T,ls], [T,ns], [T,fn], [T,u],
-    //                 [F,n], [F,s], [F,ls], [F,ns], [F,fn], [F,u],
-    //                 [n,T], [n,F], [n,s], [n,ns], [n,fn], [n,u],
-    //                 [s,T], [s,F], [s,n], [s,ls], [s,ns], [s,fn], [s,u],
-    //                 [ls,T], [ls,F], [ls,n], [ls,s], [ls,ns], [ls,fn], [ls,u],
-    //                 [ns,T], [ns,F], [ns,n], [ns,s], [ns,ls], [ns,fn], [ns,u],
-    //                 [fn,T], [fn,F], [fn,n], [fn,s], [fn,ls], [fn,ns], [fn,u],
-    //                 [u,T], [u,F], [u,n], [u,s], [u,ls], [u,ns], [u,fn], [u,u] ]) {
-    // 
-    //             var LType = context.type(L);
-    //             var RType = context.type(R);
-    //             expect(await evaluate("L % R", {L,R})).to.be.Undefined('modulo', L, R, new Position("L % R", 2));
-    //         }            
-    //     });
-    // 
-    //     it("should return (x1/y1, x2/y2, ...) if X and/or Y is a tuple", async () => {
-    //         expect(Array.from(await evaluate("(10,20,30) % (4,7,8)"))).to.deep.equal([2,6,6]);
-    //         expect(Array.from(await evaluate("(10,20) % (4,7,8)"))).to.deep.equal([2,6]);
-    //         expect(await evaluate("10 % (4,7,8)")).to.equal(2);
-    //         expect(await evaluate("() % (4,7,8)")).to.equal(null);
-    // 
-    //         // partial exception
-    //         var source = "(10,20,30) % (3,6)";
-    //         var tuple = await evaluate(source);
-    //         expect(tuple).to.be.instanceof(Tuple);
-    //         expect(Array.from(tuple)[0]).to.equal(1);
-    //         expect(Array.from(tuple)[1]).to.equal(2);
-    //         expect(Array.from(tuple)[2]).to.be.Undefined('modulo', 30, new Position(source, 11));
-    //     });
-    // });
-    // 
-    // describe("X ^ Y", () => {
-    // 
-    //     it("should return nothing if X is nothing", async () => {
-    //         var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
-    //         expect(await evaluate("() ^ ()", presets)).to.equal(null);
-    //         expect(await evaluate("() ^ T", presets)).to.equal(null);
-    //         expect(await evaluate("() ^ F", presets)).to.equal(null);
-    //         expect(await evaluate("() ^ 10", presets)).to.equal(null);
-    //         expect(await evaluate("() ^ 'abc'", presets)).to.equal(null);
-    //         expect(await evaluate("() ^ fn", presets)).to.equal(null);
-    //         expect(await evaluate("() ^ ls", presets)).to.equal(null);
-    //         expect(await evaluate("() ^ ns", presets)).to.equal(null);
-    //     });
-    // 
-    //     it("should return Undefined if Y is NOTHING", async () => {
-    //         for (let L of [true, false, 10, 'abc', [1,2,3], {x:1}, x=>x]) {
-    //             var LType = context.type(L);
-    //             expect(await evaluate("L ^ ()", {L})).to.be.Undefined('exponentiation', L, new Position("L ^ ()", 2));
-    //         }
-    //     });
-    // 
-    //     it("should return `X**Y` if both X and Y are numbers", async () => {
-    //         expect(await evaluate("10 ^ 2")).to.equal(100);
-    //         expect(await evaluate("20 ^ 0")).to.equal(1);
-    //         expect(await evaluate("10 ^ (-2)")).to.equal(0.01);
-    //     });
-    // 
-    //     it("should return Undefined for all the other type combinations", async () => {
-    //         var T=true, F=false, n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x, u=new Undefined();
-    //         for (let [L,R] of [
-    //                 [T,n], [T,s], [T,ls], [T,ns], [T,fn], [T,u],
-    //                 [F,n], [F,s], [F,ls], [F,ns], [F,fn], [F,u],
-    //                 [n,T], [n,F], [n,s], [n,ns], [n,fn], [n,u],
-    //                 [s,T], [s,F], [s,n], [s,ls], [s,ns], [s,fn], [s,u],
-    //                 [ls,T], [ls,F], [ls,n], [ls,s], [ls,ns], [ls,fn], [ls,u],
-    //                 [ns,T], [ns,F], [ns,n], [ns,s], [ns,ls], [ns,fn], [ns,u],
-    //                 [fn,T], [fn,F], [fn,n], [fn,s], [fn,ls], [fn,ns], [fn,u],
-    //                 [u,T], [u,F], [u,n], [u,s], [u,ls], [u,ns], [u,fn], [u,u] ]) {
-    // 
-    //             var LType = context.type(L);
-    //             var RType = context.type(R);
-    //             expect(await evaluate("L ^ R", {L,R})).to.be.Undefined('exponentiation', L, R, new Position("L ^ R", 2));
-    //         }
-    //     });
-    // 
-    //     it("should return (x1^y1, x2^y2, ...) if X and/or Y is a tuple", async () => {
-    //         expect(Array.from(await evaluate("(10,20,30) ^ (2,3,4)"))).to.deep.equal([10**2,20**3,30**4]);
-    //         expect(Array.from(await evaluate("(10,20) ^ (2,3,4)"))).to.deep.equal([10**2,20**3]);
-    //         expect(await evaluate("10 ^ (2,3,4)")).to.equal(10**2);
-    //         expect(await evaluate("() ^ (2,3,4)")).to.equal(null);
-    // 
-    //         // partial exception
-    //         var source = "(2,3,4) ^ (2,3)";
-    //         var tuple = await evaluate(source);
-    //         expect(tuple).to.be.instanceof(Tuple);
-    //         expect(Array.from(tuple)[0]).to.equal(4);
-    //         expect(Array.from(tuple)[1]).to.equal(27);
-    //         expect(Array.from(tuple)[2]).to.be.Undefined("exponentiation", 4, new Position(source, 8));
-    //     });
-    // });
-    // 
-    // 
     // // COMPARISON OPERATORS
     // 
     // describe("X == Y", () => {
