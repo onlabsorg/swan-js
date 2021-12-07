@@ -1150,64 +1150,63 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
         });
     });
     
-    describe.skip("X ^ Y", () => {
+    describe("X ^ Y", () => {
     
-        it("should return nothing if X is nothing", async () => {
-            var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
-            expect(await evaluate("() ^ ()", presets)).to.equal(null);
-            expect(await evaluate("() ^ T", presets)).to.equal(null);
-            expect(await evaluate("() ^ F", presets)).to.equal(null);
-            expect(await evaluate("() ^ 10", presets)).to.equal(null);
-            expect(await evaluate("() ^ 'abc'", presets)).to.equal(null);
-            expect(await evaluate("() ^ fn", presets)).to.equal(null);
-            expect(await evaluate("() ^ ls", presets)).to.equal(null);
-            expect(await evaluate("() ^ ns", presets)).to.equal(null);
+        it("should return () if X is nothing", async () => {
+            var context = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false,
+                    un: new Undefined()};
+    
+            expect(await parse("() ^ ()"     )(context)).to.equal(null);
+            expect(await parse("() ^ T"      )(context)).to.equal(null);
+            expect(await parse("() ^ F"      )(context)).to.equal(null);
+            expect(await parse("() ^ 10"     )(context)).to.equal(null);
+            expect(await parse("() ^ 'abc'"  )(context)).to.equal(null);
+            expect(await parse("() ^ fn"     )(context)).to.equal(null);
+            expect(await parse("() ^ ls"     )(context)).to.equal(null);
+            expect(await parse("() ^ ns"     )(context)).to.equal(null);
+            expect(await parse("() ^ (1,2,3)")(context)).to.equal(null);
+            expect(await parse("() ^ un"     )(context)).to.equal(null);
         });
-    
-        it("should return Undefined if Y is NOTHING", async () => {
-            for (let L of [true, false, 10, 'abc', [1,2,3], {x:1}, x=>x]) {
-                var LType = context.type(L);
-                expect(await evaluate("L ^ ()", {L})).to.be.Undefined('exponentiation', L, new Position("L ^ ()", 2));
-            }
-        });
-    
+        
         it("should return `X**Y` if both X and Y are numbers", async () => {
-            expect(await evaluate("10 ^ 2")).to.equal(100);
-            expect(await evaluate("20 ^ 0")).to.equal(1);
-            expect(await evaluate("10 ^ (-2)")).to.equal(0.01);
+            expect(await parse("2 ^ 2"   )()).to.equal(4);
+            expect(await parse("2 ^ 5"   )()).to.equal(32);
+            expect(await parse("2 ^ (-2)")()).to.equal(0.25);
+            expect(await parse("2 ^ 0"   )()).to.equal(1);
         });
-    
+        
         it("should return Undefined for all the other type combinations", async () => {
-            var T=true, F=false, n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x, u=new Undefined();
+            var T=true, F=false, n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x, u=new Undefined(), no=null;
             for (let [L,R] of [
-                    [T,n], [T,s], [T,ls], [T,ns], [T,fn], [T,u],
-                    [F,n], [F,s], [F,ls], [F,ns], [F,fn], [F,u],
-                    [n,T], [n,F], [n,s], [n,ns], [n,fn], [n,u],
-                    [s,T], [s,F], [s,n], [s,ls], [s,ns], [s,fn], [s,u],
-                    [ls,T], [ls,F], [ls,n], [ls,s], [ls,ns], [ls,fn], [ls,u],
-                    [ns,T], [ns,F], [ns,n], [ns,s], [ns,ls], [ns,fn], [ns,u],
-                    [fn,T], [fn,F], [fn,n], [fn,s], [fn,ls], [fn,ns], [fn,u],
-                    [u,T], [u,F], [u,n], [u,s], [u,ls], [u,ns], [u,fn], [u,u] ]) {
+                    [T, T], [T, F], [T, n], [T, s], [T, ls], [T, ns], [T, fn], [T, u], [T, no],
+                    [F, T], [F, F], [F, n], [F, s], [F, ls], [F, ns], [F, fn], [F, u], [F, no],
+                    [n, T], [n, F],         [n, s], [n, ls], [n, ns], [n, fn], [n, u], [n, no],
+                    [s, T], [s, F], [s, n], [s, s], [s, ls], [s, ns], [s, fn], [s, u], [s, no],
+                    [ls,T], [ls,F], [ls,n], [ls,s], [ls,ls], [ls,ns], [ls,fn], [ls,u], [ls,no],
+                    [ns,T], [ns,F], [ns,n], [ns,s], [ns,ls], [ns,ns], [ns,fn], [ns,u], [ns,no],
+                    [fn,T], [fn,F], [fn,n], [fn,s], [fn,ls], [fn,ns], [fn,fn], [fn,u], [fn,no],
+                    [u, T], [u, F], [u, n], [u, s], [u, ls], [u, ns], [u, fn], [u, u], [u, no]]) {
     
-                var LType = context.type(L);
-                var RType = context.type(R);
-                expect(await evaluate("L ^ R", {L,R})).to.be.Undefined('exponentiation', L, R, new Position("L ^ R", 2));
-            }
+                const undef = await parse("L ^ R")({L,R});
+                expect(undef).to.be.Undefined("PowOperation");
+                expect(undef.children[0].unwrap()).to.deep.equal(L);
+                expect(undef.children[1].unwrap()).to.deep.equal(R);
+            }                        
         });
     
-        it("should return (x1^y1, x2^y2, ...) if X and/or Y is a tuple", async () => {
-            expect(Array.from(await evaluate("(10,20,30) ^ (2,3,4)"))).to.deep.equal([10**2,20**3,30**4]);
-            expect(Array.from(await evaluate("(10,20) ^ (2,3,4)"))).to.deep.equal([10**2,20**3]);
-            expect(await evaluate("10 ^ (2,3,4)")).to.equal(10**2);
-            expect(await evaluate("() ^ (2,3,4)")).to.equal(null);
+        it("should return (x1**y1, x2**y2, ...) if X and/or Y is a tuple", async () => {
+            var context = {T:true, F:false};
+            expect(await parse("(2,3,4) ^ (2,4,3)")(context)).to.be.Tuple([4,81,64]);
+            expect(await parse("(2,3)   ^ (2,4,3)")(context)).to.be.Tuple([4,81]);
+            expect(await parse("2       ^ (2,4,3)")(context)).to.equal(4);
     
             // partial exception
-            var source = "(2,3,4) ^ (2,3)";
-            var tuple = await evaluate(source);
-            expect(tuple).to.be.instanceof(Tuple);
+            var tuple = await parse("(2,3,4) ^ (2,4)")();
             expect(Array.from(tuple)[0]).to.equal(4);
-            expect(Array.from(tuple)[1]).to.equal(27);
-            expect(Array.from(tuple)[2]).to.be.Undefined("exponentiation", 4, new Position(source, 8));
+            expect(Array.from(tuple)[1]).to.equal(81);
+            expect(Array.from(tuple)[2]).to.be.Undefined('PowOperation');
+            expect(Array.from(tuple)[2].children[0].unwrap()).to.equal(4);
+            expect(Array.from(tuple)[2].children[1].unwrap()).to.equal(null);
         });
     });
         
