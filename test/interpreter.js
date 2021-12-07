@@ -841,33 +841,34 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
         });
     });
     
-    describe.skip("X - Y", () => {
+    describe("X - Y", () => {
     
         it("should return X if Y is nothing", async () => {
-            var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
-            expect(await evaluate("() - ()", presets)).to.equal(null);
-            expect(await evaluate("T - ()", presets)).to.equal(true);
-            expect(await evaluate("F - ()", presets)).to.equal(false);
-            expect(await evaluate("10 - ()", presets)).to.equal(10);
-            expect(await evaluate("'abc' - ()", presets)).to.equal("abc");
-            expect(await evaluate("fn - ()", presets)).to.equal(presets.fn);
-            expect(await evaluate("ls - ()", presets)).to.deep.equal(presets.ls);
-            expect(await evaluate("ns - ()", presets)).to.deep.equal(presets.ns);
-            expect(Array.from(await evaluate("(1,2,3) - ()", presets))).to.deep.equal([1,2,3]);
+            var context = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
+            expect(await parse("() - ()"   )(context)).to.equal(null);
+            expect(await parse("T - ()"    )(context)).to.equal(true);
+            expect(await parse("F - ()"    )(context)).to.equal(false);
+            expect(await parse("10 - ()"   )(context)).to.equal(10);
+            expect(await parse("'abc' - ()")(context)).to.equal("abc");
+            expect(await parse("fn - ()"   )(context)).to.equal(context.fn);
+            expect(await parse("ls - ()"   )(context)).to.deep.equal(context.ls);
+            expect(await parse("ns - ()"   )(context)).to.deep.equal(context.ns);
+            expect(await parse("(1,2) - ()")(context)).to.be.Tuple([1,2]);
         });
     
         it("should return Undefined if X is nothing", async () => {
             for (let R of [true, false, 10, 'abc', [1,2,3], {a:1}, x=>x]) {
-                var RType = context.type(R);
-                expect(await evaluate("() - R", {R})).to.be.Undefined('subtraction', R, new Position("() - R", 3));
+                var undef = await parse("() - R")({R});
+                expect(undef).to.be.Undefined('SubOperation');
+                expect(undef.children[0].unwrap()).to.be.null;
+                expect(undef.children[1].unwrap()).to.deep.equal(R);
             }
         });
     
         it("should return `X-Y` if both X and Y are numbers", async () => {
-            var presets = {T:true, F:false};
-            expect(await evaluate("10 - 1", presets)).to.equal(9);
-            expect(await evaluate("20 - 0", presets)).to.equal(20);
-            expect(await evaluate("10 - (-7)", presets)).to.equal(17);
+            expect(await parse("10 - 1"   )()).to.equal(9);
+            expect(await parse("20 - 0"   )()).to.equal(20);
+            expect(await parse("10 - (-7)")()).to.equal(17);
         });
     
         it("should return Undefined for all the other type combinations", async () => {
@@ -882,25 +883,25 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                     [fn,T], [fn,F], [fn,n], [fn,s], [fn,ls], [fn,ns], [fn,u],
                     [u,T], [u,F], [u,n], [u,s], [u,ls], [u,ns], [u,fn], [u,u] ]) {
     
-                var LType = context.type(L);
-                var RType = context.type(R);
-                expect(await evaluate("L - R", {L,R})).to.be.Undefined('subtraction', L, R, new Position("L - R", 2));
+                var undef = await parse("L - R")({L,R});
+                expect(undef).to.be.Undefined('SubOperation');
+                expect(undef.children[0].unwrap()).to.deep.equal(L);
+                expect(undef.children[1].unwrap()).to.deep.equal(R);
             }            
         });
     
         it("should return (x1-y1, x2-y2, ...) if X and/or Y is a tuple", async () => {
-            var presets = {};
-            expect(Array.from(await evaluate("(10,20,30) - (1,2,3)", presets))).to.deep.equal([9,18,27]);
-            expect(Array.from(await evaluate("(10,20,30) - (1,2)", presets))).to.deep.equal([9,18,30]);
-            expect(Array.from(await evaluate("(10,20,30) - 1", presets))).to.deep.equal([9,20,30]);
+            expect(await parse("(10,20,30) - (1,2,3)")(context)).to.be.Tuple([9,18,27]);
+            expect(await parse("(10,20,30) - (1,2)"  )(context)).to.be.Tuple([9,18,30]);
+            expect(await parse("(10,20,30) - 1"      )(context)).to.be.Tuple([9,20,30]);
     
             // partial exception
-            var source = "(10,20,30) - (1,2,[])";
-            var tuple = await evaluate(source);
-            expect(tuple).to.be.instanceof(Tuple);
+            var tuple = await parse("(10,20,30) - (1,2,[])")();
             expect(Array.from(tuple)[0]).to.equal(9);
             expect(Array.from(tuple)[1]).to.equal(18);
-            expect(Array.from(tuple)[2]).to.be.Undefined('subtraction', 30, [], new Position(source, 11));
+            expect(Array.from(tuple)[2]).to.be.Undefined('SubOperation');
+            expect(Array.from(tuple)[2].children[0].unwrap()).to.equal(30);
+            expect(Array.from(tuple)[2].children[1].unwrap()).to.deep.equal([]);
         });
     });
     
