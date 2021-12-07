@@ -905,115 +905,130 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
         });
     });
     
-    describe.skip("X * Y", () => {
+    describe("X * Y", () => {
     
         it("should return () if either X or Y is nothing", async () => {
-            var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false,
+            var context = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false,
                     un: new Undefined()};
     
-            expect(await evaluate("() * ()", presets)).to.equal(null);
-            expect(await evaluate("() * T", presets)).to.equal(null);
-            expect(await evaluate("() * F", presets)).to.equal(null);
-            expect(await evaluate("() * 10", presets)).to.equal(null);
-            expect(await evaluate("() * 'abc'", presets)).to.equal(null);
-            expect(await evaluate("() * fn", presets)).to.equal(null);
-            expect(await evaluate("() * ls", presets)).to.equal(null);
-            expect(await evaluate("() * ns", presets)).to.equal(null);
-            expect(await evaluate("() * (1,2,3)", presets)).to.equal(null);
-            expect(await evaluate("() * un", presets)).to.equal(null);
+            expect(await parse("() * ()"     )(context)).to.equal(null);
+            expect(await parse("() * T"      )(context)).to.equal(null);
+            expect(await parse("() * F"      )(context)).to.equal(null);
+            expect(await parse("() * 10"     )(context)).to.equal(null);
+            expect(await parse("() * 'abc'"  )(context)).to.equal(null);
+            expect(await parse("() * fn"     )(context)).to.equal(null);
+            expect(await parse("() * ls"     )(context)).to.equal(null);
+            expect(await parse("() * ns"     )(context)).to.equal(null);
+            expect(await parse("() * (1,2,3)")(context)).to.equal(null);
+            expect(await parse("() * un"     )(context)).to.equal(null);
     
-            expect(await evaluate("() * ()", presets)).to.equal(null);
-            expect(await evaluate("T * ()", presets)).to.equal(null);
-            expect(await evaluate("F * ()", presets)).to.equal(null);
-            expect(await evaluate("10 * ()", presets)).to.equal(null);
-            expect(await evaluate("'abc' * ()", presets)).to.equal(null);
-            expect(await evaluate("fn * ()", presets)).to.equal(null);
-            expect(await evaluate("ls * ()", presets)).to.equal(null);
-            expect(await evaluate("ns * ()", presets)).to.equal(null);
-            expect(await evaluate("(1,2,3) * ()", presets)).to.equal(null);
-            expect(await evaluate("un * ()", presets)).to.equal(null);
+            expect(await parse("() * ()"     )(context)).to.equal(null);
+            expect(await parse("T * ()"      )(context)).to.equal(null);
+            expect(await parse("F * ()"      )(context)).to.equal(null);
+            expect(await parse("10 * ()"     )(context)).to.equal(null);
+            expect(await parse("'abc' * ()"  )(context)).to.equal(null);
+            expect(await parse("fn * ()"     )(context)).to.equal(null);
+            expect(await parse("ls * ()"     )(context)).to.equal(null);
+            expect(await parse("ns * ()"     )(context)).to.equal(null);
+            expect(await parse("(1,2,3) * ()")(context)).to.equal(null);
+            expect(await parse("un * ()"     )(context)).to.equal(null);
         });
+        
+        it("should return Y if X is true", async () => {
+            var context = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false,
+                    un: new Undefined()};
     
-        it("should return `X&&Y` if both X and Y are booleans", async () => {
-            var presets = {T:true, F:false};
-            expect(await evaluate("T * T", presets)).to.equal(true);
-            expect(await evaluate("T * F", presets)).to.equal(false);
-            expect(await evaluate("F * T", presets)).to.equal(false);
-            expect(await evaluate("F * F", presets)).to.equal(false);
+            expect(await parse("T * ()"   )(context)).to.equal(null);
+            expect(await parse("T * T"    )(context)).to.equal(true);
+            expect(await parse("T * F"    )(context)).to.equal(false);
+            expect(await parse("T * 10"   )(context)).to.equal(10);
+            expect(await parse("T * 'abc'")(context)).to.equal('abc');
+            expect(await parse("T * fn"   )(context)).to.equal(context.fn);
+            expect(await parse("T * ls"   )(context)).to.deep.equal(context.ls);
+            expect(await parse("T * ns"   )(context)).to.deep.equal(context.ns);
+            expect(await parse("T * un"   )(context)).to.equal(context.un);            
+        });
+
+        it("should return the void element of the Y type if X is false", async () => {
+            var context = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false,
+                    un: new Undefined()};
+    
+            expect(await parse("F * ()"   )(context)).to.equal(null);
+            expect(await parse("F * T"    )(context)).to.equal(false);
+            expect(await parse("F * F"    )(context)).to.equal(false);
+            expect(await parse("F * 10"   )(context)).to.equal(0);
+            expect(await parse("F * 'abc'")(context)).to.equal('');
+            expect(await parse("F * fn"   )(context)).to.equal(null);
+            expect(await parse("F * ls"   )(context)).to.deep.equal([]);
+            expect(await parse("F * ns"   )(context)).to.deep.equal({});
+            expect(await parse("F * un"   )(context)).to.equal(null);                        
+        });
+
+        it("should return X if Y is true", async () => {
+            var context = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false,
+                    un: new Undefined()};
+    
+            expect(await parse("() * T"   )(context)).to.equal(null);
+            expect(await parse("10 * T"   )(context)).to.equal(10);
+            expect(await parse("'abc' * T")(context)).to.equal('abc');
+            expect(await parse("fn * T"   )(context)).to.equal(context.fn);
+            expect(await parse("ls * T"   )(context)).to.deep.equal(context.ls);
+            expect(await parse("ns * T"   )(context)).to.deep.equal(context.ns);
+            expect(await parse("un * T"   )(context)).to.equal(context.un);                        
+        });
+
+        it("should return the void element of the X type if Y is false", async () => {
+            var context = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false,
+                    un: new Undefined()};
+    
+            expect(await parse("() * F"   )(context)).to.equal(null);
+            expect(await parse("10 * F"   )(context)).to.equal(0);
+            expect(await parse("'abc' * F")(context)).to.equal('');
+            expect(await parse("fn * F"   )(context)).to.equal(null);
+            expect(await parse("ls * F"   )(context)).to.deep.equal([]);
+            expect(await parse("ns * F"   )(context)).to.deep.equal({});
+            expect(await parse("un * F"   )(context)).to.equal(null);                                    
         });
     
         it("should return `X*Y` if both X and Y are numbers", async () => {
-            expect(await evaluate("10 * 2")).to.equal(20);
-            expect(await evaluate("10 * 0")).to.equal(0);
-            expect(await evaluate("10 * (-2)")).to.equal(-20);
+            expect(await parse("10 * 2"   )()).to.equal(20);
+            expect(await parse("10 * 0"   )()).to.equal(0);
+            expect(await parse("10 * (-2)")()).to.equal(-20);
         });
-    
-        it("should concatenate X times Y if X is a number and Y is a string", async () => {
-            expect(await evaluate("3 * 'Abc'")).to.equal("AbcAbcAbc");
-            expect(await evaluate("3.1 * 'Abc'")).to.equal("AbcAbcAbc");
-            expect(await evaluate("3.9 * 'Abc'")).to.equal("AbcAbcAbc");
-            expect(await evaluate("0 * 'Abc'")).to.equal("");
-            expect(await evaluate("-2 * 'Abc'")).to.equal("");
-        });
-    
-        it("should concatenate Y times X if Y is a number and X is a string", async () => {
-            expect(await evaluate("'Abc' * 3")).to.equal("AbcAbcAbc");
-            expect(await evaluate("'Abc' * 3.1")).to.equal("AbcAbcAbc");
-            expect(await evaluate("'Abc' * 3.9")).to.equal("AbcAbcAbc");
-            expect(await evaluate("'Abc' * 0")).to.equal("");
-            expect(await evaluate("'Abc' * (-2)")).to.equal("");
-        });
-    
-        it("should concatenate X times Y if X is a number and Y is a list", async () => {
-            expect(await evaluate("3 * [1,2,3]")).to.deep.equal([1,2,3,1,2,3,1,2,3]);
-            expect(await evaluate("3.1 * [1,2,3]")).to.deep.equal([1,2,3,1,2,3,1,2,3]);
-            expect(await evaluate("3.9 * [1,2,3]")).to.deep.equal([1,2,3,1,2,3,1,2,3]);
-            expect(await evaluate("0 * [1,2,3]")).to.deep.equal([]);
-            expect(await evaluate("-2 * [1,2,3]")).to.deep.equal([]);
-        });
-    
-        it("should concatenate Y times X if Y is a number and X is a list", async () => {
-            expect(await evaluate("[1,2,3] * 3")).to.deep.equal([1,2,3,1,2,3,1,2,3]);
-            expect(await evaluate("[1,2,3] * 3.1")).to.deep.equal([1,2,3,1,2,3,1,2,3]);
-            expect(await evaluate("[1,2,3] * 3.9")).to.deep.equal([1,2,3,1,2,3,1,2,3]);
-            expect(await evaluate("[1,2,3] * 0")).to.deep.equal([]);
-            expect(await evaluate("[1,2,3] * (-2)")).to.deep.equal([]);
-        });
-    
+        
         it("should return Undefined for all the other type combinations", async () => {
-            var T=true, F=false, n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x, u=new Undefined();
+            var n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x, u=new Undefined();
             for (let [L,R] of [
-                    [T,n], [T,s], [T,ls], [T,ns], [T,fn], [T,u],
-                    [F,n], [F,s], [F,ls], [F,ns], [F,fn], [F,u],
-                    [n,T], [n,F], [n,ns], [n,fn], [n,u],
-                    [s,T], [s,F], [s,ls], [s,ns], [s,fn], [s,u],
-                    [ls,T], [ls,F], [ls,s], [ls,ns], [ls,fn], [ls,u],
-                    [ns,T], [ns,F], [ns,n], [ns,s], [ns,ls], [ns,fn], [ns,u],
-                    [fn,T], [fn,F], [fn,n], [fn,s], [fn,ls], [fn,ns], [fn,u],
-                    [u,T], [u,F], [u,n], [u,s], [u,ls], [u,ns], [u,fn], [u,u] ]) {
+                            [n, s], [n, ls], [n, ns], [n, fn], [n, u],
+                    [s, n], [s, s], [s, ls], [s, ns], [s, fn], [s, u],
+                    [ls,n], [ls,s], [ls,ls], [ls,ns], [ls,fn], [ls,u],
+                    [ns,n], [ns,s], [ns,ls], [ns,ns], [ns,fn], [ns,u],
+                    [fn,n], [fn,s], [fn,ls], [fn,ns], [fn,fn], [fn,u],
+                    [u, n], [u, s], [u, ls], [u, ns], [u, fn], [u, u]]) {
     
-                var LType = context.type(L);
-                var RType = context.type(R);
-                expect(await evaluate("L * R", {L,R})).to.be.Undefined('product', L, R, new Position("L * R", 2));
+                const undef = await parse("L * R")({L,R});
+                expect(undef).to.be.Undefined("MulOperation");
+                expect(undef.children[0].unwrap()).to.deep.equal(L);
+                expect(undef.children[1].unwrap()).to.deep.equal(R);
             }                        
         });
     
         it("should return (x1*y1, x2*y2, ...) if X and/or Y is a tuple", async () => {
-            var presets = {T:true, F:false};
-            expect(Array.from(await evaluate("(T, 3, 'a', [1]) * (F, 2, 2, 2)",presets))).to.deep.equal([false, 6, "aa", [1,1]]);
-            expect(Array.from(await evaluate("(10,20,30) * (2,3,4)",presets))).to.deep.equal([20,60,120]);
-            expect(Array.from(await evaluate("(10,20,30) * (2,3)",presets))).to.deep.equal([20,60]);
-            expect(Array.from(await evaluate("(10,20) * (2,3,4)",presets))).to.deep.equal([20,60]);
-            expect(await evaluate("10 * (2,3,4)",presets)).to.equal(20);
-            expect(await evaluate("(10,20,30) * 2",presets)).to.equal(20);
+            var context = {T:true, F:false};
+            expect(await parse("(T, 3) * (F, 2)"     )(context)).to.be.Tuple([false, 6]);
+            expect(await parse("(10,20,30) * (2,3,4)")(context)).to.be.Tuple([20,60,120]);
+            expect(await parse("(10,20,30) * (2,3)"  )(context)).to.be.Tuple([20,60]);
+            expect(await parse("(10,20) * (2,3,4)"   )(context)).to.be.Tuple([20,60]);
+            expect(await parse("10 * (2,3,4)"        )(context)).to.equal(20);
+            expect(await parse("(10,20,30) * 2"      )(context)).to.equal(20);
     
             // partial exception
-            var source = "(10,20,30) * (1,2,{})";
-            var tuple = await evaluate(source);
-            expect(tuple).to.be.instanceof(Tuple);
+            var tuple = await parse("(10,20,30) * (1,2,{})")();
             expect(Array.from(tuple)[0]).to.equal(10);
             expect(Array.from(tuple)[1]).to.equal(40);
-            expect(Array.from(tuple)[2]).to.be.Undefined('product', 30, {}, new Position(source, 11));
+            expect(Array.from(tuple)[2]).to.be.Undefined('MulOperation');
+            expect(Array.from(tuple)[2].children[0].unwrap()).to.equal(30);
+            expect(Array.from(tuple)[2].children[1].unwrap()).to.deep.equal({});
         });
     });
     
