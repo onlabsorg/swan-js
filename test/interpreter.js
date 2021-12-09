@@ -501,18 +501,6 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
         });
     });
     
-    // describe("tuple mapping operation: X => Y", () => {
-    // 
-    //     it("should apply Y to each item of X and return the resulting tuple", async () => {
-    //         expect(await parse("(1,2,3) => x -> 2*x")).to.be.Tuple([2,4,6]);
-    //         var tuple = await parse("(1,2,3) => 'abcdef'");
-    //         expect(tuple).to.be.instanceof(Tuple);
-    //         expect(Array.from(tuple)[0]).to.be.Undefined('application', "abcdef");
-    //         expect(Array.from(tuple)[1]).to.be.Undefined('application', "abcdef");
-    //         expect(Array.from(tuple)[2]).to.be.Undefined('application', "abcdef");
-    //     });
-    // });
-    
     describe("sub-contexting: X.Y", () => {
     
         describe("when X is a namespace", () => {
@@ -1891,623 +1879,192 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("(1,2,3) <= ()     ")()).to.equal(false);
         });
     });
-        
     
     
     
+    // MISCELLANEOUS
     
+    describe.skip("string templates", () => {
     
-    // // CONSTANTS
-    // 
-    // describe("TRUE constant", () => {
-    //     it("should return true", async () => {
-    //         expect(await parse("TRUE")).to.equal(true);
-    //     });
-    // });
-    // 
-    // describe("FALSE constant", () => {
-    //     it("should return false", async () => {
-    //         expect(await parse("FALSE")).to.equal(false);
-    //     });
-    // });
-    // 
-    // describe("INFINITY constant", () => {
-    //     it("should return Infinity", async () => {
-    //         expect(await parse("INFINITY")).to.equal(Infinity);
-    //     });
-    // });
-    // 
-    // 
-    // // BUILT-IN FUNCTIONS
-    // 
-    // describe("undefined X", () => {
-    // 
-    //     it("should return Undefined", async () => {
-    //         var u = await parse("undefined('testing', 1)");
-    //         expect(u).to.be.Undefined("testing", 1);
-    // 
-    //         var u = await parse("undefined('testing', 1, [])");
-    //         expect(u).to.be.Undefined("testing", 1, []);
-    // 
-    //         var u = await parse("undefined('testing', 1, [], {})");
-    //         expect(u).to.be.Undefined("testing", 1, [], {});
-    // 
-    //         var u = await parse("undefined('testing', null)");
-    //         expect(u).to.be.Undefined("testing");
-    //     });
-    // });
-    // 
-    // describe("bool X", () => {
-    // 
-    //     it("should return X if it is a boolean", async () => {
-    //         expect(await parse("bool FALSE")).to.equal(false);
-    //         expect(await parse("bool TRUE")).to.equal(true);
-    //     });
-    // 
-    //     it("should return true if X is a non-zero number", async () => {
-    //         expect(await parse("bool 0")).to.equal(false);
-    //         expect(await parse("bool 10")).to.equal(true);
-    //         expect(await parse("bool (-1)")).to.equal(true);
-    //     });
-    // 
-    //     it("should return true if X is a non-empty string", async () => {
-    //         expect(await parse("bool ''")).to.equal(false);
-    //         expect(await parse("bool 'abc'")).to.equal(true);
-    //     });
-    // 
-    //     it("should return true if X is a non-empty list", async () => {
-    //         expect(await parse("bool []")).to.equal(false);
-    //         expect(await parse("bool [1,2,3]")).to.equal(true);
-    //     });
-    // 
-    //     it("should return true if X is a non-empty namespace", async () => {
-    //         expect(await parse("bool {}")).to.equal(false);
-    //         expect(await parse("bool {a=1,b=2,c=3}")).to.equal(true);
-    //     });
-    // 
-    //     it("should return true if X is a function", async () => {
-    //         expect(await parse("bool (x->x)")).to.equal(true);
-    //         expect(await parse("bool jsFn", {jsFn:x=>2*x})).to.equal(true);
-    //     });
-    // 
-    //     it("should return true if X is a tuple with at least one true item", async () => {
-    //         expect(await parse("bool (0,0,0)")).to.equal(false);
-    //         expect(await parse("bool (0,1,-1)")).to.equal(true);
-    //     });
-    // 
-    //     it("should return false if X is an empty tuple", async () => {
-    //         expect(await parse("bool ()")).to.equal(false);
-    //     });
-    // 
-    //     it("should return Undefined if any of the X items is Undefined", async () => {
-    //         var presets = {
-    //             un1: new Undefined('text1'),
-    //             un2: new Undefined('test2'),
-    //         };
-    //         expect(await parse("bool un1", presets)).to.be.Undefined('booleanization', presets.un1);
-    //         expect(await parse("bool (0,un1,un2)", presets)).to.be.Undefined('booleanization', presets.un1);
-    //     });
-    // });
-    // 
-    // describe("not X", () => {
-    // 
-    //     it("should return !X if it is a boolean", async () => {
-    //         expect(await parse("not FALSE")).to.equal(!false);
-    //         expect(await parse("not TRUE")).to.equal(!true);
-    //     });
-    // 
-    //     it("should return false if X is a non-zero number", async () => {
-    //         expect(await parse("not 0")).to.equal(!false);
-    //         expect(await parse("not 10")).to.equal(!true);
-    //         expect(await parse("not (-1)")).to.equal(!true);
-    //     });
-    // 
-    //     it("should return false if X is a non-empty string", async () => {
-    //         expect(await parse("not ''")).to.equal(!false);
-    //         expect(await parse("not 'abc'")).to.equal(!true);
-    //     });
-    // 
-    //     it("should return false if X is a non-empty list", async () => {
-    //         expect(await parse("not []")).to.equal(!false);
-    //         expect(await parse("not [1,2,3]")).to.equal(!true);
-    //     });
-    // 
-    //     it("should return false if X is a non-empty namespace", async () => {
-    //         expect(await parse("not {}")).to.equal(!false);
-    //         expect(await parse("not {a=1,b=2,c=3}")).to.equal(!true);
-    //     });
-    // 
-    //     it("should return false if X is a function", async () => {
-    //         expect(await parse("not (x->x)")).to.equal(!true);
-    //         expect(await parse("not jsFn", {jsFn:x=>2*x})).to.equal(!true);
-    //     });
-    // 
-    //     it("should return false if X is a tuple with at least one true item", async () => {
-    //         expect(await parse("not (0,0,0)")).to.equal(!false);
-    //         expect(await parse("not (0,1,-1)")).to.equal(!true);
-    //     });
-    // 
-    //     it("should return true if X is an empty tuple", async () => {
-    //         expect(await parse("not ()")).to.equal(!false);
-    //     });
-    // 
-    //     it("should return Undefined if any of the X items is undefined", async () => {
-    //         var presets = {
-    //             un1: new Undefined('text1'),
-    //             un2: new Undefined('test2'),
-    //         };
-    //         expect(await parse("not un1", presets)).to.be.Undefined('booleanization', presets.un1);
-    //         expect(await parse("not (0,un1,un2)", presets)).to.be.Undefined('booleanization', presets.un1);
-    //     });
-    // });
-    // 
-    // describe("str X", () => {
-    // 
-    //     it("should return an empty string if X is nothing", async () => {
-    //         expect(await parse("str ()")).to.equal("");
-    //     });
-    // 
-    //     it("should return 'TRUE' if X is true", async () => {
-    //         expect(await parse("str TRUE")).to.equal("TRUE");
-    //     });
-    // 
-    //     it("should return 'FALSE' if X is false", async () => {
-    //         expect(await parse("str FALSE")).to.equal("FALSE");
-    //     });
-    // 
-    //     it("should return String(X) if X is a number", async () => {
-    //         expect(await parse("str 123.4")).to.equal("123.4");
-    //     });
-    // 
-    //     it("should return X itself if it is a string", async () => {
-    //         expect(await parse("str 'abc'")).to.equal("abc");
-    //     });
-    // 
-    //     it("should return '[[Function]]' if X is a function", async () => {
-    //         expect(await parse("str jsFn", {jsFn: x => 2*x})).to.equal("[[Function]]");
-    //         expect(await parse("str (x->x)", {jsFn: x => 2*x})).to.equal("[[Function]]");
-    //     });
-    // 
-    //     it("should return '[[List of n items]]' when X is a list with n items", async () => {
-    //         expect(await parse("str[1,2,'abc']")).to.equal("[[List of 3 items]]")
-    //     });
-    // 
-    //     it("should return '[[Namespace of n items]]' when X is a namestpace with n items", async () => {
-    //         expect(await parse("str{a=1,b=2,c=3}")).to.equal("[[Namespace of 3 items]]");
-    //         expect(await parse("str ns", {ns:{a:1,b:2,c:3,$d:4}})).to.equal("[[Namespace of 3 items]]");
-    //     });
-    // 
-    //     it("shoulr return `X.__str__` if `X` is a namespace and `X.__str__` is a string", async () => {
-    //         expect(await parse("str{__str__:'custom string'}")).to.equal("custom string");
-    //         expect(await parse("str{a=1,b=2,__str__=3}")).to.equal("[[Namespace of 3 items]]");            
-    //     });
-    // 
-    //     it("Should return '[[Undefined: arg1, arg2, ...]]' if X is Undefined", async () => {
-    //         var presets = {un: new Undefined("test", 10, [1,2,3], new Position("\n1+2", 2))};
-    //         console.log(await parse("str un", presets));
-    //         expect(await parse("str un", presets)).to.equal("[[Undefined: test, 10, [[List of 3 items]], @2:1]]");
-    //     });
-    // 
-    //     it("should concatenate the serialized item if X is a tuple", async () => {
-    //         expect(await parse("str('it is ',TRUE,' that 1+2 is ',3)")).to.equal("it is TRUE that 1+2 is 3");
-    //     });
-    // });
-    // 
-    // describe("enum X", () => {
-    // 
-    //     it("shoule return the tuple of the first X integers if X is a number", async () => {
-    //         expect(await parse('enum 5')).to.be.Tuple([0,1,2,3,4]);
-    //         expect(await parse('enum 5.1')).to.be.Tuple([0,1,2,3,4,5]);
-    //         expect(await parse('enum (-3)')).to.be.Tuple([0,-1,-2]);
-    //         expect(await parse('enum (-3.1)')).to.be.Tuple([0,-1,-2,-3]);
-    //         expect(await parse("enum 1")).to.equal(0);
-    //         expect(await parse("enum 0")).to.equal(null);
-    //     });
-    // 
-    //     it("should return the tuple `(x1,x2,x3,...)` when X is the list `[x1,x2,x3,...]`", async () => {
-    //         expect(await parse("enum [10,20,30]")).to.be.Tuple([10,20,30]);
-    //         expect(await parse("enum ls", {ls:[10,20,30]})).to.be.Tuple([10,20,30]);
-    //         expect(await parse("enum [1]")).to.equal(1);
-    //         expect(await parse("enum []")).to.equal(null);
-    // 
-    //         // it doesn't complain if a list item is Undefined
-    //         var presets = {un: new Undefined('Test exception!')};
-    //         expect(await parse("enum [1,un,2]", presets)).to.be.Tuple([1,presets.un,2]);
-    //         expect(await parse("enum [un]", presets)).to.equal(presets.un);
-    //     });
-    // 
-    //     it("should return the tuple `('a','b','c')` when X is the string `'abc'`", async () => {
-    //         expect(await parse("enum 'abc'")).to.be.Tuple(['a','b','c']);
-    //         expect(await parse("enum s", {s:"abc"})).to.be.Tuple(['a','b','c']);
-    //         expect(await parse("enum 'a'")).to.equal("a");
-    //         expect(await parse("enum ''")).to.equal(null);
-    //     });
-    // 
-    //     it("should return the tuple `('name1','name2',...)` when X is the namespace `{name1:val1, name2:val2, ...}`", async () => {
-    //         expect(await parse("enum {a:1,b:2,c:3}")).to.be.Tuple(['a','b','c']);
-    //         expect(await parse("enum ns", {ns:{a:1,b:2,c:3,$d:4}})).to.be.Tuple(['a','b','c']);
-    //         expect(await parse("enum {a:1}")).to.equal("a");
-    //         expect(await parse("enum {}")).to.equal(null);
-    //     });
-    // 
-    //     it("should return Undefined when X is of any other type", async () => {
-    //         expect(await parse("enum TRUE")).to.be.Undefined("enumeration", true);
-    //         expect(await parse("enum FALSE")).to.be.Undefined("enumeration", false);
-    // 
-    //         var presets = {un: new Undefined(), fn: x=>2*x};
-    //         expect(await parse("enum fn", presets)).to.be.Undefined("enumeration", presets.fn);
-    //         expect(await parse("enum un", presets)).to.be.Undefined('enumeration', presets.un);
-    //     });
-    // 
-    //     it("should concatenate the enumeration of each item if X is a tuple", async () => {
-    //         expect(await parse("enum ('abc',[1,2,3])")).to.be.Tuple(['a','b','c',1,2,3]);
-    //     });
-    // });
-    // 
-    // describe("type X", () => {
-    // 
-    //     it("should return Nothing if `X` is an empty tuple", async () => {
-    //         expect(await parse("type()")).to.equal(null);
-    //     });
-    // 
-    //     it("should return 'Undefined' if `X` is an Undefined object", async () => {
-    //         var presets = {un: new Undefined()};
-    //         expect(await parse("type un", presets)).to.equal('Undefined');
-    //     });
-    // 
-    //     it("should return 'Boolean' if `X` is a boolean value", async () => {
-    //         expect(await parse("type TRUE")).to.equal("Boolean");
-    //         expect(await parse("type FALSE")).to.equal("Boolean");
-    //     });
-    // 
-    //     it("should return 'Number' if `X` is a number", async () => {
-    //         expect(await parse("type 1")).to.equal("Number");
-    //     });
-    // 
-    //     it("should return 'String' if `X` is a string", async () => {
-    //         expect(await parse("type 'abc'")).to.equal("String");
-    //     });
-    // 
-    //     it("should return 'List' if `X` is a list", async () => {
-    //         expect(await parse("type [1,2,3]")).to.equal("List");
-    //     });
-    // 
-    //     it("should return 'Namespace' if `X` is a namespace", async () => {
-    //         expect(await parse("type {x:1}")).to.equal("Namespace");
-    //     });
-    // 
-    //     it("should return 'Function' if `X` is a function", async () => {
-    //         expect(await parse("type(()->())")).to.equal("Function");
-    //     });
-    // 
-    //     it("should return a tuple of types if `X` is a tuple", async () => {
-    //         expect(await parse("type(TRUE,1,'abc')")).to.be.Tuple(['Boolean', 'Number', 'String']);
-    // 
-    //         // it should not complain fi a tuple item is Undefined
-    //         var presets = {un: new Undefined()}
-    //         expect(await parse("type(TRUE,un,'abc')", presets)).to.be.Tuple(['Boolean', 'Undefined', 'String']);
-    //     });
-    // });
-    // 
-    // describe("size X", () => {
-    // 
-    //     it("should return the length of X if X is a string", async () => {
-    //         var size = await parse("size 'abc'");
-    //         expect(size).to.equal(3);
-    //     });
-    // 
-    //     it("should return the length of X if X is a list", async () => {
-    //         var size = await parse("size [1,2,3]");
-    //         expect(size).to.equal(3);
-    //     });
-    // 
-    //     it("should return the number of own names if X is a namespace", async () => {
-    //         var size = await parse("size {a=1,b=2,c=3}");
-    //         expect(size).to.equal(3);
-    // 
-    //         var ctx = {o: Object.assign(Object.create({x:1,y:2,a:10}), {a:1,b:2,c:3,$d:4})};
-    //         var size = await parse("size o", ctx);
-    //         expect(size).to.equal(5);
-    //     });
-    // 
-    //     it("should return Undefined if X is of any other type", async () => {
-    //         expect(await parse("size TRUE")).to.be.Undefined('size', true);
-    //         expect(await parse("size 1")).to.be.Undefined('size', 1);
-    // 
-    //         var presets = {un: new Undefined(), fn: x=>2*x};
-    //         expect(await parse("size fn", presets)).to.be.Undefined('size', presets.fn);
-    //         expect(await parse("size un", presets)).to.be.Undefined('size', presets.un);
-    //     });
-    // 
-    //     it("should return a tuple containing the size of each item if X is a tuple", async () => {
-    //         expect(await parse("size('abc', [1,2,3,4], {a:1})")).to.be.Tuple([3,4,1]);
-    //         expect(await parse("size()")).to.be.null;
-    // 
-    //         // it should not complain fi a tuple item is Undefined
-    //         var presets = {un: new Undefined};
-    //         var size = await parse("size('abc', un, 10)", presets);
-    //         expect(size).to.be.instanceof(Tuple);
-    //         expect(Array.from(size)[0]).to.equal(3);
-    //         expect(Array.from(size)[1]).to.be.Undefined('size', presets.un);
-    //         expect(Array.from(size)[2]).to.be.Undefined('size', 10);
-    //     });
-    // });
-    // 
+        it("should evaluate string literals between accent quotes '``'", async () => {
+            expect(await parse("`ab\nc`")).to.equal("ab\nc");
+            expect(await parse("``")).to.equal("");
+        });
     
+        it("should replace expressions between `${` and `}` with their value", async () => {
+            expect(await parse("`aaa ${2*x} bbb`", {x:10})).to.equal("aaa 20 bbb");
+        });
+    });
     
-    // 
-    // 
-    // // FUNCTION composition
-    // 
-    // describe("G << F", () => {
-    // 
-    //     it("should return the function X -> G(F(X))", async () => {
-    //         var presets = {f: x=>2*x, g: x=>[x]};
-    //         var cf = await parse("g << f", presets);
-    //         expect(cf).to.be.a("function");
-    //         expect(await cf(2)).to.deep.equal([4]);
-    //     });
-    // 
-    //     it("should work with tuples of functions", async () => {
-    //         var presets = {f2: x=>2*x, f3: x=>3*x, f4: x=>4*x, g: (...x)=>[...Tuple(...x)]};
-    //         var cf = await parse("g << (f2,f3,f4)", presets);
-    //         expect(cf).to.be.a("function");
-    //         expect(await cf(2)).to.deep.equal([4, 6, 8]);
-    //     });
-    // 
-    //     it("should be righ-to-left associative", async () => {
-    //         var presets = {f: x=>2*x, g: x=>x**2, h: x=>[x]};
-    // 
-    //         var cf = await parse("h << g << f", presets);
-    //         expect(cf).to.be.a("function");
-    //         expect(await cf(2)).to.deep.equal([16]);            
-    // 
-    //         var cf = await parse("h << f << g", presets);
-    //         expect(cf).to.be.a("function");
-    //         expect(await cf(2)).to.deep.equal([8]);            
-    //     });
-    // });
-    // 
-    // describe("F >> G", () => {
-    // 
-    //     it("should return the function X -> G(F(X))", async () => {
-    //         var presets = {f: x=>2*x, g: x=>[x]};
-    //         var cf = await parse("f >> g", presets);
-    //         expect(cf).to.be.a("function");
-    //         expect(await cf(2)).to.deep.equal([4]);            
-    //     });
-    // 
-    //     it("should work with tuples of functions", async () => {
-    //         var presets = {f2: x=>2*x, f3: x=>3*x, f4: x=>4*x, g: (...x)=>[...Tuple(...x)]};
-    //         var cf = await parse("(f2,f3,f4) >> g", presets);
-    //         expect(cf).to.be.a("function");
-    //         expect(await cf(2)).to.deep.equal([4, 6, 8]);            
-    //     });
-    // });
-    // 
-    // 
-    // // MISCELLANEOUS
-    // 
-    // describe("string templates", () => {
-    // 
-    //     it("should evaluate string literals between accent quotes '``'", async () => {
-    //         expect(await parse("`ab\nc`")).to.equal("ab\nc");
-    //         expect(await parse("``")).to.equal("");
-    //     });
-    // 
-    //     it("should replace expressions between `${` and `}` with their value", async () => {
-    //         expect(await parse("`aaa ${2*x} bbb`", {x:10})).to.equal("aaa 20 bbb");
-    //     });
-    // });
-    // 
-    // describe("X ?> F", () => {
-    // 
-    //     it("should return X if it is not undefined", async () => {
-    //         for (let X of [true, false, 10, "abc", [], {}, x=>x]) {
-    //             expect(await parse("X ?> 20", {X})).to.equal(X);
-    //         }
-    //     });
-    // 
-    //     it("should execute the function F with X.args as parameters if X is Undefined", async () => {
-    //         var presets = {
-    //             f: (operation, ...operands) => ['f result', operation, ...operands],
-    //             u: new Undefined('op', 1, 2, 3)
-    //         };
-    //         expect(await parse(`u ?> f`, presets)).to.deep.equal(['f result', 'op', 1, 2, 3]);
-    //     });
-    // 
-    //     it("should return Undefined if F is not a function", async () => {
-    //         var presets = {u: new Undefined()};
-    //         expect(await parse('u ?> 10', presets)).to.be.Undefined("application", 10);
-    //     });
-    // 
-    //     it("should apply the operator to each item if X is a tuple", async () => {
-    //         var presets = {
-    //             f: (operation, ...operands) => ['f result', operation, ...operands],
-    //             u: new Undefined('op', 1, 2, 3)
-    //         };
-    //         expect(await parse(`(10, u, 20) ?> f`, presets)).to.be.Tuple([10, ['f result', 'op', 1, 2, 3], 20]);            
-    //     });
-    // });
-    // 
-    // describe("operators precedence and grouping", () => {
-    // 
-    //     it("should execute assignment operations (`=`) before pairing operations (`,`)", async () => {
-    //         var ctx = context.$extend();
-    // 
-    //         await parse("x = 1,2,3")(ctx);
-    //         expect(ctx.x).to.equal(1);
-    // 
-    //         await parse("x = (1,2,3)")(ctx);
-    //         expect(ctx.x).to.be.Tuple([1,2,3]);
-    //     });
-    // 
-    //     it("should execute tuple mapping (`=>`) before assignment operations (`=`)", async () => {
-    //         var ctx = context.$extend({doub:x=>2*x});
-    //         await parse("t = (1,2) => doub")(ctx);
-    //         expect(ctx.t).to.be.Tuple([2,4]);
-    //     });
-    // 
-    //     it("should execute function definitions (`->`) before tuple mapping operations (`=>`) and assignment operations", async () => {
-    //         var ctx = context.$extend();
-    // 
-    //         await parse("f = x -> [x]")(ctx);
-    //         expect(ctx.f).to.be.a("function");
-    //         expect(await ctx.f(1)).to.deep.equal([1]);
-    // 
-    //         var retval = await parse("1, f = x -> [x], 2")(ctx);
-    //         expect(ctx.f).to.be.a("function");
-    //         expect(retval).to.be.Tuple([1,2]);
-    // 
-    //         await parse("t = (1,2) => x -> [x]")(ctx);
-    //         expect(ctx.t).to.be.Tuple([[1],[2]]);
-    //     });
-    // 
-    //     it("should execure `;` operations before function definitions (`->`)", async () => {
-    //         var ctx = context.$extend({T:true, F:false});
-    //         expect(await parse("f = (x) -> x ; 1")(ctx)).to.equal(null);
-    //         expect(await ctx.f(3)).to.equal(3);
-    //         expect(await ctx.f()).to.equal(1);
-    //     });
-    // 
-    //     it("should execure `?` operations before `;` operations", async () => {
-    //         var ctx = context.$extend({T:true, F:false});
-    //         expect(await parse("f = (x,y) -> x ? 1 ; y ? 2 ; 3")(ctx)).to.equal(null);
-    //         expect(await ctx.f(true, false)).to.equal(1);
-    //         expect(await ctx.f(true, true)).to.equal(1);
-    //         expect(await ctx.f(false, true)).to.equal(2);
-    //         expect(await ctx.f(false, false)).to.equal(3);
-    //     });
-    // 
-    //     it("should execute logic operations (`&` and `|`) before `?` and `;` operations", async () => {
-    //         var ctx = context.$extend({T:true, F:false});
-    //         expect(await parse("f = (x,y) -> x & y ? 1 ; x | y ? 2 ; 3")(ctx)).to.equal(null);
-    //         expect(await ctx.f(true, true)).to.equal(1);
-    //         expect(await ctx.f(true, false)).to.equal(2);
-    //         expect(await ctx.f(false, true)).to.equal(2);
-    //         expect(await ctx.f(false, false)).to.equal(3);
-    //     });
-    // 
-    //     it("should execute comparison operations (`==`,`!=`,`<`,`<=`,`>=`,`>`) before logic operations (`&` and `|`)", async () => {
-    //         var ctx = context.$extend({T:true, F:false});
-    //         expect(await parse("f = x -> x==0 ? 'null' ; 0.01<=x & x<0.1 ? 'small' ; 1000>x & x>=100 ? 'big' ; 'huge' ")(ctx)).to.equal(null);
-    //         expect(await ctx.f(0)).to.equal('null');
-    //         expect(await ctx.f(0.01)).to.equal('small');
-    //         expect(await ctx.f(0.09)).to.equal('small');
-    //         expect(await ctx.f(999)).to.equal('big');
-    //         expect(await ctx.f(100)).to.equal('big');
-    //         expect(await ctx.f(1000)).to.equal('huge');
-    //     });
-    // 
-    //     it("should execute sum (`+`) and subtraction (`-`) operations before comparison operations (`==`,`!=`,`<`,`<=`,`>=`,`>`)", async () => {
-    //         var ctx = context.$extend({T:true, F:false});
-    //         expect(await parse("1+1<4 & 8-3==5")(ctx)).to.equal(true);
-    //     });
-    // 
-    //     it("should execute product (`*`) division (`/`) and modulo (`%`) operations before sum and subtraction operations (`+` and `-`)", async () => {
-    //         var ctx = context.$extend({T:true, F:false});
-    //         expect(await parse("1+2*3-10/5+8%5")(ctx)).to.equal(8);
-    //     });
-    // 
-    //     it("should execute exponentiation (`^`) operations before product (`*`) division (`/`) and modulo (`%`) operations", async () => {
-    //         var ctx = context.$extend({T:true, F:false});
-    //         expect(await parse("1+2*3^2-10/5+8%5")(ctx)).to.equal(20);
-    //     });
-    // 
-    //     it("should execute subcontexting (`.`), function calls and referencing (`@`) before arithmetic operations", async () => {
-    //         var ctx = context.$extend({double:x=>2*x, b:10});
-    //         expect(await parse("double 2+3")(ctx)).to.equal(7);
-    //         expect(await parse("double(2+3)")(ctx)).to.equal(10);
-    // 
-    //         expect(await parse("{a=1,b=2}.a+b")(ctx)).to.equal(11);
-    //         expect(await parse("{a=1,b=2}.(a+b)")(ctx)).to.equal(3);
-    // 
-    //         expect(await parse("{f=x->2*x}.f 2")(ctx)).to.equal(4);
-    //         expect(await parse("(x->{a=2*x}) 4 . a")(ctx)).to.equal(8);
-    // 
-    //         expect(await parse("[10,20,30] @ 1 + 1")(ctx)).to.equal(21);
-    //     });
-    // });
-    // 
-    // describe("undefined value", () => {
-    // 
-    //     it("should expose the constructor parametera tuple as 'args'", async () => {
-    //         var u = await parse("undefined('name', 1, 2, 3)");
-    //         expect(u).to.be.instanceof(Undefined);
-    //         expect(u.args).to.be.Tuple(['name', 1,2,3]);
-    //     });
-    // });   
-    // 
-    // describe("lexer and parser errors", () => {
-    // 
-    //     it("should resolve an undefined value on lexer errors", async () => {
-    // 
-    //         // missing closing quote
-    //         var u = await parse("\n'abc", {});
-    //         expect(u).to.be.instanceof(Undefined);
-    //         var args = Array.from(u.args);
-    //         expect(args[0]).to.equal("failure");
-    //         expect(args[1]).to.be.instanceof(Error);
-    //         expect(args[1].message).to.equal("Closing quote expected @2:4");            
-    // 
-    //         // missing exponent
-    //         var u = await parse("123E+", {});
-    //         expect(u).to.be.instanceof(Undefined);
-    //         var args = Array.from(u.args);
-    //         expect(args[0]).to.equal("failure");
-    //         expect(args[1]).to.be.instanceof(Error);
-    //         expect(args[1].message).to.equal("Expected exponent value @1:5");            
-    // 
-    //         // invalid number
-    //         var u = await parse("1abc", {});
-    //         expect(u).to.be.instanceof(Undefined);
-    //         var args = Array.from(u.args);
-    //         expect(args[0]).to.equal("failure");
-    //         expect(args[1]).to.be.instanceof(Error);
-    //         expect(args[1].message).to.equal("Invalid number @1:0");            
-    // 
-    //         // unexpected period
-    //         var u = await parse("12.34.56", {});
-    //         expect(u).to.be.instanceof(Undefined);
-    //         var args = Array.from(u.args);
-    //         expect(args[0]).to.equal("failure");
-    //         expect(args[1]).to.be.instanceof(Error);
-    //         expect(args[1].message).to.equal("Unexpected period @1:5");
-    // 
-    //         // invalid name identifier
-    //         var u = await parse("$a", {$a:1});
-    //         expect(u).to.be.instanceof(Undefined);
-    //         var args = Array.from(u.args);
-    //         expect(args[0]).to.equal("failure");
-    //         expect(args[1]).to.be.instanceof(Error);
-    //         expect(args[1].message).to.equal("Unexpected character '$' @1:0");
-    //     });
-    // 
-    //     it("should resolve an undefined value on parser errors", async () => {
-    // 
-    //         // operand expected
-    //         var u = await parse("125 +", {});
-    //         expect(u).to.be.instanceof(Undefined);
-    //         var args = Array.from(u.args);
-    //         expect(args[0]).to.equal("failure");
-    //         expect(args[1]).to.be.instanceof(Error);
-    //         expect(args[1].message).to.equal("Operand expected @1:5");
-    // 
-    //         // operand expected
-    //         var u = await parse("(125 +", {});
-    //         expect(u).to.be.instanceof(Undefined);
-    //         var args = Array.from(u.args);
-    //         expect(args[0]).to.equal("failure");
-    //         expect(args[1]).to.be.instanceof(Error);
-    //         expect(args[1].message).to.equal("Operand expected @1:6");
-    // 
-    //         // operand expected
-    //         var u = await parse("125 + *", {});
-    //         expect(u).to.be.instanceof(Undefined);
-    //         var args = Array.from(u.args);
-    //         expect(args[0]).to.equal("failure");
-    //         expect(args[1]).to.be.instanceof(Error);
-    //         expect(args[1].message).to.equal("Operand expected @1:6");
-    //     });
-    // });
+    describe.skip("precedence", () => {
+    
+        it("should execute assignment operations (`=`) before pairing operations (`,`)", async () => {
+            var ctx = context.$extend();
+    
+            await parse("x = 1,2,3")(ctx);
+            expect(ctx.x).to.equal(1);
+    
+            await parse("x = (1,2,3)")(ctx);
+            expect(ctx.x).to.be.Tuple([1,2,3]);
+        });
+    
+        it("should execute tuple mapping (`=>`) before assignment operations (`=`)", async () => {
+            var ctx = context.$extend({doub:x=>2*x});
+            await parse("t = (1,2) => doub")(ctx);
+            expect(ctx.t).to.be.Tuple([2,4]);
+        });
+    
+        it("should execute function definitions (`->`) before tuple mapping operations (`=>`) and assignment operations", async () => {
+            var ctx = context.$extend();
+    
+            await parse("f = x -> [x]")(ctx);
+            expect(ctx.f).to.be.a("function");
+            expect(await ctx.f(1)).to.deep.equal([1]);
+    
+            var retval = await parse("1, f = x -> [x], 2")(ctx);
+            expect(ctx.f).to.be.a("function");
+            expect(retval).to.be.Tuple([1,2]);
+    
+            await parse("t = (1,2) => x -> [x]")(ctx);
+            expect(ctx.t).to.be.Tuple([[1],[2]]);
+        });
+    
+        it("should execure `;` operations before function definitions (`->`)", async () => {
+            var ctx = context.$extend({T:true, F:false});
+            expect(await parse("f = (x) -> x ; 1")(ctx)).to.equal(null);
+            expect(await ctx.f(3)).to.equal(3);
+            expect(await ctx.f()).to.equal(1);
+        });
+    
+        it("should execure `?` operations before `;` operations", async () => {
+            var ctx = context.$extend({T:true, F:false});
+            expect(await parse("f = (x,y) -> x ? 1 ; y ? 2 ; 3")(ctx)).to.equal(null);
+            expect(await ctx.f(true, false)).to.equal(1);
+            expect(await ctx.f(true, true)).to.equal(1);
+            expect(await ctx.f(false, true)).to.equal(2);
+            expect(await ctx.f(false, false)).to.equal(3);
+        });
+    
+        it("should execute logic operations (`&` and `|`) before `?` and `;` operations", async () => {
+            var ctx = context.$extend({T:true, F:false});
+            expect(await parse("f = (x,y) -> x & y ? 1 ; x | y ? 2 ; 3")(ctx)).to.equal(null);
+            expect(await ctx.f(true, true)).to.equal(1);
+            expect(await ctx.f(true, false)).to.equal(2);
+            expect(await ctx.f(false, true)).to.equal(2);
+            expect(await ctx.f(false, false)).to.equal(3);
+        });
+    
+        it("should execute comparison operations (`==`,`!=`,`<`,`<=`,`>=`,`>`) before logic operations (`&` and `|`)", async () => {
+            var ctx = context.$extend({T:true, F:false});
+            expect(await parse("f = x -> x==0 ? 'null' ; 0.01<=x & x<0.1 ? 'small' ; 1000>x & x>=100 ? 'big' ; 'huge' ")(ctx)).to.equal(null);
+            expect(await ctx.f(0)).to.equal('null');
+            expect(await ctx.f(0.01)).to.equal('small');
+            expect(await ctx.f(0.09)).to.equal('small');
+            expect(await ctx.f(999)).to.equal('big');
+            expect(await ctx.f(100)).to.equal('big');
+            expect(await ctx.f(1000)).to.equal('huge');
+        });
+    
+        it("should execute sum (`+`) and subtraction (`-`) operations before comparison operations (`==`,`!=`,`<`,`<=`,`>=`,`>`)", async () => {
+            var ctx = context.$extend({T:true, F:false});
+            expect(await parse("1+1<4 & 8-3==5")(ctx)).to.equal(true);
+        });
+    
+        it("should execute product (`*`) division (`/`) and modulo (`%`) operations before sum and subtraction operations (`+` and `-`)", async () => {
+            var ctx = context.$extend({T:true, F:false});
+            expect(await parse("1+2*3-10/5+8%5")(ctx)).to.equal(8);
+        });
+    
+        it("should execute exponentiation (`^`) operations before product (`*`) division (`/`) and modulo (`%`) operations", async () => {
+            var ctx = context.$extend({T:true, F:false});
+            expect(await parse("1+2*3^2-10/5+8%5")(ctx)).to.equal(20);
+        });
+    
+        it("should execute subcontexting (`.`), function calls and referencing (`@`) before arithmetic operations", async () => {
+            var ctx = context.$extend({double:x=>2*x, b:10});
+            expect(await parse("double 2+3")(ctx)).to.equal(7);
+            expect(await parse("double(2+3)")(ctx)).to.equal(10);
+    
+            expect(await parse("{a=1,b=2}.a+b")(ctx)).to.equal(11);
+            expect(await parse("{a=1,b=2}.(a+b)")(ctx)).to.equal(3);
+    
+            expect(await parse("{f=x->2*x}.f 2")(ctx)).to.equal(4);
+            expect(await parse("(x->{a=2*x}) 4 . a")(ctx)).to.equal(8);
+    
+            expect(await parse("[10,20,30] @ 1 + 1")(ctx)).to.equal(21);
+        });
+    });
+
+    describe.skip("parsing errors", () => {
+    
+        it("should resolve an undefined value on lexer errors", async () => {
+    
+            // missing closing quote
+            var u = await parse("\n'abc", {});
+            expect(u).to.be.instanceof(Undefined);
+            var args = Array.from(u.args);
+            expect(args[0]).to.equal("failure");
+            expect(args[1]).to.be.instanceof(Error);
+            expect(args[1].message).to.equal("Closing quote expected @2:4");            
+    
+            // missing exponent
+            var u = await parse("123E+", {});
+            expect(u).to.be.instanceof(Undefined);
+            var args = Array.from(u.args);
+            expect(args[0]).to.equal("failure");
+            expect(args[1]).to.be.instanceof(Error);
+            expect(args[1].message).to.equal("Expected exponent value @1:5");            
+    
+            // invalid number
+            var u = await parse("1abc", {});
+            expect(u).to.be.instanceof(Undefined);
+            var args = Array.from(u.args);
+            expect(args[0]).to.equal("failure");
+            expect(args[1]).to.be.instanceof(Error);
+            expect(args[1].message).to.equal("Invalid number @1:0");            
+    
+            // unexpected period
+            var u = await parse("12.34.56", {});
+            expect(u).to.be.instanceof(Undefined);
+            var args = Array.from(u.args);
+            expect(args[0]).to.equal("failure");
+            expect(args[1]).to.be.instanceof(Error);
+            expect(args[1].message).to.equal("Unexpected period @1:5");
+    
+            // invalid name identifier
+            var u = await parse("$a", {$a:1});
+            expect(u).to.be.instanceof(Undefined);
+            var args = Array.from(u.args);
+            expect(args[0]).to.equal("failure");
+            expect(args[1]).to.be.instanceof(Error);
+            expect(args[1].message).to.equal("Unexpected character '$' @1:0");
+        });
+    
+        it("should resolve an undefined value on parser errors", async () => {
+    
+            // operand expected
+            var u = await parse("125 +", {});
+            expect(u).to.be.instanceof(Undefined);
+            var args = Array.from(u.args);
+            expect(args[0]).to.equal("failure");
+            expect(args[1]).to.be.instanceof(Error);
+            expect(args[1].message).to.equal("Operand expected @1:5");
+    
+            // operand expected
+            var u = await parse("(125 +", {});
+            expect(u).to.be.instanceof(Undefined);
+            var args = Array.from(u.args);
+            expect(args[0]).to.equal("failure");
+            expect(args[1]).to.be.instanceof(Error);
+            expect(args[1].message).to.equal("Operand expected @1:6");
+    
+            // operand expected
+            var u = await parse("125 + *", {});
+            expect(u).to.be.instanceof(Undefined);
+            var args = Array.from(u.args);
+            expect(args[0]).to.equal("failure");
+            expect(args[1]).to.be.instanceof(Error);
+            expect(args[1].message).to.equal("Operand expected @1:6");
+        });
+    });
 });
