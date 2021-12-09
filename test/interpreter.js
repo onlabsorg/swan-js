@@ -1627,107 +1627,128 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
         });
     });
     
-    describe.skip("X > Y", () => {
+    describe("X > Y", () => {
     
         it("should return false if both X and Y are nothing", async () => {
-            var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
-            expect(await parse("() > ()", presets)).to.equal(false);
+            expect(await parse("() > ()")()).to.equal(false);
         });
     
         it("should return true if X is true and Y is false", async () => {
-            var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
-            expect(await parse("T > T", presets)).to.equal(false);
-            expect(await parse("F > F", presets)).to.equal(false);
-            expect(await parse("T > F", presets)).to.equal(true);
-            expect(await parse("F > T", presets)).to.equal(false);
+            var context = {T:true, F:false};
+            expect(await parse("T > T")(context)).to.equal(false);
+            expect(await parse("F > F")(context)).to.equal(false);
+            expect(await parse("T > F")(context)).to.equal(true);
+            expect(await parse("F > T")(context)).to.equal(false);
         });
     
         it("should return true if X is a higher number than Y", async () => {
-            var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
-            expect(await parse("1 > 2", presets)).to.equal(false);
-            expect(await parse("0 > 2", presets)).to.equal(false);
-            expect(await parse("-1 > 2", presets)).to.equal(false);
-            expect(await parse("2 > 1", presets)).to.equal(true);
-            expect(await parse("2 > 0", presets)).to.equal(true);
-            expect(await parse("2 > (-2)", presets)).to.equal(true);
-            expect(await parse("2 > 2", presets)).to.equal(false);
+            var context = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
+            expect(await parse("1  > 2   ")(context)).to.equal(false);
+            expect(await parse("0  > 2   ")(context)).to.equal(false);
+            expect(await parse("-1 > 2   ")(context)).to.equal(false);
+            expect(await parse("2  > 1   ")(context)).to.equal(true);
+            expect(await parse("2  > 0   ")(context)).to.equal(true);
+            expect(await parse("2  > (-2)")(context)).to.equal(true);
+            expect(await parse("2  > 2   ")(context)).to.equal(false);
         });
     
-        it("should return true if X and Y are both strings and X follows Y alphabetically", async () => {
-            var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
-            expect(await parse("'abc' > 'def'", presets)).to.equal(false);
-            expect(await parse("'abc' > 'abd'", presets)).to.equal(false);
-            expect(await parse("'ab' > 'abc'", presets)).to.equal(false);
-            expect(await parse("'' > 'abc'", presets)).to.equal(false);
-            expect(await parse("'abc' > 'abc'", presets)).to.equal(false);
-            expect(await parse("'abd' > 'abc'", presets)).to.equal(true);
-            expect(await parse("'abc' > 'ab'", presets)).to.equal(true);
-            expect(await parse("'abc' > ''", presets)).to.equal(true);
+        it("should return true if X and Y are both strings and X precedes Y alphabetically", async () => {
+            var context = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
+            expect(await parse("'abc' > 'def'")(context)).to.equal(false);
+            expect(await parse("'abc' > 'abd'")(context)).to.equal(false);
+            expect(await parse("'ab'  > 'abc'")(context)).to.equal(false);
+            expect(await parse("''    > 'abc'")(context)).to.equal(false);
+            expect(await parse("'abc' > 'abc'")(context)).to.equal(false);
+            expect(await parse("'abd' > 'abc'")(context)).to.equal(true);
+            expect(await parse("'abc' > 'ab' ")(context)).to.equal(true);
+            expect(await parse("'abc' > ''   ")(context)).to.equal(true);
         });
     
-        it("should return true if X and Y are both lists and X follows Y lexicographically", async () => {
-            var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
-            expect(await parse("[1,2,3] > [4,5,6]", presets)).to.equal(false);
-            expect(await parse("[1,2,3] > [1,2,4]", presets)).to.equal(false);
-            expect(await parse("[1,2] > [1,2,4]", presets)).to.equal(false);
-            expect(await parse("[] > [1,2,3]", presets)).to.equal(false);
-            expect(await parse("[1,2,3] > [1,2,3]", presets)).to.equal(false);
-            expect(await parse("[1,2,4] > [1,2,3]", presets)).to.equal(true);
-            expect(await parse("[1,2,4] > [1,2]", presets)).to.equal(true);
-            expect(await parse("[1,2,3] > []", presets)).to.equal(true);
+        it("should return true if X and Y are both lists and X precedes Y lexicographically", async () => {
+            var context = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
+            expect(await parse("[1,2,3] > [4,5,6]")(context)).to.equal(false);
+            expect(await parse("[1,2,3] > [1,2,4]")(context)).to.equal(false);
+            expect(await parse("[1,2]   > [1,2,4]")(context)).to.equal(false);
+            expect(await parse("[]      > [1,2,3]")(context)).to.equal(false);
+            expect(await parse("[1,2,3] > [1,2,3]")(context)).to.equal(false);
+            expect(await parse("[1,2,4] > [1,2,3]")(context)).to.equal(true);
+            expect(await parse("[1,2,4] > [1,2]  ")(context)).to.equal(true);
+            expect(await parse("[1,2,3] > []     ")(context)).to.equal(true);
+        });
+        
+        it("should return false if both X and Y are namespaces", async () => {
+            const context = {ns1:{}, ns2:{a:1}};
+            expect(await parse("ns1 > ns2")(context)).to.be.false;
+            expect(await parse("ns2 > ns1")(context)).to.be.false;
+            expect(await parse("ns1 > ns1")(context)).to.be.false;
+            expect(await parse("ns2 > ns2")(context)).to.be.false;
         });
     
+        it("should return false if both X and Y are functions", async () => {
+            const context = {fn1:x=>2*x, fn2:(x,y)=>x+y};
+            expect(await parse("fn1 > fn2")(context)).to.be.false;
+            expect(await parse("fn2 > fn1")(context)).to.be.false;
+            expect(await parse("fn1 > fn1")(context)).to.be.false;
+            expect(await parse("fn2 > fn2")(context)).to.be.false;
+        });
+
+        it("should return false if both X and Y are unfefined", async () => {
+            const context = {un1:new Undefined("Op1",1,2), un2:new Undefined("Op2",1,2,3)};
+            expect(await parse("un1 > un2")(context)).to.be.false;
+            expect(await parse("un2 > un1")(context)).to.be.false;
+            expect(await parse("un1 > un1")(context)).to.be.false;
+            expect(await parse("un2 > un2")(context)).to.be.false;
+        });
+
         it("should return false if X is nothing", async () => {
-            var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
-            expect(await parse("() > ()", presets)).to.equal(false);
-            expect(await parse("() > T", presets)).to.equal(false);
-            expect(await parse("() > F", presets)).to.equal(false);
-            expect(await parse("() > 1", presets)).to.equal(false);
-            expect(await parse("() > 'abc'", presets)).to.equal(false);
-            expect(await parse("() > ls", presets)).to.equal(false);
-            expect(await parse("() > ns", presets)).to.equal(false);
-            expect(await parse("() > fn", presets)).to.equal(false);
+            var context = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
+            expect(await parse("() > ()"    )(context)).to.equal(false);
+            expect(await parse("() > T"     )(context)).to.equal(false);
+            expect(await parse("() > F"     )(context)).to.equal(false);
+            expect(await parse("() > 1"     )(context)).to.equal(false);
+            expect(await parse("() > 'abc'" )(context)).to.equal(false);
+            expect(await parse("() > ls"    )(context)).to.equal(false);
+            expect(await parse("() > ns"    )(context)).to.equal(false);
+            expect(await parse("() > fn"    )(context)).to.equal(false);
         });
     
         it("should return true if Y is nothing and X is not", async () => {
-            var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
-            expect(await parse("() > ()", presets)).to.equal(false);
-            expect(await parse("T > ()", presets)).to.equal(true);
-            expect(await parse("F > ()", presets)).to.equal(true);
-            expect(await parse("1 > ()", presets)).to.equal(true);
-            expect(await parse("'abc' > ()", presets)).to.equal(true);
-            expect(await parse("ls > ()", presets)).to.equal(true);
-            expect(await parse("ns > ()", presets)).to.equal(true);
-            expect(await parse("fn > ()", presets)).to.equal(true);
+            var context = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
+            expect(await parse("()    > ()")(context)).to.equal(false);
+            expect(await parse("T     > ()")(context)).to.equal(true);
+            expect(await parse("F     > ()")(context)).to.equal(true);
+            expect(await parse("1     > ()")(context)).to.equal(true);
+            expect(await parse("'abc' > ()")(context)).to.equal(true);
+            expect(await parse("ls    > ()")(context)).to.equal(true);
+            expect(await parse("ns    > ()")(context)).to.equal(true);
+            expect(await parse("fn    > ()")(context)).to.equal(true);
         });
     
-        it("should return Undefined for any other type combination", async () => {
-            var T=true, F=false, n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x;
+        it("should return false for any other type combination", async () => {
+            var T=true, F=false, n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x, u=new Undefined();
             for (let [L,R] of [
-                    [T,n], [T,s], [T,ls], [T,ns], [T,fn],
-                    [F,n], [F,s], [F,ls], [F,ns], [F,fn],
-                    [n,T], [n,F], [n,s], [n,ns], [n,fn],
-                    [s,T], [s,F], [s,n], [s,ls], [s,ns], [s,fn],
-                    [ls,T], [ls,F], [ls,n], [ls,s], [ls,ns], [ls,fn],
-                    [ns,T], [ns,F], [ns,n], [ns,s], [ns,ls], [ns,fn],
-                    [fn,T], [fn,F], [fn,n], [fn,s], [fn,ls], [fn,ns] ]) {
+                                    [T, n], [T, s], [T, ls], [T, ns], [T, fn], [T, u],
+                                    [F, n], [F, s], [F, ls], [F, ns], [F, fn], [F, u],
+                    [n, T], [n, F],         [n, s], [n, ls], [n, ns], [n, fn], [n, u],
+                    [s, T], [s, F], [s, n],         [s, ls], [s, ns], [s, fn], [s, u],
+                    [ls,T], [ls,F], [ls,n], [ls,s],          [ls,ns], [ls,fn], [ls,u],
+                    [ns,T], [ns,F], [ns,n], [ns,s], [ns,ls],          [ns,fn], [ns,u],
+                    [fn,T], [fn,F], [fn,n], [fn,s], [fn,ls], [fn,ns],          [fn,u],
+                    [u, T], [u, F], [u, n], [u, s], [u, ls], [u, ns], [u, fn]        ]) {
     
-                var LType = context.type(L);
-                var RType = context.type(R);
-                expect(await parse("L > R", {L,R})).to.be.Undefined('comparison', L, R, new Position("L > R", 2));
-            }                        
+                expect(await parse("L > R")({L,R})).to.be.false;
+            }
         });
     
         it("should compare tuples with lexicographical criteria", async () => {
-            var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
-            expect(await parse("(1,2,3) > (4,5,6)", presets)).to.equal(false);
-            expect(await parse("(1,2,3) > (1,2,4)", presets)).to.equal(false);
-            expect(await parse("(1,2) > (1,2,4)", presets)).to.equal(false);
-            expect(await parse("() > (1,2,3)", presets)).to.equal(false);
-            expect(await parse("(1,2,3) > (1,2,3)", presets)).to.equal(false);
-            expect(await parse("(1,2,4) > (1,2,3)", presets)).to.equal(true);
-            expect(await parse("(1,2,4) > (1,2)", presets)).to.equal(true);
-            expect(await parse("(1,2,3) > ()", presets)).to.equal(true);
+            expect(await parse("(1,2,3) > (4,5,6)")()).to.equal(false);
+            expect(await parse("(1,2,3) > (1,2,4)")()).to.equal(false);
+            expect(await parse("(1,2)   > (1,2,4)")()).to.equal(false);
+            expect(await parse("()      > (1,2,3)")()).to.equal(false);
+            expect(await parse("(1,2,3) > (1,2,3)")()).to.equal(false);
+            expect(await parse("(1,2,4) > (1,2,3)")()).to.equal(true);
+            expect(await parse("(1,2,4) > (1,2)  ")()).to.equal(true);
+            expect(await parse("(1,2,3) > ()     ")()).to.equal(true);
         });
     });
     
