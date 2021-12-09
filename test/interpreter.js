@@ -1,10 +1,8 @@
+
+const parse = require("../lib/interpreter");
+const {Undefined, Tuple, wrap, unwrap} = require("../lib/types");
+
 const chai = require("chai"), expect = chai.expect;
-
-const {parse} = require("../lib/interpreter");
-const {Bool, Undefined, Tuple, wrap, unwrap} = require("../lib/types");
-const Lexer = require("../lib/lexer");
-
-
 chai.use(function (chai, utils) {
     chai.Assertion.addMethod('Tuple', function (itemArray) {
         var obj = utils.flag(this, 'object');
@@ -17,6 +15,7 @@ chai.use(function (chai, utils) {
         expect(obj.type).to.equal(type);
     });
 });
+
 
 
 describe("SWAN EXPRESSION INTERPRETER", () => {
@@ -1312,96 +1311,90 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
         });
     });
     
-    describe.skip("X != Y", () => {
+    describe("X != Y", () => {
     
         it("should return false if both X and Y are nothing", async () => {
-            var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
-            expect(await parse("() != ()", presets)).to.equal(false);
+            expect(await parse("() != ()")()).to.equal(false);
         });
     
         it("should return false if X and Y are both false or both true", async () => {
-            var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
-            expect(await parse("T != T", presets)).to.equal(false);
-            expect(await parse("F != F", presets)).to.equal(false);
-            expect(await parse("T != F", presets)).to.equal(true);
-            expect(await parse("F != T", presets)).to.equal(true);
+            var context = {T:true, F:false};
+            expect(await parse("T != T")(context)).to.equal(false);
+            expect(await parse("F != F")(context)).to.equal(false);
+            expect(await parse("T != F")(context)).to.equal(true);
+            expect(await parse("F != T")(context)).to.equal(true);
         });
     
         it("should return false if X and Y are the same number", async () => {
-            var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
-            expect(await parse("3 != 3", presets)).to.equal(false);
-            expect(await parse("0 != 0", presets)).to.equal(false);
-            expect(await parse("-3 != -3", presets)).to.equal(false);
-            expect(await parse("3 != 2", presets)).to.equal(true);
-            expect(await parse("0 != -4", presets)).to.equal(true);
+            expect(await parse("3 != 3"  )()).to.equal(false);
+            expect(await parse("0 != 0"  )()).to.equal(false);
+            expect(await parse("-3 != -3")()).to.equal(false);
+            expect(await parse("3 != 2"  )()).to.equal(true);
+            expect(await parse("0 != -4" )()).to.equal(true);
         });
     
         it("should return false if X and Y are the same string", async () => {
-            var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
-            expect(await parse("'abc' != 'abc'", presets)).to.equal(false);
-            expect(await parse("'' != ''", presets)).to.equal(false);
-            expect(await parse("'abc' != 'def'", presets)).to.equal(true);
-            expect(await parse("'abc' != ''", presets)).to.equal(true);
+            expect(await parse("'abc' != 'abc'")()).to.equal(false);
+            expect(await parse("'' != ''"      )()).to.equal(false);
+            expect(await parse("'abc' != 'def'")()).to.equal(true);
+            expect(await parse("'abc' != ''"   )()).to.equal(true);
         });
     
         it("should return false if X and Y are both lists with equal items", async () => {
-            var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
-            expect(await parse("[1,2,3] != [1,2,3]", presets)).to.equal(false);
-            expect(await parse("[] != []", presets)).to.equal(false);
-            expect(await parse("[1,2,3] != [4,5,6]", presets)).to.equal(true);
-            expect(await parse("[1,2,3] != []", presets)).to.equal(true);
+            expect(await parse("[1,2,3] != [1,2,3]")()).to.equal(false);
+            expect(await parse("[] != []"          )()).to.equal(false);
+            expect(await parse("[1,2,3] != [4,5,6]")()).to.equal(true);
+            expect(await parse("[1,2,3] != []"     )()).to.equal(true);
         });
     
         it("should return false if X and Y are both namespace with sname name:value pairs", async () => {
-            var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
-            expect(await parse("{a=1,b=2} != {a=1,b=2}", presets)).to.equal(false);
-            expect(await parse("{} != {}", presets)).to.equal(false);
-            expect(await parse("{a=1,b=2} != {a=1,c=2}", presets)).to.equal(true);
-            expect(await parse("{a=1,b=2} != {a=1,b=3}", presets)).to.equal(true);
-            expect(await parse("{a=1,b=2} != {a=1}", presets)).to.equal(true);
-            expect(await parse("{a=1,b=2} != {}", presets)).to.equal(true);
-            expect(await parse("{a=1} != {a=1,b=2}", presets)).to.equal(true);
-            expect(await parse("{} != {a=1,b=2}", presets)).to.equal(true);
+            expect(await parse("{a=1,b=2} != {a=1,b=2}")()).to.equal(false);
+            expect(await parse("{} != {}"              )()).to.equal(false);
+            expect(await parse("{a=1,b=2} != {a=1,c=2}")()).to.equal(true);
+            expect(await parse("{a=1,b=2} != {a=1,b=3}")()).to.equal(true);
+            expect(await parse("{a=1,b=2} != {a=1}"    )()).to.equal(true);
+            expect(await parse("{a=1,b=2} != {}"       )()).to.equal(true);
+            expect(await parse("{a=1} != {a=1,b=2}"    )()).to.equal(true);
+            expect(await parse("{} != {a=1,b=2}"       )()).to.equal(true);
         });
     
         it("should return false if X and Y are the same function", async () => {
-            var presets = {fn1:x=>2*x, fn2:x=>2*x};
-            expect(await parse("fn1 != fn1", presets)).to.equal(false);
-            expect(await parse("fn1 != fn2", presets)).to.equal(true);
-            expect(await parse("(x->2*x) != (x->2*x)", presets)).to.equal(true);
-            expect(await parse("(x->2*x) != fn1", presets)).to.equal(true);
-            expect(await parse("fn1 != (x->2*x)", presets)).to.equal(true);
+            var context = {fn1:x=>2*x, fn2:x=>2*x};
+            expect(await parse("fn1 != fn1"          )(context)).to.equal(false);
+            expect(await parse("fn1 != fn2"          )(context)).to.equal(true);
+            expect(await parse("(x->2*x) != (x->2*x)")(context)).to.equal(true);
+            expect(await parse("(x->2*x) != fn1"     )(context)).to.equal(true);
+            expect(await parse("fn1 != (x->2*x)"     )(context)).to.equal(true);
         });
     
         it("should return false if X and Y are the same Undefined object", async () => {
-            var presets = {un1: new Undefined(), un2: new Undefined};
-            expect(await parse("un1 != un1", presets)).to.equal(false);
-            expect(await parse("un1 != un2", presets)).to.equal(true);
+            var context = {un1: new Undefined(), un2: new Undefined};
+            expect(await parse("un1 != un1")(context)).to.equal(false);
+            expect(await parse("un1 != un2")(context)).to.equal(true);
         });
     
         it("should return true if X and Y are of different types", async () => {
             var T=true, F=false, n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x, u=new Undefined();
             for (let [L,R] of [
-                    [T,n], [T,s], [T,ls], [T,ns], [T,fn], [T,u],
-                    [F,n], [F,s], [F,ls], [F,ns], [F,fn], [F, u],
-                    [n,T], [n,F], [n,s], [n,ls], [n,ns], [n,fn], [n,u],
-                    [s,T], [s,F], [s,n], [s,ls], [s,ns], [s,fn], [s,u],
-                    [ls,T], [ls,F], [ls,n], [ls,s], [ls,ns], [ls,fn], [ls,u],
-                    [ns,T], [ns,F], [ns,n], [ns,s], [ns,ls], [ns,fn], [ns,u],
-                    [fn,T], [fn,F], [fn,n], [fn,s], [fn,ls], [fn,ns], [fn,u],
-                    [u,T], [u,F], [u,n], [u,s], [u,ls], [u,ns], [u,fn] ]) {
+                                    [T, n], [T, s], [T, ls], [T, ns], [T, fn], [T, u],
+                                    [F, n], [F, s], [F, ls], [F, ns], [F, fn], [F, u],
+                    [n, T], [n, F],         [n, s], [n, ls], [n, ns], [n, fn], [n, u],
+                    [s, T], [s, F], [s, n],         [s, ls], [s, ns], [s, fn], [s, u],
+                    [ls,T], [ls,F], [ls,n], [ls,s],          [ls,ns], [ls,fn], [ls,u],
+                    [ns,T], [ns,F], [ns,n], [ns,s], [ns,ls],          [ns,fn], [ns,u],
+                    [fn,T], [fn,F], [fn,n], [fn,s], [fn,ls], [fn,ns],          [fn,u],
+                    [u, T], [u, F], [u, n], [u, s], [u, ls], [u, ns], [u,fn]         ]) {
     
-                expect(await parse("L != R", {L,R})).to.be.true;
+                expect(await parse("L != R")({L,R})).to.be.true;
             }
         });
     
         it("should compare tuples with lexicographical criteria", async () => {
-            var presets = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
-            expect(await parse("(1,2,3) != (1,2,3)", presets)).to.equal(false);
-            expect(await parse("(1,2,3) != (1,2)", presets)).to.equal(true);
-            expect(await parse("(1,2) != (1,2,3)", presets)).to.equal(true);
-            expect(await parse("1 != (1,2,3)", presets)).to.equal(true);
-            expect(await parse("(1,2,3) != 1", presets)).to.equal(true);
+            expect(await parse("(1,2,3) != (1,2,3)")()).to.equal(false);
+            expect(await parse("(1,2,3) != (1,2)"  )()).to.equal(true);
+            expect(await parse("(1,2) != (1,2,3)"  )()).to.equal(true);
+            expect(await parse("1 != (1,2,3)"      )()).to.equal(true);
+            expect(await parse("(1,2,3) != 1"      )()).to.equal(true);
         });
     });
     
