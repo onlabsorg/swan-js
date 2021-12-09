@@ -1884,15 +1884,15 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
     
     // MISCELLANEOUS
     
-    describe.skip("string templates", () => {
+    describe("string templates", () => {
     
         it("should evaluate string literals between accent quotes '``'", async () => {
-            expect(await parse("`ab\nc`")).to.equal("ab\nc");
-            expect(await parse("``")).to.equal("");
+            expect(await parse("`ab\nc`")()).to.equal("ab\nc");
+            expect(await parse("``")()).to.equal("");
         });
     
         it("should replace expressions between `${` and `}` with their value", async () => {
-            expect(await parse("`aaa ${2*x} bbb`", {x:10})).to.equal("aaa 20 bbb");
+            expect(await parse("`aaa ${2*x} bbb`")({x:10})).to.equal("aaa 20 bbb");
         });
     });
     
