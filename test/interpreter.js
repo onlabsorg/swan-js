@@ -14,8 +14,14 @@ chai.use(function (chai, utils) {
         expect(obj).to.be.instanceof(Undefined);
         expect(obj.type).to.equal(type);
     });
+    chai.Assertion.addMethod('UndefinedSyntax', function (errorMessage) {
+        var obj = utils.flag(this, 'object');
+        expect(obj).to.be.instanceof(Undefined);
+        expect(obj.type).to.equal("Syntax");
+        expect(obj.value).to.be.instanceof(Error);
+        expect(obj.value.message).to.equal(errorMessage);
+    });    
 });
-
 
 
 describe("SWAN EXPRESSION INTERPRETER", () => {
@@ -2082,76 +2088,37 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
         });
     });
 
-    describe.skip("parsing errors", () => {
-    
-        it("should resolve an undefined value on lexer errors", async () => {
-    
-            // missing closing quote
-            var u = await parse("\n'abc", {});
-            expect(u).to.be.instanceof(Undefined);
-            var args = Array.from(u.args);
-            expect(args[0]).to.equal("failure");
-            expect(args[1]).to.be.instanceof(Error);
-            expect(args[1].message).to.equal("Closing quote expected @2:4");            
-    
-            // missing exponent
-            var u = await parse("123E+", {});
-            expect(u).to.be.instanceof(Undefined);
-            var args = Array.from(u.args);
-            expect(args[0]).to.equal("failure");
-            expect(args[1]).to.be.instanceof(Error);
-            expect(args[1].message).to.equal("Expected exponent value @1:5");            
-    
-            // invalid number
-            var u = await parse("1abc", {});
-            expect(u).to.be.instanceof(Undefined);
-            var args = Array.from(u.args);
-            expect(args[0]).to.equal("failure");
-            expect(args[1]).to.be.instanceof(Error);
-            expect(args[1].message).to.equal("Invalid number @1:0");            
-    
-            // unexpected period
-            var u = await parse("12.34.56", {});
-            expect(u).to.be.instanceof(Undefined);
-            var args = Array.from(u.args);
-            expect(args[0]).to.equal("failure");
-            expect(args[1]).to.be.instanceof(Error);
-            expect(args[1].message).to.equal("Unexpected period @1:5");
-    
-            // invalid name identifier
-            var u = await parse("$a", {$a:1});
-            expect(u).to.be.instanceof(Undefined);
-            var args = Array.from(u.args);
-            expect(args[0]).to.equal("failure");
-            expect(args[1]).to.be.instanceof(Error);
-            expect(args[1].message).to.equal("Unexpected character '$' @1:0");
+    describe("parsing errors", () => {
+        
+        // Lexer Errors
+        
+        it("should return Undefined Syntax on missing closing quote", async () => {
+            expect(await parse("\n'abc")()).to.be.UndefinedSyntax("Closing quote expected @2:4");
         });
     
-        it("should resolve an undefined value on parser errors", async () => {
+        it("should return Undefined Syntax on missing numeric literal exponent", async () => {
+            expect(await parse("123E+")()).to.be.UndefinedSyntax("Expected exponent value @1:5");
+        });
+        
+        it("should return Undefined Syntax on invalid numeric literal", async () => {
+            expect(await parse("1abc")()).to.be.UndefinedSyntax("Invalid number @1:0");
+        });
+        
+        it("should return Undefined Syntax on unexpected period", async () => {
+            expect(await parse("12.34.56")()).to.be.UndefinedSyntax("Unexpected period @1:5");
+        });
+ 
+        it("should return Undefined Syntax on invalid identifier", async () => {
+            expect(await parse("$a")()).to.be.UndefinedSyntax("Unexpected character '$' @1:0");
+        });
     
-            // operand expected
-            var u = await parse("125 +", {});
-            expect(u).to.be.instanceof(Undefined);
-            var args = Array.from(u.args);
-            expect(args[0]).to.equal("failure");
-            expect(args[1]).to.be.instanceof(Error);
-            expect(args[1].message).to.equal("Operand expected @1:5");
     
-            // operand expected
-            var u = await parse("(125 +", {});
-            expect(u).to.be.instanceof(Undefined);
-            var args = Array.from(u.args);
-            expect(args[0]).to.equal("failure");
-            expect(args[1]).to.be.instanceof(Error);
-            expect(args[1].message).to.equal("Operand expected @1:6");
-    
-            // operand expected
-            var u = await parse("125 + *", {});
-            expect(u).to.be.instanceof(Undefined);
-            var args = Array.from(u.args);
-            expect(args[0]).to.equal("failure");
-            expect(args[1]).to.be.instanceof(Error);
-            expect(args[1].message).to.equal("Operand expected @1:6");
+        // Parsing Errors
+        
+        it("should return Undefined Syntax on missing operand", async () => {
+            expect(await parse("125 +")()).to.be.UndefinedSyntax("Operand expected @1:5");
+            expect(await parse("(125 +")()).to.be.UndefinedSyntax("Operand expected @1:6");
+            expect(await parse("125 + *")()).to.be.UndefinedSyntax("Operand expected @1:6");
         });
     });
 });
