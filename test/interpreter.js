@@ -383,6 +383,14 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             it("should consider negative indexes as relative to the string end", async () => {
                 expect(await parse("'abcdef'(i)")({i:-2})).to.equal('e');
             });
+            
+            it("should return Undefined ApplyOperation if Y is undefined", async () => {
+                const context = {un: new Undefined()};
+                const undef = await parse("'abc' un")(context);
+                expect(undef).to.be.Undefined("ApplyOperation");
+                expect(undef.children[0].unwrap()).to.equal("abc");
+                expect(undef.children[1]).to.equal(context.un);
+            });
     
             it("should return an empty string if X is an out of range number or not a number", async () => {
                 expect(await parse("'abcdef'(i)")({i:100 })).to.equal("");
@@ -421,6 +429,14 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 expect(await parse("list(i)")(context)).to.equal(50);
             });
     
+            it("should return Undefined ApplyOperation if Y is undefined", async () => {
+                const context = {un: new Undefined()};
+                const undef = await parse("[1,2,3] un")(context);
+                expect(undef).to.be.Undefined("ApplyOperation");
+                expect(undef.children[0].unwrap()).to.deep.equal([1,2,3]);
+                expect(undef.children[1]).to.equal(context.un);
+            });
+    
             it("should return () if X is an out of range number or not a number", async () => {
                 const context = {
                     list: [10, 20, 30, 40, 50, 60],
@@ -451,6 +467,14 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 expect(await parse("ns('def')")(context)).to.equal(20);
             });
             
+            it("should return Undefined ApplyOperation if Y is undefined", async () => {
+                const context = {un: new Undefined()};
+                const undef = await parse("{a:1, b:2} un")(context);
+                expect(undef).to.be.Undefined("ApplyOperation");
+                expect(undef.children[0].unwrap()).to.deep.equal({a:1, b:2});
+                expect(undef.children[1]).to.equal(context.un);
+            });
+    
             it("shoudl return () if X is not a valid name or a name not mapped to a value", async () => {
                 var context = {
                     ns: {abc:10, def:20}
@@ -547,6 +571,11 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 var undef = await parse("fn.name")(context);
                 expect(undef).to.be.Undefined("SubcontextingOperation");
                 expect(undef.children[0].unwrap()).to.equal(context.fn);
+
+                var context = {un: new Undefined()};
+                var undef = await parse("un.name")(context);
+                expect(undef).to.be.Undefined("SubcontextingOperation");
+                expect(undef.children[0]).to.equal(context.un);
             });
         });
 
@@ -1896,102 +1925,160 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
         });
     });
     
-    describe.skip("precedence", () => {
-    
-        it("should execute assignment operations (`=`) before pairing operations (`,`)", async () => {
-            var ctx = context.$extend();
-    
-            await parse("x = 1,2,3")(ctx);
-            expect(ctx.x).to.equal(1);
-    
-            await parse("x = (1,2,3)")(ctx);
-            expect(ctx.x).to.be.Tuple([1,2,3]);
+    describe("precedence", () => {
+        
+        describe("Arithmetic operations", () => {
+            
+            it("should execute `+` and `-` with the same precedence", async () => {
+                expect(await parse("3+5-2")()).to.equal(6);
+            });
+            
+            it("should execute `*`, `/` and `%` with the same precedence", async () => {
+                expect(await parse("10*2/5%3")()).to.equal(1);
+                expect(await parse("10%3*2/5")()).to.equal(0.4);
+            });
+            
+            it("should execute `*`, `/` and `%` before `+` and `-`", async () => {
+                expect(await parse("3+2*4")()).to.equal(11);
+                expect(await parse("3+4/2")()).to.equal(5);
+                expect(await parse("4+4%3")()).to.equal(5);
+            })
+            
+            it("should execute `^` before `*`, `/`, `%`, `+` and `-`", async () => {
+                expect(await parse("3+2^2")()).to.equal(7);
+                expect(await parse("3-2^2")()).to.equal(-1);
+                expect(await parse("3*2^2")()).to.equal(12);
+                expect(await parse("4*2^2")()).to.equal(16);
+                expect(await parse("10%2^2")()).to.equal(2);                
+            });
         });
-    
-        it("should execute tuple mapping (`=>`) before assignment operations (`=`)", async () => {
-            var ctx = context.$extend({doub:x=>2*x});
-            await parse("t = (1,2) => doub")(ctx);
-            expect(ctx.t).to.be.Tuple([2,4]);
+
+        describe("Parenthesis", () => {
+            
+            it("Should execute parenthesis first", async () => {
+                expect(await parse("3*(6-1)")()).to.equal(15);
+            });            
         });
-    
-        it("should execute function definitions (`->`) before tuple mapping operations (`=>`) and assignment operations", async () => {
-            var ctx = context.$extend();
-    
-            await parse("f = x -> [x]")(ctx);
-            expect(ctx.f).to.be.a("function");
-            expect(await ctx.f(1)).to.deep.equal([1]);
-    
-            var retval = await parse("1, f = x -> [x], 2")(ctx);
-            expect(ctx.f).to.be.a("function");
-            expect(retval).to.be.Tuple([1,2]);
-    
-            await parse("t = (1,2) => x -> [x]")(ctx);
-            expect(ctx.t).to.be.Tuple([[1],[2]]);
+        
+        describe("Apply and Subcontexting", () => {
+            
+            it("should execute apply operations before arithmetic operations", async () => {
+                const context = {fn:x=>2*x, ns:{a:10, b:20, fn:x=>10*x}, ls:[10,20,30]}
+                
+                expect(await parse("fn 3+5")(context)).to.equal(11);
+                expect(await parse("fn(3+5)")(context)).to.equal(16);
+                
+                expect(await parse("ls 1 + 1")(context)).to.equal(21);
+                expect(await parse("ls(1+1)")(context)).to.equal(30);
+
+                expect(await parse("ns 'a' + 1")(context)).to.equal(11);
+                expect(await parse("ns('a'+1)")(context)).to.be.Undefined('ApplyOperation');                
+            });
+            
+            it("should execute subcontexting operations before arithmetic operations", async () => {
+                const context = {ns:{a:10, b:20, fn:x=>10*x}, b:2}
+                expect(await parse("ns.a + b")(context)).to.equal(12);
+                expect(await parse("ns.(a + b)")(context)).to.equal(30);                
+            });
+            
+            it("should execute apply and subcontexting operations with the same precedence", async () => {
+                const context = {fn:x=>2*x, ns:{a:10, b:20, fn:x=>10*x}, b:2}
+                expect(await parse("ns.fn b")(context)).to.equal(20);
+                expect(await parse("ns.(fn b)")(context)).to.equal(200);
+                expect(await parse("fn ns.a")(context)).to.be.Undefined('SubcontextingOperation');
+                expect(await parse("fn(ns.a)")(context)).to.equal(20);                
+            });
         });
-    
-        it("should execure `;` operations before function definitions (`->`)", async () => {
-            var ctx = context.$extend({T:true, F:false});
-            expect(await parse("f = (x) -> x ; 1")(ctx)).to.equal(null);
-            expect(await ctx.f(3)).to.equal(3);
-            expect(await ctx.f()).to.equal(1);
+        
+        describe("Comparison operations", () => {
+            
+            it("should execute comparison operations after arithmetic operations", async () => {
+                expect(await parse("3 + 2 == 1 + 4")()).to.be.true;
+                expect(await parse("3 + 2 != 1 + 1")()).to.be.true;
+                expect(await parse("3 + 2 <  5 + 4")()).to.be.true;
+                expect(await parse("3 + 2 <= 5 + 4")()).to.be.true;
+                expect(await parse("3 + 7 >  1 + 4")()).to.be.true;
+                expect(await parse("3 + 2 >= 1 + 4")()).to.be.true;
+            });
+            
+            it("should execute comparison operations after apply operations", async () => {
+                const context = {fn2:x=>2*x, fn10:x=>10*x};
+                expect(await parse("fn2 10 == fn10 2")(context)).to.be.true;
+            });
+
+            it("should execute comparison operations after subcontexting operations", async () => {
+                const context = {ns:{a:10, b:20}, a:2, b:1};
+                expect(await parse("ns . a < ns . b")(context)).to.be.true;
+            });
         });
-    
-        it("should execure `?` operations before `;` operations", async () => {
-            var ctx = context.$extend({T:true, F:false});
-            expect(await parse("f = (x,y) -> x ? 1 ; y ? 2 ; 3")(ctx)).to.equal(null);
-            expect(await ctx.f(true, false)).to.equal(1);
-            expect(await ctx.f(true, true)).to.equal(1);
-            expect(await ctx.f(false, true)).to.equal(2);
-            expect(await ctx.f(false, false)).to.equal(3);
+        
+        describe("Logic operations", () => {
+            
+            it("shoudl execute `|` and `&` with the same precedence", async () => {
+                expect(await parse("1 | 2 & 3")()).to.equal(3);
+                expect(await parse("1 | (2 & 3)")()).to.equal(1);
+            });
+
+            it("shoudl execute `?` after `|` and `&`", async () => {
+                expect(await parse("1 | 0 ? 3")()).to.equal(3);
+                expect(await parse("1 | (0 ? 3)")()).to.equal(1);
+                expect(await parse("1 & 2 ? 3")()).to.equal(3);
+            });
+
+            it("shoudl execute `;` after `?`", async () => {
+                expect(await parse("1 ? 2 ; 3")()).to.equal(2);
+                expect(await parse("0 ? 2 ; 3")()).to.equal(3);                
+                expect(await parse("1 ; 2 ? 3")()).to.equal(1);  
+                expect(await parse("() ; 2 ? 3")()).to.equal(3);  
+            });
+            
+            it("should execute logic operations after comparison operations", async () => {
+                expect(await parse("1 < 2 & 3 > 2 ? 4 ; 5")()).to.equal(4);
+                expect(await parse("1 > 2 | 3 < 2 ? 4 ; 5")()).to.equal(5);
+            });
         });
-    
-        it("should execute logic operations (`&` and `|`) before `?` and `;` operations", async () => {
-            var ctx = context.$extend({T:true, F:false});
-            expect(await parse("f = (x,y) -> x & y ? 1 ; x | y ? 2 ; 3")(ctx)).to.equal(null);
-            expect(await ctx.f(true, true)).to.equal(1);
-            expect(await ctx.f(true, false)).to.equal(2);
-            expect(await ctx.f(false, true)).to.equal(2);
-            expect(await ctx.f(false, false)).to.equal(3);
+        
+        describe("Function definition", () => {
+            
+            it("should execute after logic operations", async () => {
+                expect(await parse("(x -> x ? 1 ; 2)(10)")()).to.equal(1);
+                expect(await parse("(x -> x ? 1 ; 2)(0)")()).to.equal(2);
+            });
+            
+            it("should be right-associative", async () => {
+                expect(await parse("(x -> y -> x - y)(10)(3)")()).to.equal(7);
+            });
         });
-    
-        it("should execute comparison operations (`==`,`!=`,`<`,`<=`,`>=`,`>`) before logic operations (`&` and `|`)", async () => {
-            var ctx = context.$extend({T:true, F:false});
-            expect(await parse("f = x -> x==0 ? 'null' ; 0.01<=x & x<0.1 ? 'small' ; 1000>x & x>=100 ? 'big' ; 'huge' ")(ctx)).to.equal(null);
-            expect(await ctx.f(0)).to.equal('null');
-            expect(await ctx.f(0.01)).to.equal('small');
-            expect(await ctx.f(0.09)).to.equal('small');
-            expect(await ctx.f(999)).to.equal('big');
-            expect(await ctx.f(100)).to.equal('big');
-            expect(await ctx.f(1000)).to.equal('huge');
+        
+        describe("Assignment and labelling operations", () => {
+            
+            it("should execute `:` and `=` with the same precedence", async () => {
+                const context = {};
+                expect(await parse("x = y : 10")()).to.be.Undefined("LabellingOperation");
+                expect(await parse("x = (y : 10)")(context)).to.be.null;
+                expect(context.x).to.equal(10);
+                expect(context.y).to.equal(10);
+            });
+            
+            it("should execute `:` and `=` after function definitions", async () => {
+                const context = {};
+                
+                await parse("f : x -> 2 * x")(context);
+                expect(await context.f(2)).to.equal(4);
+                
+                await parse("g = x -> 3 * x")(context);
+                expect(await context.g(2)).to.equal(6);
+            });
         });
-    
-        it("should execute sum (`+`) and subtraction (`-`) operations before comparison operations (`==`,`!=`,`<`,`<=`,`>=`,`>`)", async () => {
-            var ctx = context.$extend({T:true, F:false});
-            expect(await parse("1+1<4 & 8-3==5")(ctx)).to.equal(true);
-        });
-    
-        it("should execute product (`*`) division (`/`) and modulo (`%`) operations before sum and subtraction operations (`+` and `-`)", async () => {
-            var ctx = context.$extend({T:true, F:false});
-            expect(await parse("1+2*3-10/5+8%5")(ctx)).to.equal(8);
-        });
-    
-        it("should execute exponentiation (`^`) operations before product (`*`) division (`/`) and modulo (`%`) operations", async () => {
-            var ctx = context.$extend({T:true, F:false});
-            expect(await parse("1+2*3^2-10/5+8%5")(ctx)).to.equal(20);
-        });
-    
-        it("should execute subcontexting (`.`), function calls and referencing (`@`) before arithmetic operations", async () => {
-            var ctx = context.$extend({double:x=>2*x, b:10});
-            expect(await parse("double 2+3")(ctx)).to.equal(7);
-            expect(await parse("double(2+3)")(ctx)).to.equal(10);
-    
-            expect(await parse("{a=1,b=2}.a+b")(ctx)).to.equal(11);
-            expect(await parse("{a=1,b=2}.(a+b)")(ctx)).to.equal(3);
-    
-            expect(await parse("{f=x->2*x}.f 2")(ctx)).to.equal(4);
-            expect(await parse("(x->{a=2*x}) 4 . a")(ctx)).to.equal(8);
-    
-            expect(await parse("[10,20,30] @ 1 + 1")(ctx)).to.equal(21);
+        
+        describe("Pairing operation", () => {
+            
+            it("should always be executed with lowest priority", async () => {
+                const context = {};
+                await parse("x = 1 , y = 2")(context);
+                expect(context.x).to.equal(1);
+                expect(context.y).to.equal(2);
+            });
         });
     });
 
