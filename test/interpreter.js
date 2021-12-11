@@ -344,6 +344,13 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(foo10).to.be.a("function");
             expect(await foo10(20)).to.deep.equal({a:10, b:20});
         });
+        
+        it("should return Undefined FunctionDefinition when non-valid name are defined as parameters", async () => {
+            var context = {};            
+            var undef = await parse("'abc' -> 2")(context);
+            expect(undef).to.be.Undefined('FunctionDefinition');
+            expect(undef.children[0]).to.be.Undefined('StringLiteral')
+        });
     });
     
     describe("'apply' operation: Y X`", () => {
@@ -536,12 +543,13 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
         describe("when X is a namespace", () => {
             
             it("should evaluate 'Y' in the 'X' context if 'X' is a namespace", async () => {
-                var context = {x: 10};
+                var context = {x: 10, u:new Undefined()};
                 await parse("ns = {y=20, z=30, _h=40}")(context);
-                expect(await parse("ns.y"      )(context)).to.equal(20);
+                expect(await parse("ns.y      ")(context)).to.equal(20);
                 expect(await parse("ns.[1,y,z]")(context)).to.deep.equal([1,20,30]);
-                expect(await parse("ns.x"      )(context)).to.equal(10);
-                expect(await parse("ns._h"     )(context)).to.equal(40);
+                expect(await parse("ns.x      ")(context)).to.equal(10);
+                expect(await parse("ns._h     ")(context)).to.equal(40);
+                expect(await parse("ns.u      ")(context)).to.equal(context.u);
         
                 var context = { ns:{x:10,y:20,z:30} };
                 expect(await parse("ns.[x,y,z]")(context)).to.deep.equal([10,20,30]);

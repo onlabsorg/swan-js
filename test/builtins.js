@@ -1,5 +1,408 @@
+const {expect} = require("chai");
+
+const builtins = require("../lib/builtins");
+const types = require("../lib/types");
 
 
+describe("builtins", () => {
+    
+    describe("Numb", () => {
+        
+        // MATH FUNCTIONS
+        
+        describe("Numb.e", () => {
+            it("should return the Euler's number", async () => {
+                expect(builtins.Numb.e).to.equal(Math.E);
+            });
+        });
+
+        describe("Numb.pi", () => {
+            it("should return the Pi number", async () => {
+                expect(builtins.Numb.pi).to.equal(Math.PI);
+            });
+        });
+
+        describe("Numb.abs(x)", () => {
+            it("should return the absolute value of a number", async () => {
+                expect(await builtins.Numb.abs(-123.45)).to.equal(123.45);
+                expect(await builtins.Numb.abs(0)).to.equal(0);
+                expect(await builtins.Numb.abs(123.45)).to.equal(123.45);
+            });
+        });
+
+        describe("Numb.acos(x)", () => {
+            it("should return the arc-cosine of a number", async () => {
+                expect(await builtins.Numb.acos(0.5)).to.equal(Math.acos(0.5));
+            });
+        });
+
+        describe("Numb.acosh(x)", () => {
+            it("should return the arc-hyperbolic-cosine of a number", async () => {
+                expect(await builtins.Numb.acosh(2)).to.equal(Math.acosh(2));
+            });
+        });
+
+        describe("Numb.asin(x)", () => {
+            it("should return the arc-sine of a number", async () => {
+                expect(await builtins.Numb.asin(0.5)).to.equal(Math.asin(0.5));
+            });
+        });
+
+        describe("Numb.asinh(x)", () => {
+            it("should return the arc-hyperbolic-sine of a number", async () => {
+                expect(await builtins.Numb.asinh(2)).to.equal(Math.asinh(2));
+            });
+        });
+
+        describe("Numb.atan(x)", () => {
+            it("should return the arc-tangent of a number", async () => {
+                expect(await builtins.Numb.atan(0.5)).to.equal(Math.atan(0.5));
+            });
+        });
+
+        describe("Numb.atanh(x)", () => {
+            it("should return the arc-hyperbolic-tangent of a number", async () => {
+                expect(await builtins.Numb.atanh(0.5)).to.equal(Math.atanh(0.5));
+            });
+        });
+
+        describe("Numb.ceil(x)", () => {
+            it("should round up a number to the closest largest integer", async () => {
+                expect(builtins.Numb.ceil(12.345)).to.equal(13);
+                expect(builtins.Numb.ceil(-12.345)).to.equal(-12);
+            });
+        });
+
+        describe("Numb.cos(x)", () => {
+            it("should return the cosine of a number", async () => {
+                expect(builtins.Numb.cos(0.5)).to.equal(Math.cos(0.5));
+            });
+        });
+
+        describe("Numb.cosh(x)", () => {
+            it("should return the hyperbolic cosine of a number", async () => {
+                expect(builtins.Numb.cosh(0.5)).to.equal(Math.cosh(0.5));
+            });
+        });
+
+        describe("Numb.exp(x)", () => {
+            it("should return `e` to the power of a number", async () => {
+                expect(builtins.Numb.exp(0.5)).to.equal(builtins.Numb.e**0.5);
+            });
+        });
+
+        describe("Numb.floor(x)", () => {
+            it("should round up a number to the closest smallest integer", async () => {
+                expect(builtins.Numb.floor(12.345)).to.equal(12);
+                expect(builtins.Numb.floor(-12.345)).to.equal(-13);
+            });
+        });
+
+        describe("Numb.log(x)", () => {
+            it("should return the natural logaritm of a number", async () => {
+                expect(await builtins.Numb.log(2)).to.equal(Math.log(2));
+                expect(await builtins.Numb.log(Math.E**2)).to.equal(2);
+            });
+        });
+
+        describe("Numb.log10(x)", () => {
+            it("should return the logaritm with base 10 of a number", async () => {
+                expect(await builtins.Numb.log10(2)).to.equal(Math.log10(2));
+                expect(await builtins.Numb.log10(100)).to.equal(2);
+            });
+        });
+
+        describe("Numb.max(x1, x2, x3, ...)", () => {
+            it("should return the maximum of a list of numbers", async () => {
+                expect(await builtins.Numb.max(23,1,13,56,22,-108)).to.equal(56);
+            });
+        });
+
+        describe("Numb.min(x1, x2, x3, ...)", () => {
+            it("should return the minimum of a list of numbers", async () => {
+                expect(await builtins.Numb.min(23,1,13,56,22,-108)).to.equal(-108);
+            });
+        });
+
+        describe("Numb.random(x)", () => {
+            it("should return a random number between 0 and x", async () => {
+
+                var y1 = await builtins.Numb.random(2);
+                expect(0 <= y1 && y1 <= 2).to.be.true;
+
+                var y2 = await builtins.Numb.random(2);
+                var y3 = await builtins.Numb.random(2);
+
+                expect(y1).to.not.equal(y2);
+                expect(y1).to.not.equal(y3);
+                expect(y2).to.not.equal(y3);
+            });
+        });
+
+        describe("Numb.round(x)", () => {
+            it("should round the given number to the closest integer", async () => {
+
+                expect(await builtins.Numb.round(12.345)).to.equal(12);
+                expect(await builtins.Numb.round(6.789)).to.equal(7);
+                expect(await builtins.Numb.round(10.5)).to.equal(11);
+
+                expect(await builtins.Numb.round(-12.345)).to.equal(-12);
+                expect(await builtins.Numb.round(-6.789)).to.equal(-7);
+                expect(await builtins.Numb.round(-10.5)).to.equal(-10);
+            });
+        });
+
+        describe("Numb.sin(x)", () => {
+            it("should return the sine of a number", async () => {
+                expect(builtins.Numb.sin(0.5)).to.equal(Math.sin(0.5));
+            });
+        });
+
+        describe("Numb.sinh(x)", () => {
+            it("should return the hyperbolic sine of a number", async () => {
+                expect(builtins.Numb.sinh(0.5)).to.equal(Math.sinh(0.5));
+            });
+        });
+
+        describe("Numb.sqrt(x)", () => {
+            it("should return the square root of a number", async () => {
+                expect(await builtins.Numb.sqrt(4)).to.equal(2);
+                expect(await builtins.Numb.sqrt(34.5)).to.equal(34.5**0.5);
+            });
+        });
+
+        describe("Numb.tan(x)", () => {
+            it("should return the tangent of a number", async () => {
+                expect(builtins.Numb.tan(0.5)).to.equal(Math.tan(0.5));
+            });
+        });
+
+        describe("Numb.tanh(x)", () => {
+            it("should return the hyperbolic tangent of a number", async () => {
+                expect(builtins.Numb.tanh(0.5)).to.equal(Math.tanh(0.5));
+            });
+        });
+
+        describe("Numb.trunc(x)", () => {
+            it("should return the integer part of a number", async () => {
+
+                expect(await builtins.Numb.trunc(12.345)).to.equal(12);
+                expect(await builtins.Numb.trunc(6.789)).to.equal(6);
+                expect(await builtins.Numb.trunc(10.5)).to.equal(10);
+
+                expect(await builtins.Numb.trunc(-12.345)).to.equal(-12);
+                expect(await builtins.Numb.trunc(-6.789)).to.equal(-6);
+                expect(await builtins.Numb.trunc(-10.5)).to.equal(-10);
+            });
+        });
+
+        describe("Numb.hex(s)", () => {
+            it("should return a number given his hexadecimal string representation", async () => {
+                expect(await builtins.Numb.hex('FF')).to.equal(255);
+            });
+        });
+
+        describe("Numb.oct(s)", () => {
+            it("should return a number given his octal string representation", async () => {
+                expect(await builtins.Numb.oct('77')).to.equal(63);
+            });
+        });
+
+        describe("Numb.bin(s)", () => {
+            it("should return a number given his binary string representation", async () => {
+                expect(await builtins.Numb.bin('11')).to.equal(3);
+            });
+        });
+    });
+    
+    describe("Text", () => {
+        
+        describe("Text.fromCharCodes(...charCodes)", () => {
+
+            it("should return the string made of the given UTF char codes", async () => {
+                expect(await builtins.Text.fromCharCodes(65, 98, 99)).to.equal("Abc");
+            });
+        });        
+        
+        describe("Text.toCharCodes(str)", () => {
+            
+            it("should return an iterator yielding the char codes of the given string", async () => {
+                const iter = builtins.Text.toCharCodes("Abc");
+                expect(iter[Symbol.iterator]).to.be.a("function");
+                expect(Array.from(iter)).to.deep.equal([65, 98, 99]);
+            });
+            
+            it("shoudl throw an error if str is not a string", () => {
+                expect(() => builtins.Text.toCharCodes(10)).to.throw(TypeError);
+            });
+        });
+
+        describe("Text.find(subStr)(str)", () => {
+            
+            it("should return a function", () => {
+                expect(builtins.Text.find("Abc")).to.be.a("function");
+            });
+            
+            it("should throw an error if the sub-string is not a string", () => {
+                expect(() => builtins.Text.find(1)).to.throw(TypeError);
+            });
+            
+            describe("fn = Text.find(subStr)", () => {
+                
+                it("should return the first index of subStr in str", async () => {
+                    expect(await builtins.Text.find("Abc")("__Abc__def__Abc")).to.equal(2);
+                });
+
+                it("should return -1 if no match is found", async () => {
+                    expect(await builtins.Text.find("xxx")("__Abc__def__Abc")).to.equal(-1);
+                });
+
+                it("should throw an error if the passed string is not a string", () => {
+                    const fn = builtins.Text.find("abc");
+                    expect(() => fn(1)).to.throw(TypeError);
+                });
+            });
+        });    
+        
+        describe("Text.rfind(subStr)(str)", () => {
+            
+            it("should return a function", () => {
+                expect(builtins.Text.rfind("Abc")).to.be.a("function");
+            });
+            
+            it("should throw an error if the sub-string is not a string", () => {
+                expect(() => builtins.Text.rfind(1)).to.throw(TypeError);
+            });
+            
+            describe("fn = Text.rfind(subStr)", () => {
+                
+                it("should return the last index of subStr in str", async () => {
+                    expect(await builtins.Text.rfind("Abc")("__Abc__def__Abc")).to.equal(12);
+                });
+
+                it("should return -1 if no match is found", async () => {
+                    expect(await builtins.Text.rfind("xxx")("__Abc__def__Abc")).to.equal(-1);
+                });
+
+                it("should throw an error if the passed string is not a string", () => {
+                    const fn = builtins.Text.rfind("abc");
+                    expect(() => fn(1)).to.throw(TypeError);
+                });
+            });
+        });    
+        
+        describe("Text.lower(str)", () => {
+
+            it("should return the given string converted to lower case characters", async () => {
+                expect(await builtins.Text.lower("AbcDef")).to.equal("abcdef");
+            });
+        });    
+        
+        describe("Text.upper(str)", () => {
+
+            it("should return the given string converted to upper case characters", async () => {
+                expect(await builtins.Text.upper("AbcDef")).to.equal("ABCDEF");
+            });
+        });   
+        
+        describe("Text.trimHead(str)", () => {
+            it("should remove the leading spaces", async () => {
+                expect(await builtins.Text.trimHead("   abc   ")).to.equal("abc   ");
+            });
+        });
+
+        describe("Text.trimTail(str)", () => {
+            it("should remove the trailing spaces", async () => {
+                expect(await builtins.Text.trimTail("   abc   ")).to.equal("   abc");
+            });
+        });
+
+        describe("Text.trim(str)", () => {
+            it("should remove both leading and trailing spaces", async () => {
+                expect(await builtins.Text.trim("   abc   ")).to.equal("abc");
+            });
+        });   
+        
+        describe("Text.head(index)(str)", () => {
+
+            it("should return a function", () => {
+                expect(builtins.Text.head(3)).to.be.a("function");
+            });
+            
+            it("should throw an error if the index is not a number", () => {
+                expect(() => builtins.Text.head('abc')).to.throw(TypeError);
+            });
+            
+            describe("fn = Text.head(index)", () => {
+                
+                it("should return the first `index` characters of the passed string", async () => {
+                    expect(builtins.Text.head(3)("Abcdefghi")).to.equal("Abc");
+                });
+
+                it("should interpret negative indices as relative to the end of the string", async () => {
+                    expect(builtins.Text.head(-5)("Abcdefghi")).to.equal("Abcd");
+                });
+
+                it("should throw an error if the passed string is not a string", () => {
+                    const fn = builtins.Text.head(3);
+                    expect(() => fn(1)).to.throw(TypeError);
+                });
+            });
+        });              
+
+        describe("Text.tail(index)(str)", () => {
+
+            it("should return a function", () => {
+                expect(builtins.Text.tail(3)).to.be.a("function");
+            });
+            
+            it("should throw an error if the index is not a number", () => {
+                expect(() => builtins.Text.tail('abc')).to.throw(TypeError);
+            });
+            
+            describe("fn = Text.tail(index)", () => {
+                
+                it("should return the substring made of all the character after `index`", async () => {
+                    expect(builtins.Text.tail(3)("Abcdefghi")).to.equal("defghi");
+                });
+
+                it("should interpret negative indices as relative to the end of the string", async () => {
+                    expect(builtins.Text.tail(-5)("Abcdefghi")).to.equal("efghi");
+                });
+
+                it("should throw an error if the passed string is not a string", () => {
+                    const fn = builtins.Text.tail(3);
+                    expect(() => fn(1)).to.throw(TypeError);
+                });
+            });
+        });              
+
+        describe("Text.split(divider)(str)", () => {
+
+            it("should return a function", () => {
+                expect(builtins.Text.split(",")).to.be.a("function");
+            });
+            
+            it("should throw an error if the sub-string is not a string", () => {
+                expect(() => builtins.Text.split(1)).to.throw(TypeError);
+            });
+            
+            describe("fn = Text.split(divider)", () => {
+                
+                it("should return an iterator yielding the `str` substrings between the `divider`", async () => {
+                    const iter = await builtins.Text.split(",")("Abc,def,hij");
+                    expect(iter[Symbol.iterator]).to.be.a("function");
+                    expect(Array.from(iter)).to.deep.equal(["Abc", "def", "hij"]);
+                });
+
+                it("should throw an error if the passed string is not a string", () => {
+                    const fn = builtins.Text.split("abc");
+                    expect(() => fn(1)).to.throw(TypeError);
+                });
+            });
+        });              
+    });
+});
 
 
 // describe("tuple mapping operation: X => Y", () => {
