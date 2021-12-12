@@ -103,17 +103,17 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
         it("should return `Undefined NameReference` if the name is not mapped", async () => {
             const undef = await parse("undefined_key")({a:10, _b:20});
             expect(undef).to.be.Undefined("NameReference");
-            expect(undef.value.unwrap()).to.equal("undefined_key");
+            expect(undef.value).to.equal("undefined_key");
         });
     
         it("should return `Undefined NameReference` if name is a property inherited from Object", async () => {
             var undef = await parse("isPrototypeOf")({});
             expect(undef).to.be.Undefined("NameReference");
-            expect(undef.value.unwrap()).to.equal("isPrototypeOf");
+            expect(undef.value).to.equal("isPrototypeOf");
             
             var undef = await parse("hasOwnProperty")({});
             expect(undef).to.be.Undefined("NameReference");
-            expect(undef.value.unwrap()).to.equal("hasOwnProperty");
+            expect(undef.value).to.equal("hasOwnProperty");
         });
     
         describe("name resolution in a child context", () => {
@@ -132,7 +132,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 var context = Object.assign(Object.create({a:10, b:20}), {a:100});
                 const undef = await parse("undefined_key")(context);
                 expect(undef).to.be.Undefined("NameReference");
-                expect(undef.value.unwrap()).to.equal("undefined_key");
+                expect(undef.value).to.equal("undefined_key");
             });
         });
     });
@@ -206,16 +206,16 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 var undef = await parse("'abc' : 2")(context);
                 expect(undef).to.be.Undefined('LabellingOperation');
                 expect(undef.children[0]).to.be.Undefined('StringLiteral')
-                expect(undef.children[1].unwrap()).to.equal(2);
+                expect(undef.children[1]).to.equal(2);
 
                 var undef = await parse("3*2 : 2")(context);
                 expect(undef).to.be.Undefined('LabellingOperation');
                 expect(undef.children[0]).to.be.Undefined('MulOperation')
                 expect(undef.children[0].children[0]).to.be.Undefined('NumberLiteral');
-                expect(undef.children[0].children[0].value.unwrap()).to.equal(3);
+                expect(undef.children[0].children[0].value).to.equal(3);
                 expect(undef.children[0].children[1]).to.be.Undefined('NumberLiteral');
-                expect(undef.children[0].children[1].value.unwrap()).to.equal(2);
-                expect(undef.children[1].unwrap()).to.equal(2);
+                expect(undef.children[0].children[1].value).to.equal(2);
+                expect(undef.children[1]).to.equal(2);
             });
         });
     });
@@ -289,16 +289,16 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 var undef = await parse("'abc' = 2")(context);
                 expect(undef).to.be.Undefined('AssignmentOperation');
                 expect(undef.children[0]).to.be.Undefined('StringLiteral')
-                expect(undef.children[1].unwrap()).to.equal(2);
+                expect(undef.children[1]).to.equal(2);
 
                 var undef = await parse("3*2 = 2")(context);
                 expect(undef).to.be.Undefined('AssignmentOperation');
                 expect(undef.children[0]).to.be.Undefined('MulOperation')
                 expect(undef.children[0].children[0]).to.be.Undefined('NumberLiteral');
-                expect(undef.children[0].children[0].value.unwrap()).to.equal(3);
+                expect(undef.children[0].children[0].value).to.equal(3);
                 expect(undef.children[0].children[1]).to.be.Undefined('NumberLiteral');
-                expect(undef.children[0].children[1].value.unwrap()).to.equal(2);
-                expect(undef.children[1].unwrap()).to.equal(2);
+                expect(undef.children[0].children[1].value).to.equal(2);
+                expect(undef.children[1]).to.equal(2);
             });
         });
     });
@@ -401,7 +401,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 const context = {un: new Undefined()};
                 const undef = await parse("'abc' un")(context);
                 expect(undef).to.be.Undefined("ApplyOperation");
-                expect(undef.children[0].unwrap()).to.equal("abc");
+                expect(undef.children[0]).to.equal("abc");
                 expect(undef.children[1]).to.equal(context.un);
             });
     
@@ -446,7 +446,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 const context = {un: new Undefined()};
                 const undef = await parse("[1,2,3] un")(context);
                 expect(undef).to.be.Undefined("ApplyOperation");
-                expect(undef.children[0].unwrap()).to.deep.equal([1,2,3]);
+                expect(undef.children[0]).to.deep.equal([1,2,3]);
                 expect(undef.children[1]).to.equal(context.un);
             });
     
@@ -484,7 +484,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 const context = {un: new Undefined()};
                 const undef = await parse("{a:1, b:2} un")(context);
                 expect(undef).to.be.Undefined("ApplyOperation");
-                expect(undef.children[0].unwrap()).to.deep.equal({a:1, b:2});
+                expect(undef.children[0]).to.deep.equal({a:1, b:2});
                 expect(undef.children[1]).to.equal(context.un);
             });
     
@@ -519,8 +519,8 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 for (let Y of [true, false, 10, new Undefined]) {
                     const undef = await parse("Y(1)")({Y});
                     expect(undef).to.be.Undefined('ApplyOperation');
-                    expect(undef.children[0].unwrap()).to.equal(Y);
-                    expect(undef.children[1].unwrap()).to.equal(1);
+                    expect(undef.children[0]).to.equal(Y);
+                    expect(undef.children[1]).to.equal(1);
                 }
             });            
         });
@@ -575,16 +575,16 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             it("should return Undefined SubcontextingOperation", async () => {
                 var undef = await parse("(10).name")({});
                 expect(undef).to.be.Undefined("SubcontextingOperation");
-                expect(undef.children[0].unwrap()).to.equal(10);
+                expect(undef.children[0]).to.equal(10);
                 
                 var undef = await parse("[].name")({});
                 expect(undef).to.be.Undefined("SubcontextingOperation");
-                expect(undef.children[0].unwrap()).to.deep.equal([]);
+                expect(undef.children[0]).to.deep.equal([]);
                 
                 var context = {fn: x=>2*x};
                 var undef = await parse("fn.name")(context);
                 expect(undef).to.be.Undefined("SubcontextingOperation");
-                expect(undef.children[0].unwrap()).to.equal(context.fn);
+                expect(undef.children[0]).to.equal(context.fn);
 
                 var context = {un: new Undefined()};
                 var undef = await parse("un.name")(context);
@@ -643,7 +643,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             for (let X of [true, false, "abc", [1,2,3], {x:1}, x=>x, new Undefined()]) {
                 const undef = await parse("-X")({X});
                 expect(undef).to.be.Undefined('NegationOperation');
-                expect(undef.children[0].unwrap()).to.deep.equal(X);
+                expect(undef.children[0]).to.deep.equal(X);
             }
         });
     
@@ -653,7 +653,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(Array.from(tuple)[0]).to.equal(-3);
             expect(Array.from(tuple)[1]).to.equal(10);
             expect(Array.from(tuple)[2]).to.be.Undefined('NegationOperation');
-            expect(Array.from(tuple)[2].children[0].unwrap()).to.equal('abc');
+            expect(Array.from(tuple)[2].children[0]).to.equal('abc');
         });
     });
 
@@ -794,7 +794,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("un + ()"   )(context)).to.deep.equal(context.un);
             expect(await parse("(1,2) + ()")(context)).to.be.Tuple([1,2]);
         });
-    
+        
         it("should return `X||Y` if both X and Y are booleans", async () => {
             var context = {T:true, F:false};
             expect(await parse("T + T")(context)).to.be.true;
@@ -802,37 +802,37 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("F + T")(context)).to.be.true;
             expect(await parse("F + F")(context)).to.be.false;
         });
-    
+        
         it("should return `X+Y` if both X and Y are numbers", async () => {
             expect(await parse("10 + 1"   )()).to.equal(11);
             expect(await parse("10 + 0"   )()).to.equal(10);
             expect(await parse("10 + (-2)")()).to.equal(8);
         });
-    
+        
         it("should concatenate X and Y if they are both strings", async () => {
             expect(await parse("'abc' + 'def'")()).to.equal("abcdef");
             expect(await parse("'abc' + ''"   )()).to.equal("abc");
             expect(await parse("'' + 'def'"   )()).to.equal("def");
         });
-    
+        
         it("should concatenate X and Y if they are both lists", async () => {
             expect(await parse("[1,2,3] + [4,5,6]")()).to.deep.equal([1,2,3,4,5,6]);
             expect(await parse("[1,2,3] + []"     )()).to.deep.equal([1,2,3]);
             expect(await parse("[] + [4,5,6]"     )()).to.deep.equal([4,5,6]);
         });
-    
+        
         it("should merge X and Y if they are both namespaces", async () => {
             expect(await parse("{a=1,b=2} + {b=20,c=30}")()).to.deep.equal({a:1,b:20,c:30});
             expect(await parse("{a=1,b=2} + {}"         )()).to.deep.equal({a:1,b:2});
             expect(await parse("{} + {b=20,c=30}"       )()).to.deep.equal({b:20,c:30});
-    
+        
             var context = {
                 ns1: {a:1, un: new Undefined()},
                 ns2: {b:2, un: new Undefined()},
             }
             expect(await parse("ns1 + ns2")(context)).to.deep.equal({a:1, b:2, un:context.ns2.un});
         });
-    
+        
         it("should return Undefined for all the other type combinations", async () => {
             var T=true, F=false, n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x, u=new Undefined();
             for (let [L,R] of [
@@ -844,14 +844,14 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                     [ns,T], [ns,F], [ns,n], [ns,s], [ns,ls], [ns,fn], [ns,u],
                     [fn,T], [fn,F], [fn,n], [fn,s], [fn,ls], [fn,ns], [fn,u],
                     [u,T], [u,F], [u,n], [u,s], [u,ls], [u,ns], [u,fn], [u,u] ]) {
-    
+        
                 const undef = await parse("L + R")({L,R});
                 expect(undef).to.be.Undefined('SumOperation');
-                expect(undef.children[0].unwrap()).to.deep.equal(L);
-                expect(undef.children[1].unwrap()).to.deep.equal(R);
+                expect(undef.children[0]).to.deep.equal(L);
+                expect(undef.children[1]).to.deep.equal(R);
             }
         });
-    
+        
         it("should return (x1+y1, x2+y2, ...) if X and/or Y is a tuple", async () => {
             var context = {T:true, F:false};
             expect(await parse("(T, 1, 'a', [1], {a=1}) + (F, 2, 'b', [2], {b=2})")(context)).to.be.Tuple([true, 3, "ab", [1,2], {a:1,b:2}])
@@ -859,14 +859,14 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("(T, 1, 'a') + (F, 2, 'b', [2], {b=2})"            )(context)).to.be.Tuple([true, 3, "ab", [2], {b:2}])
             expect(await parse("10 + (1, 2, 3)"                                   )(context)).to.be.Tuple([11, 2, 3])
             expect(await parse("(1, 2, 3) + 10"                                   )(context)).to.be.Tuple([11, 2, 3])
-            
+        
             // partial exception
             var tuple = await parse("(10,20,30) + (1,2,[])")();
             expect(Array.from(tuple)[0]).to.equal(11);
             expect(Array.from(tuple)[1]).to.equal(22);
             expect(Array.from(tuple)[2]).to.be.Undefined('SumOperation');
-            expect(Array.from(tuple)[2].children[0].unwrap()).to.equal(30);
-            expect(Array.from(tuple)[2].children[1].unwrap()).to.deep.equal([]);
+            expect(Array.from(tuple)[2].children[0]).to.equal(30);
+            expect(Array.from(tuple)[2].children[1]).to.deep.equal([]);
         });
     });
     
@@ -889,8 +889,8 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             for (let R of [true, false, 10, 'abc', [1,2,3], {a:1}, x=>x]) {
                 var undef = await parse("() - R")({R});
                 expect(undef).to.be.Undefined('SubOperation');
-                expect(undef.children[0].unwrap()).to.be.null;
-                expect(undef.children[1].unwrap()).to.deep.equal(R);
+                expect(undef.children[0]).to.be.null;
+                expect(undef.children[1]).to.deep.equal(R);
             }
         });
     
@@ -914,8 +914,8 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
     
                 var undef = await parse("L - R")({L,R});
                 expect(undef).to.be.Undefined('SubOperation');
-                expect(undef.children[0].unwrap()).to.deep.equal(L);
-                expect(undef.children[1].unwrap()).to.deep.equal(R);
+                expect(undef.children[0]).to.deep.equal(L);
+                expect(undef.children[1]).to.deep.equal(R);
             }            
         });
     
@@ -929,8 +929,8 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(Array.from(tuple)[0]).to.equal(9);
             expect(Array.from(tuple)[1]).to.equal(18);
             expect(Array.from(tuple)[2]).to.be.Undefined('SubOperation');
-            expect(Array.from(tuple)[2].children[0].unwrap()).to.equal(30);
-            expect(Array.from(tuple)[2].children[1].unwrap()).to.deep.equal([]);
+            expect(Array.from(tuple)[2].children[0]).to.equal(30);
+            expect(Array.from(tuple)[2].children[1]).to.deep.equal([]);
         });
     });
     
@@ -962,7 +962,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("(1,2,3) * ()")(context)).to.equal(null);
             expect(await parse("un * ()"     )(context)).to.equal(null);
         });
-        
+    
         it("should return Y if X is true", async () => {
             var context = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false,
                     un: new Undefined()};
@@ -977,7 +977,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("T * ns"   )(context)).to.deep.equal(context.ns);
             expect(await parse("T * un"   )(context)).to.equal(context.un);            
         });
-
+    
         it("should return the void element of the Y type if X is false", async () => {
             var context = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false,
                     un: new Undefined()};
@@ -992,7 +992,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("F * ns"   )(context)).to.deep.equal({});
             expect(await parse("F * un"   )(context)).to.equal(null);                        
         });
-
+    
         it("should return X if Y is true", async () => {
             var context = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false,
                     un: new Undefined()};
@@ -1005,7 +1005,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("ns * T"   )(context)).to.deep.equal(context.ns);
             expect(await parse("un * T"   )(context)).to.equal(context.un);                        
         });
-
+    
         it("should return the void element of the X type if Y is false", async () => {
             var context = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false,
                     un: new Undefined()};
@@ -1024,7 +1024,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("10 * 0"   )()).to.equal(0);
             expect(await parse("10 * (-2)")()).to.equal(-20);
         });
-        
+    
         it("should return Undefined for all the other type combinations", async () => {
             var n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x, u=new Undefined();
             for (let [L,R] of [
@@ -1037,8 +1037,8 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
     
                 const undef = await parse("L * R")({L,R});
                 expect(undef).to.be.Undefined("MulOperation");
-                expect(undef.children[0].unwrap()).to.deep.equal(L);
-                expect(undef.children[1].unwrap()).to.deep.equal(R);
+                expect(undef.children[0]).to.deep.equal(L);
+                expect(undef.children[1]).to.deep.equal(R);
             }                        
         });
     
@@ -1056,8 +1056,8 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(Array.from(tuple)[0]).to.equal(10);
             expect(Array.from(tuple)[1]).to.equal(40);
             expect(Array.from(tuple)[2]).to.be.Undefined('MulOperation');
-            expect(Array.from(tuple)[2].children[0].unwrap()).to.equal(30);
-            expect(Array.from(tuple)[2].children[1].unwrap()).to.deep.equal({});
+            expect(Array.from(tuple)[2].children[0]).to.equal(30);
+            expect(Array.from(tuple)[2].children[1]).to.deep.equal({});
         });
     });
     
@@ -1078,14 +1078,14 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("() / (1,2,3)")(context)).to.equal(null);
             expect(await parse("() / un"     )(context)).to.equal(null);
         });
-        
+    
         it("should return `X/Y` if both X and Y are numbers", async () => {
             expect(await parse("10 / 2"   )()).to.equal(5);
             expect(await parse("10 / 5"   )()).to.equal(2);
             expect(await parse("10 / (-2)")()).to.equal(-5);
             expect(await parse("10 / 0"   )()).to.equal(Infinity);
         });
-        
+    
         it("should return Undefined for all the other type combinations", async () => {
             var T=true, F=false, n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x, u=new Undefined(), no=null;
             for (let [L,R] of [
@@ -1100,8 +1100,8 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
     
                 const undef = await parse("L / R")({L,R});
                 expect(undef).to.be.Undefined("DivOperation");
-                expect(undef.children[0].unwrap()).to.deep.equal(L);
-                expect(undef.children[1].unwrap()).to.deep.equal(R);
+                expect(undef.children[0]).to.deep.equal(L);
+                expect(undef.children[1]).to.deep.equal(R);
             }                        
         });
     
@@ -1116,8 +1116,8 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(Array.from(tuple)[0]).to.equal(5);
             expect(Array.from(tuple)[1]).to.equal(4);
             expect(Array.from(tuple)[2]).to.be.Undefined('DivOperation');
-            expect(Array.from(tuple)[2].children[0].unwrap()).to.equal(30);
-            expect(Array.from(tuple)[2].children[1].unwrap()).to.equal(null);
+            expect(Array.from(tuple)[2].children[0]).to.equal(30);
+            expect(Array.from(tuple)[2].children[1]).to.equal(null);
         });
     });
     
@@ -1137,13 +1137,13 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("() % ns"     )(context)).to.deep.equal(context.ns);
             expect(await parse("() % un"     )(context)).to.equal(context.un);
         });
-        
+    
         it("should return `X%Y` if both X and Y are numbers", async () => {
             expect(await parse("10 % 3"   )()).to.equal(1);
             expect(await parse("10 % 4"   )()).to.equal(2);
             expect(await parse("10 % (-3)")()).to.equal(1);
         });
-        
+    
         it("should return Undefined for all the other type combinations", async () => {
             var T=true, F=false, n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x, u=new Undefined(), no=null;
             for (let [L,R] of [
@@ -1158,8 +1158,8 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
     
                 const undef = await parse("L % R")({L,R});
                 expect(undef).to.be.Undefined("ModOperation");
-                expect(undef.children[0].unwrap()).to.deep.equal(L);
-                expect(undef.children[1].unwrap()).to.deep.equal(R);
+                expect(undef.children[0]).to.deep.equal(L);
+                expect(undef.children[1]).to.deep.equal(R);
             }                        
         });
     
@@ -1174,8 +1174,8 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(Array.from(tuple)[0]).to.equal(1);
             expect(Array.from(tuple)[1]).to.equal(6);
             expect(Array.from(tuple)[2]).to.be.Undefined('ModOperation');
-            expect(Array.from(tuple)[2].children[0].unwrap()).to.equal(30);
-            expect(Array.from(tuple)[2].children[1].unwrap()).to.equal(null);
+            expect(Array.from(tuple)[2].children[0]).to.equal(30);
+            expect(Array.from(tuple)[2].children[1]).to.equal(null);
         });
     });
     
@@ -1196,14 +1196,14 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("() ^ (1,2,3)")(context)).to.equal(null);
             expect(await parse("() ^ un"     )(context)).to.equal(null);
         });
-        
+    
         it("should return `X**Y` if both X and Y are numbers", async () => {
             expect(await parse("2 ^ 2"   )()).to.equal(4);
             expect(await parse("2 ^ 5"   )()).to.equal(32);
             expect(await parse("2 ^ (-2)")()).to.equal(0.25);
             expect(await parse("2 ^ 0"   )()).to.equal(1);
         });
-        
+    
         it("should return Undefined for all the other type combinations", async () => {
             var T=true, F=false, n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x, u=new Undefined(), no=null;
             for (let [L,R] of [
@@ -1218,8 +1218,8 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
     
                 const undef = await parse("L ^ R")({L,R});
                 expect(undef).to.be.Undefined("PowOperation");
-                expect(undef.children[0].unwrap()).to.deep.equal(L);
-                expect(undef.children[1].unwrap()).to.deep.equal(R);
+                expect(undef.children[0]).to.deep.equal(L);
+                expect(undef.children[1]).to.deep.equal(R);
             }                        
         });
     
@@ -1234,13 +1234,13 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(Array.from(tuple)[0]).to.equal(4);
             expect(Array.from(tuple)[1]).to.equal(81);
             expect(Array.from(tuple)[2]).to.be.Undefined('PowOperation');
-            expect(Array.from(tuple)[2].children[0].unwrap()).to.equal(4);
-            expect(Array.from(tuple)[2].children[1].unwrap()).to.equal(null);
+            expect(Array.from(tuple)[2].children[0]).to.equal(4);
+            expect(Array.from(tuple)[2].children[1]).to.equal(null);
         });
     });
-
-
-
+    
+    
+    
     // COMPARISON OPERATORS
     
     describe("X == Y", () => {
@@ -1294,7 +1294,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             context.ns1 = {x:10};
             context.ns2 = Object.assign(Object.create(context.ns1), {y:20});
             expect(await parse("ns2 == {x:10,y:20}")(context)).to.equal(true);
-
+    
             // Should ignore non-valid swan names
             var context = {};
             context.ns1 = {x:10, y:20};
@@ -1477,7 +1477,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("[1,2,4] < [1,2]  ")(context)).to.equal(false);
             expect(await parse("[1,2,3] < []     ")(context)).to.equal(false);
         });
-        
+    
         it("should return false if both X and Y are namespaces", async () => {
             const context = {ns1:{}, ns2:{a:1}};
             expect(await parse("ns1 < ns2")(context)).to.be.false;
@@ -1493,7 +1493,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("fn1 < fn1")(context)).to.be.false;
             expect(await parse("fn2 < fn2")(context)).to.be.false;
         });
-
+    
         it("should return false if both X and Y are unfefined", async () => {
             const context = {un1:new Undefined("Op1",1,2), un2:new Undefined("Op2",1,2,3)};
             expect(await parse("un1 < un2")(context)).to.be.false;
@@ -1501,7 +1501,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("un1 < un1")(context)).to.be.false;
             expect(await parse("un2 < un2")(context)).to.be.false;
         });
-
+    
         it("should return true if X is nothing and Y is not", async () => {
             var context = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
             expect(await parse("() < ()"    )(context)).to.equal(false);
@@ -1615,7 +1615,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("fn1 >= fn1")(context)).to.be.true;
             expect(await parse("fn2 >= fn2")(context)).to.be.true;
         });
-
+    
         it("should return true if both X and Y are unfefined, but only if they are the same object", async () => {
             const context = {un1:new Undefined("Op1",1,2), un2:new Undefined("Op2",1,2,3)};
             expect(await parse("un1 >= un2")(context)).to.be.false;
@@ -1623,7 +1623,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("un1 >= un1")(context)).to.be.true;
             expect(await parse("un2 >= un2")(context)).to.be.true;
         });
-
+    
         it("should return false if X is nothing and Y is not", async () => {
             var context = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
             expect(await parse("() >= ()   ")(context)).to.equal(true);
@@ -1724,7 +1724,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("[1,2,4] > [1,2]  ")(context)).to.equal(true);
             expect(await parse("[1,2,3] > []     ")(context)).to.equal(true);
         });
-        
+    
         it("should return false if both X and Y are namespaces", async () => {
             const context = {ns1:{}, ns2:{a:1}};
             expect(await parse("ns1 > ns2")(context)).to.be.false;
@@ -1740,7 +1740,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("fn1 > fn1")(context)).to.be.false;
             expect(await parse("fn2 > fn2")(context)).to.be.false;
         });
-
+    
         it("should return false if both X and Y are unfefined", async () => {
             const context = {un1:new Undefined("Op1",1,2), un2:new Undefined("Op2",1,2,3)};
             expect(await parse("un1 > un2")(context)).to.be.false;
@@ -1748,7 +1748,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("un1 > un1")(context)).to.be.false;
             expect(await parse("un2 > un2")(context)).to.be.false;
         });
-
+    
         it("should return false if X is nothing", async () => {
             var context = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
             expect(await parse("() > ()"    )(context)).to.equal(false);
@@ -1862,7 +1862,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("fn1 <= fn1")(context)).to.be.true;
             expect(await parse("fn2 <= fn2")(context)).to.be.true;
         });
-
+    
         it("should return true if both X and Y are unfefined, but only if they are the same object", async () => {
             const context = {un1:new Undefined("Op1",1,2), un2:new Undefined("Op2",1,2,3)};
             expect(await parse("un1 <= un2")(context)).to.be.false;
@@ -1870,7 +1870,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("un1 <= un1")(context)).to.be.true;
             expect(await parse("un2 <= un2")(context)).to.be.true;
         });
-
+    
         it("should return true if X is nothing", async () => {
             var context = {fn:()=>{}, ls:[1,2,3], ns:{a:1,b:2,c:3}, T:true, F:false};
             expect(await parse("() <= ()   ")(context)).to.equal(true);
@@ -1940,24 +1940,24 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
     });
     
     describe("precedence", () => {
-        
+    
         describe("Arithmetic operations", () => {
-            
+    
             it("should execute `+` and `-` with the same precedence", async () => {
                 expect(await parse("3+5-2")()).to.equal(6);
             });
-            
+    
             it("should execute `*`, `/` and `%` with the same precedence", async () => {
                 expect(await parse("10*2/5%3")()).to.equal(1);
                 expect(await parse("10%3*2/5")()).to.equal(0.4);
             });
-            
+    
             it("should execute `*`, `/` and `%` before `+` and `-`", async () => {
                 expect(await parse("3+2*4")()).to.equal(11);
                 expect(await parse("3+4/2")()).to.equal(5);
                 expect(await parse("4+4%3")()).to.equal(5);
             })
-            
+    
             it("should execute `^` before `*`, `/`, `%`, `+` and `-`", async () => {
                 expect(await parse("3+2^2")()).to.equal(7);
                 expect(await parse("3-2^2")()).to.equal(-1);
@@ -1966,35 +1966,35 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 expect(await parse("10%2^2")()).to.equal(2);                
             });
         });
-
+    
         describe("Parenthesis", () => {
-            
+    
             it("Should execute parenthesis first", async () => {
                 expect(await parse("3*(6-1)")()).to.equal(15);
             });            
         });
-        
+    
         describe("Apply and Subcontexting", () => {
-            
+    
             it("should execute apply operations before arithmetic operations", async () => {
                 const context = {fn:x=>2*x, ns:{a:10, b:20, fn:x=>10*x}, ls:[10,20,30]}
-                
+    
                 expect(await parse("fn 3+5")(context)).to.equal(11);
                 expect(await parse("fn(3+5)")(context)).to.equal(16);
-                
+    
                 expect(await parse("ls 1 + 1")(context)).to.equal(21);
                 expect(await parse("ls(1+1)")(context)).to.equal(30);
-
+    
                 expect(await parse("ns 'a' + 1")(context)).to.equal(11);
                 expect(await parse("ns('a'+1)")(context)).to.be.Undefined('ApplyOperation');                
             });
-            
+    
             it("should execute subcontexting operations before arithmetic operations", async () => {
                 const context = {ns:{a:10, b:20, fn:x=>10*x}, b:2}
                 expect(await parse("ns.a + b")(context)).to.equal(12);
                 expect(await parse("ns.(a + b)")(context)).to.equal(30);                
             });
-            
+    
             it("should execute apply and subcontexting operations with the same precedence", async () => {
                 const context = {fn:x=>2*x, ns:{a:10, b:20, fn:x=>10*x}, b:2}
                 expect(await parse("ns.fn b")(context)).to.equal(20);
@@ -2003,9 +2003,9 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 expect(await parse("fn(ns.a)")(context)).to.equal(20);                
             });
         });
-        
+    
         describe("Comparison operations", () => {
-            
+    
             it("should execute comparison operations after arithmetic operations", async () => {
                 expect(await parse("3 + 2 == 1 + 4")()).to.be.true;
                 expect(await parse("3 + 2 != 1 + 1")()).to.be.true;
@@ -2014,58 +2014,58 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 expect(await parse("3 + 7 >  1 + 4")()).to.be.true;
                 expect(await parse("3 + 2 >= 1 + 4")()).to.be.true;
             });
-            
+    
             it("should execute comparison operations after apply operations", async () => {
                 const context = {fn2:x=>2*x, fn10:x=>10*x};
                 expect(await parse("fn2 10 == fn10 2")(context)).to.be.true;
             });
-
+    
             it("should execute comparison operations after subcontexting operations", async () => {
                 const context = {ns:{a:10, b:20}, a:2, b:1};
                 expect(await parse("ns . a < ns . b")(context)).to.be.true;
             });
         });
-        
+    
         describe("Logic operations", () => {
-            
+    
             it("shoudl execute `|` and `&` with the same precedence", async () => {
                 expect(await parse("1 | 2 & 3")()).to.equal(3);
                 expect(await parse("1 | (2 & 3)")()).to.equal(1);
             });
-
+    
             it("shoudl execute `?` after `|` and `&`", async () => {
                 expect(await parse("1 | 0 ? 3")()).to.equal(3);
                 expect(await parse("1 | (0 ? 3)")()).to.equal(1);
                 expect(await parse("1 & 2 ? 3")()).to.equal(3);
             });
-
+    
             it("shoudl execute `;` after `?`", async () => {
                 expect(await parse("1 ? 2 ; 3")()).to.equal(2);
                 expect(await parse("0 ? 2 ; 3")()).to.equal(3);                
                 expect(await parse("1 ; 2 ? 3")()).to.equal(1);  
                 expect(await parse("() ; 2 ? 3")()).to.equal(3);  
             });
-            
+    
             it("should execute logic operations after comparison operations", async () => {
                 expect(await parse("1 < 2 & 3 > 2 ? 4 ; 5")()).to.equal(4);
                 expect(await parse("1 > 2 | 3 < 2 ? 4 ; 5")()).to.equal(5);
             });
         });
-        
+    
         describe("Function definition", () => {
-            
+    
             it("should execute after logic operations", async () => {
                 expect(await parse("(x -> x ? 1 ; 2)(10)")()).to.equal(1);
                 expect(await parse("(x -> x ? 1 ; 2)(0)")()).to.equal(2);
             });
-            
+    
             it("should be right-associative", async () => {
                 expect(await parse("(x -> y -> x - y)(10)(3)")()).to.equal(7);
             });
         });
-        
+    
         describe("Assignment and labelling operations", () => {
-            
+    
             it("should execute `:` and `=` with the same precedence", async () => {
                 const context = {};
                 expect(await parse("x = y : 10")()).to.be.Undefined("LabellingOperation");
@@ -2073,20 +2073,20 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 expect(context.x).to.equal(10);
                 expect(context.y).to.equal(10);
             });
-            
+    
             it("should execute `:` and `=` after function definitions", async () => {
                 const context = {};
-                
+    
                 await parse("f : x -> 2 * x")(context);
                 expect(await context.f(2)).to.equal(4);
-                
+    
                 await parse("g = x -> 3 * x")(context);
                 expect(await context.g(2)).to.equal(6);
             });
         });
-        
+    
         describe("Pairing operation", () => {
-            
+    
             it("should always be executed with lowest priority", async () => {
                 const context = {};
                 await parse("x = 1 , y = 2")(context);
@@ -2095,11 +2095,11 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             });
         });
     });
-
+    
     describe("parsing errors", () => {
-        
+    
         // Lexer Errors
-        
+    
         it("should return Undefined Syntax on missing closing quote", async () => {
             expect(await parse("\n'abc")()).to.be.UndefinedSyntax("Closing quote expected @2:4");
         });
@@ -2107,22 +2107,22 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
         it("should return Undefined Syntax on missing numeric literal exponent", async () => {
             expect(await parse("123E+")()).to.be.UndefinedSyntax("Expected exponent value @1:5");
         });
-        
+    
         it("should return Undefined Syntax on invalid numeric literal", async () => {
             expect(await parse("1abc")()).to.be.UndefinedSyntax("Invalid number @1:0");
         });
-        
+    
         it("should return Undefined Syntax on unexpected period", async () => {
             expect(await parse("12.34.56")()).to.be.UndefinedSyntax("Unexpected period @1:5");
         });
- 
+    
         it("should return Undefined Syntax on invalid identifier", async () => {
             expect(await parse("$a")()).to.be.UndefinedSyntax("Unexpected character '$' @1:0");
         });
     
     
         // Parsing Errors
-        
+    
         it("should return Undefined Syntax on missing operand", async () => {
             expect(await parse("125 +")()).to.be.UndefinedSyntax("Operand expected @1:5");
             expect(await parse("(125 +")()).to.be.UndefinedSyntax("Operand expected @1:6");
