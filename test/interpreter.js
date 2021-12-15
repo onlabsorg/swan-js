@@ -6,8 +6,8 @@ const chai = require("chai"), expect = chai.expect;
 chai.use(function (chai, utils) {
     chai.Assertion.addMethod('Tuple', function (itemArray) {
         var obj = utils.flag(this, 'object');
-        expect(obj[Symbol.iterator]).to.be.a("function");
-        expect(Array.from(obj)).to.deep.equal(itemArray);
+        expect(obj).to.be.instanceof(Tuple);
+        expect(Array.from(obj.values())).to.deep.equal(itemArray);
     });
     chai.Assertion.addMethod('Undefined', function (type) {
         var obj = utils.flag(this, 'object');
