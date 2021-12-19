@@ -100,19 +100,19 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("__c__")(context)).to.equal("xxx");
         });
     
-        it("should return `Undefined NameReference` if the name is not mapped", async () => {
+        it("should return `Undefined Mapping` if the name is not mapped", async () => {
             const undef = await parse("undefined_key")({a:10, _b:20});
-            expect(undef).to.be.Undefined("NameReference");
+            expect(undef).to.be.Undefined("Mapping");
             expect(undef.value).to.equal("undefined_key");
         });
     
-        it("should return `Undefined NameReference` if name is a property inherited from Object", async () => {
+        it("should return `Undefined Mapping` if name is a property inherited from Object", async () => {
             var undef = await parse("isPrototypeOf")({});
-            expect(undef).to.be.Undefined("NameReference");
+            expect(undef).to.be.Undefined("Mapping");
             expect(undef.value).to.equal("isPrototypeOf");
             
             var undef = await parse("hasOwnProperty")({});
-            expect(undef).to.be.Undefined("NameReference");
+            expect(undef).to.be.Undefined("Mapping");
             expect(undef.value).to.equal("hasOwnProperty");
         });
     
@@ -128,10 +128,10 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 expect(await parse("b")(context)).to.equal(20);
             });
     
-            it("should return `Undefined NameReference` if the name is not mapped in the child context nor in the parent context", async () => {
+            it("should return `Undefined Mapping` if the name is not mapped in the child context nor in the parent context", async () => {
                 var context = Object.assign(Object.create({a:10, b:20}), {a:100});
                 const undef = await parse("undefined_key")(context);
-                expect(undef).to.be.Undefined("NameReference");
+                expect(undef).to.be.Undefined("Mapping");
                 expect(undef.value).to.equal("undefined_key");
             });
         });
@@ -397,24 +397,17 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 expect(await parse("'abcdef'(i)")({i:-2})).to.equal('e');
             });
             
-            it("should return Undefined ApplyOperation if Y is undefined", async () => {
-                const context = {un: new Undefined()};
-                const undef = await parse("'abc' un")(context);
-                expect(undef).to.be.Undefined("ApplyOperation");
-                expect(undef.children[0]).to.equal("abc");
-                expect(undef.children[1]).to.equal(context.un);
-            });
-    
-            it("should return an empty string if X is an out of range number or not a number", async () => {
-                expect(await parse("'abcdef'(i)")({i:100 })).to.equal("");
-                expect(await parse("'abcdef'(i)")({i:-100})).to.equal("");
-                expect(await parse("'abcdef'(i)")({i:'1' })).to.equal("");
-                expect(await parse("'abcdef'(i)")({i:[]  })).to.equal("");
-                expect(await parse("'abcdef'(i)")({i:{}  })).to.equal("");
+            it("should return Undefined Term if X is an out of range number or not a number", async () => {
+                
+                for (let i of [100, -100, '1', [], {}, new Undefined()]) {
+                    const undef = await parse("'abc'(i)")({i});
+                    expect(undef).to.be.Undefined("Mapping");
+                    expect(undef.value).to.equal(i);                    
+                }
             });
     
             it("should return an tuple ot characters if X is a tuple", async () => {
-                expect(await parse("'abcdef'(1,'x',3)")({})).to.be.Tuple(['b','','d']);
+                expect(await parse("'abcdef'(1,5,3)")()).to.be.Tuple(['b','f','d']);
             });            
         })
         
@@ -442,31 +435,20 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 expect(await parse("list(i)")(context)).to.equal(50);
             });
     
-            it("should return Undefined ApplyOperation if Y is undefined", async () => {
-                const context = {un: new Undefined()};
-                const undef = await parse("[1,2,3] un")(context);
-                expect(undef).to.be.Undefined("ApplyOperation");
-                expect(undef.children[0]).to.deep.equal([1,2,3]);
-                expect(undef.children[1]).to.equal(context.un);
-            });
-    
             it("should return () if X is an out of range number or not a number", async () => {
-                const context = {
-                    list: [10, 20, 30, 40, 50, 60],
-                    i:-100
+                
+                for (let i of [100, -100, '1', [], {}, new Undefined()]) {
+                    const undef = await parse("[1, 2, 3](i)")({i});
+                    expect(undef).to.be.Undefined("Mapping");
+                    expect(undef.value).to.equal(i);                    
                 }
-                expect(await parse("list(100)")(context)).to.be.null;
-                expect(await parse("list(i)"  )(context)).to.be.null;
-                expect(await parse("list('1')")(context)).to.be.null;
-                expect(await parse("list([])" )(context)).to.be.null;
-                expect(await parse("list({i})")(context)).to.be.null;
             });
     
             it("should return a tuple of list items if X is a tuple", async () => {
                 const context = {
                     list: [10, 20, 30, 40, 50, 60],
                 }
-                expect(await parse("list(1,'x',3)")(context)).to.be.Tuple([20,40]);
+                expect(await parse("list(1,5,3)")(context)).to.be.Tuple([20,60,40]);
             });            
         })
         
@@ -480,36 +462,29 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 expect(await parse("ns('def')")(context)).to.equal(20);
             });
             
-            it("should return Undefined ApplyOperation if Y is undefined", async () => {
-                const context = {un: new Undefined()};
-                const undef = await parse("{a:1, b:2} un")(context);
-                expect(undef).to.be.Undefined("ApplyOperation");
-                expect(undef.children[0]).to.deep.equal({a:1, b:2});
-                expect(undef.children[1]).to.equal(context.un);
-            });
-    
-            it("shoudl return () if X is not a valid name or a name not mapped to a value", async () => {
-                var context = {
-                    ns: {abc:10, def:20}
-                };
-                expect(await parse("ns '123'"  )(context)).to.be.null;
-                expect(await parse("ns 123"    )(context)).to.be.null;
-                expect(await parse("ns [1,2,3]")(context)).to.be.null;
+            it("shoudl return Undefined Mapping if X is not a valid name or a name not mapped to a value", async () => {
+                
+                for (let name of ['123', 123, [1,2,3], new Undefined()]) {
+                    const undef = await parse("{a:1, b:2}(name)")({name});
+                    expect(undef).to.be.Undefined("Mapping");
+                    expect(undef.value).to.equal(name);
+                }
             });
 
-            it("shoudl return () if X is a name inherited from Object", async () => {
-                var context = {
-                    ns: {abc:10, def:20}
-                };
-                expect(await parse("ns 'isPrototypeOf'" )(context)).to.be.null;
-                expect(await parse("ns 'hasOwnProperty'")(context)).to.be.null;
+            it("shoudl return Undefined Mapping if X is a name inherited from Object", async () => {
+
+                for (let name of ['isPrototypeOf', 'hasOwnProperty']) {
+                    const undef = await parse("{a:1, b:2}(name)")({name});
+                    expect(undef).to.be.Undefined("Mapping");
+                    expect(undef.value).to.equal(name);
+                }
             });
 
             it("shoudl return a tuple of value if X is a tuple with more than one item", async () => {
                 var context = {
-                    ns: {abc:10, def:20}
+                    ns: {abc:10, def:20, ghi:30}
                 };
-                expect(await parse("ns('abc',2,'def')" )(context)).to.be.Tuple([10, 20]);
+                expect(await parse("ns('abc','ghi','def')" )(context)).to.be.Tuple([10, 30, 20]);
             });
         });
     
@@ -1986,7 +1961,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 expect(await parse("ls(1+1)")(context)).to.equal(30);
     
                 expect(await parse("ns 'a' + 1")(context)).to.equal(11);
-                expect(await parse("ns('a'+1)")(context)).to.be.Undefined('ApplyOperation');                
+                expect(await parse("ns('a'+1)")(context)).to.be.Undefined('Mapping');                
             });
     
             it("should execute subcontexting operations before arithmetic operations", async () => {
