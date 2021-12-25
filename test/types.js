@@ -38,7 +38,7 @@ describe("types", () => {
         describe(".toString()", () => {
             
             it("should return '[[Undefined <type-name>]]'", () => {
-                expect((new Undefined(null, "TestOperation")).toString()).to.equal("[[Undefined TestOperation]]");
+                expect((new Undefined("TestOperation")).toString()).to.equal("[[Undefined TestOperation]]");
             });
         });
     });

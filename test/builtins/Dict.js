@@ -102,9 +102,11 @@ describe("Dict", () => {
                 expect(d.get("z")).to.be.null;
             });
             
-            it("should return null if no value is mapped to key", () => {
+            it("should return Undefined Mapping if no value is mapped to key", () => {
                 var d = Dict.create(["x", 10], ["y", 20]);
-                expect(d.get('z')).to.equal(null);                
+                var undef = d.get('z');
+                expect(undef).to.be.instanceof(types.Undefined);
+                expect(undef.args[0]).to.equal('z');
             });
         })
     });
@@ -138,5 +140,10 @@ describe("Dict", () => {
         });
     });
     
-    describe.skip("json_str = Dict.to_JSON(dict)", () => {});
+    describe.skip("json_str = Dict.to_JSON(dict)", () => {
+        
+        it("should convert the dictionary to a JSON object", () => {});
+        
+        it("should convert tuples to lists", () => {});
+    });
 });
