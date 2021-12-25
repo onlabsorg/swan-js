@@ -13,13 +13,36 @@ const {
                     Text, 
                     List, 
                 Namespace,
-            Name,
                 
     wrap, unwrap 
 } = require('../lib/types');
 
 describe("types", () => {
     
+    describe("Undefined", () => {
+        
+        describe(".toBoolean()", () => {
+            
+            it("should return true", () => {
+                expect((new Undefined()).toBoolean()).to.be.false;
+            });
+        });
+        
+        describe(".toVoid()", () => {
+            
+            it("should return null", () => {
+                expect((new Undefined()).toVoid()).to.be.null;
+            });
+        });
+
+        describe(".toString()", () => {
+            
+            it("should return '[[Undefined <type-name>]]'", () => {
+                expect((new Undefined(null, "TestOperation")).toString()).to.equal("[[Undefined TestOperation]]");
+            });
+        });
+    });
+
     describe("Bool", () => {
         
         describe(".toBoolean()", () => {
@@ -100,31 +123,14 @@ describe("types", () => {
         });
     });
 
-    describe("Undefined", () => {
-        
-        describe(".toBoolean()", () => {
-            
-            it("should return true", () => {
-                expect((new Undefined()).toBoolean()).to.be.false;
-            });
-        });
-        
-        describe(".toVoid()", () => {
-            
-            it("should return null", () => {
-                expect((new Undefined()).toVoid()).to.be.null;
-            });
-        });
-
-        describe(".toString()", () => {
-            
-            it("should return '[[Undefined <type-name>]]'", () => {
-                expect((new Undefined(null, "TestOperation")).toString()).to.equal("[[Undefined TestOperation]]");
-            });
-        });
-    });
-
     describe("Text", () => {
+        
+        describe(".size", () => {
+            it("should contain the number of characters of the string", () => {
+                expect(new Text("abc").size).to.equal(3);
+                expect(new Text("").size).to.equal(0);
+            });
+        });
         
         describe(".toBoolean()", () => {
             
@@ -151,6 +157,13 @@ describe("types", () => {
     });
 
     describe("List", () => {
+        
+        describe(".size", () => {
+            it("should contain the number of items of the list", () => {
+                expect(new List([10,20,30]).size).to.equal(3);
+                expect(new List([]).size).to.equal(0);
+            });
+        });
         
         describe(".toBoolean()", () => {
             
@@ -180,11 +193,26 @@ describe("types", () => {
 
     describe("Namespace", () => {
         
+        describe(".size", () => {
+            
+            it("should contain the number of names in the namespace", () => {
+                expect(new Namespace({x:10,y:20,z:30}).size).to.equal(3);
+                expect(new Namespace({}).size).to.equal(0);
+            });
+            
+            it("should ignore non-valid identifiers", () => {
+                expect(new Namespace({x:10,y:20,$z:30}).size).to.equal(2);
+            });
+        });
+        
         describe(".toBoolean()", () => {
             
             it("should return true if the namespace value is not empty", () => {
                 expect((new Namespace({a:1})).toBoolean()).to.be.true;
                 expect((new Namespace({})).toBoolean()).to.be.false;
+            });
+            
+            it("should consider empty a namespace containing only non-valid identifiers", () => {
                 expect((new Namespace({$key:1})).toBoolean()).to.be.false;
             });
         });
@@ -199,7 +227,7 @@ describe("types", () => {
 
         describe(".toString()", () => {
             
-            it("should retun a comma-separated list of keys enclosed between curly braces", () => {
+            it("should retun a comma-separated list of valid names enclosed between curly braces", () => {
                 expect((new Namespace({key1:1, key2:2, key3:3, $key4:4})).toString()).to.equal("{key1, key2, key3}");
             });
         });
