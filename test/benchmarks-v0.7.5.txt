@@ -1,3 +1,0 @@
-Lexer time:  3
-Parser time:  279
-Eval time:  341

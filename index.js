@@ -8,11 +8,10 @@
  *  are the only two swan types that do not correspond to a javascript negative
  *  type.
  */
- 
-const {Tuple, Undefined, parse, context} = require('./lib/interpreter');
-const modules = require('./lib/modules');
-context.require = modules.require;
 
+const types = require("./lib/types");
+const parse = require("./lib/interpreter");
+const builtins = require("./lib/builtins");
 
 
 /**
@@ -32,12 +31,9 @@ context.require = modules.require;
 
 exports.parse = function (expression) {
     const evaluate = parse(expression);
-    return async (ctx) => {
-        if (!context.isPrototypeOf(ctx)) {
-            throw new Error("Invalid context!");
-        }
-        const value = await evaluate(ctx);
-        return Tuple(value).normalize();
+    return async (context={}) => {
+        const term = await evaluate(context);
+        return term.unwrap();
     }
 }
 
@@ -56,58 +52,17 @@ exports.parse = function (expression) {
  *    all the properties of the passed namespace, added in order.
  */
 exports.createContext = function (...namespaces) {
-    
-    if (namespaces.length === 0) {
-        return context.$extend({});
+    let context = new types.Namespace(builtins);
+    for (let namespaceValue of namespaces) {
+        context = context.sum( new types.Namespace(namespaceValue) );
     }
-    
-    let ctx = context;
-    for (let namespace of namespaces) {
-        ctx = ctx.$extend(namespace);
-    }
-    return ctx;
+    return types.unwrap(context);
 }
 
 
 
 /**
- *  swan.defineModule - function
+ *  swan.types - namespace
  *  ----------------------------------------------------------------------------
- *  Adds a module to the swan library. The module can be then loaded with
- *  the built-in `require` function.
- *  ```js
- *  swan.defineModule(modulePath, moduleLoader)
- *  ```
- *  - `modulePath` a `/-separated` path that identifies the module
- *  - `moduleLoader` an asynchronous function that returns the module
  */
-exports.defineModule = modules.define;
-
-
-
-/**
- *  swan.Tuple - function
- *  ----------------------------------------------------------------------------
- *  This function creates a swan tuple object.
- *  ```js
- *  tuple = Tuple(item1, item2, ...)
- *  tuple instanceof Tuple      // true
- *  ```
- */
-exports.Tuple = Tuple;
-
-
-
-/**
- *  swan.Undefined - function
- *  ----------------------------------------------------------------------------
- *  This function creates a swan undefined object.
- *  ```js
- *  undef = Undefined(...args)
- *  undef instanceof Undefined      // true
- *  ```
- */
-exports.Undefined = function (...args) {
-    return new Undefined(...args);
-}
-exports.Undefined.prototype = Undefined.prototype;
+exports.types = types;
