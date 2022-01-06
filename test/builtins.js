@@ -508,226 +508,391 @@ describe("builtins", () => {
         });
     });
     
-    describe.skip("Text", () => {
+    describe("Text", () => {
     
-        describe("Text.from(...values)", () => {
-    
-            it("should return a tuple of stringified values", async () => {                
-                expect(await Text.from()).to.equal("");
-                expect(await Text.from(true)).to.equal("TRUE");
-                expect(await Text.from(false)).to.equal("FALSE");
-                expect(await Text.from(123)).to.equal("123");
-                expect(await Text.from("abc")).to.equal("abc");
-                expect(await Text.from([1,2,3])).to.equal("[[List of 3 items]]");
-                expect(await Text.from({a:10, b:20})).to.equal("{a, b}");
-                expect(await Text.from(new types.Undefined("Foo"))).to.equal("[[Undefined Foo]]");
-                expect(await Text.from(123, 'abc')).to.equal(`123abc`);
+        describe("Text.from - function", () => {
+            
+            it("should return either 'TRUE' or 'FALSE' if the argument is a Bool item", async () => {
+                expect(await evaluate("Text.from(Bool.TRUE)")).to.be.Text("TRUE");
+                expect(await evaluate("Text.from(1==1)")).to.be.Text("TRUE");
+                expect(await evaluate("Text.from(Bool.FALSE)")).to.be.Text("FALSE");
+                expect(await evaluate("Text.from(1!=1)")).to.be.Text("FALSE");
+            });
+            
+            it("should return the stringified decimal if the argument is a Numb item", async () => {
+                expect(await evaluate("Text.from 123.45")).to.be.Text("123.45");
             });
     
-            it("shoudl return value.__text__ if it exists and it is not a function", async () => {
-                expect(await Text.from({__text__: 10})).to.equal("10");
+            it("should return the argument itself if is a Text item", async () => {
+                expect(await evaluate("Text.from 'abc'")).to.be.Text("abc");
             });
-    
-            it("shoudl return value.__text__(value) if it exists and it is a function", async () => {
-                expect(await Text.from({__text__: ns => ns.s, s:20})).to.equal("20");
+
+            it("should return '[[List of <n> items]]' if the argument is a List item", async () => {
+                expect(await evaluate("Text.from [10,20,30]")).to.be.Text("[[List of 3 items]]");
+                expect(await evaluate("Text.from [10]      ")).to.be.Text("[[List of 1 item]]");
+                expect(await evaluate("Text.from []        ")).to.be.Text("[[List of 0 items]]");
+            });
+            
+            it("should return '[[Func]]' if the argument is a Func item", async () => {
+                expect(await evaluate("Text.from(x->x)")).to.be.Text("[[Func]]");
+            });
+            
+            it("should return '[[Undefined <type>]]' if the argument is an Undefined item", async () => {
+                const u = new types.Undefined("TestOp")
+                expect(await evaluate("Text.from(u)", {u})).to.be.Text("[[Undefined TestOp]]");
+            });
+            
+            it("should concatenate the stringified items if the argument is a tuple", async () => {
+                expect(await evaluate("Text.from(12,'+',10)")).to.be.Text("12+10");
+                expect(await evaluate("Text.from()         ")).to.be.Text("");
+            });
+            
+            describe("when the argument is a Namespace item NS", () => {
+                
+                it("should return its comma-separated list of keys, enclosed between curly braces", async () => {
+                    expect(await evaluate("Text.from{k1:1,k2:2,k3:3}")).to.be.Text("{k1, k2, k3}")
+                });
+                
+                it("should return `Text.from(NS.__text__)` if `NS.__text__` exists and is not a Func item", async () => {
+                    expect(await evaluate("Text.from{__text__:123}")).to.be.Text("123")
+                });
+                
+                it("should return `Text.from(NS.__text__(NS))` if `NS.__text__` is a Func item", async () => {
+                    expect(await evaluate("Text.from{t:456, __text__: self -> self.t}")).to.be.Text("456");
+                });
             });
         });
     
         describe("Text.size(string)", () => {
     
-            it("should return the string length", () => {
-                expect(Text.size("abc")).to.equal(3);
-                expect(Text.size("")).to.equal(0);
+            it("should return the string length", async () => {
+                expect(await evaluate("Text.size 'abc'")).to.be.Numb(3);
             });
-    
-            it("shoudl throw a type error if the passed argument is not a string", () => {
-                expect(() => Text.size({})).to.throw(TypeError);
+            
+            it("should return Undefined Number if the argument is not a string", async () => {
+                expect(await evaluate("Text.size 123")).to.be.Undefined("Number");
             });
+
+            it("should apply to all the items and return a tuple if the argument is a truple", async () => {
+                expect(await evaluate("Text.size('ABC','Defg')")).to.be.Tuple([3,4]);
+            });                        
         });
     
-        describe("Text.from_char_codes(...charCodes)", () => {
-    
-            it("should return the string made of the given UTF char codes", async () => {
-                expect(await Text.from_char_codes(65, 98, 99)).to.equal("Abc");
-            });
-        });        
-    
-        describe("Text.to_char_codes (str)", () => {
-    
-            it("should return an iterator yielding the char codes of the given string", async () => {
-                const iter = Text.to_char_codes ("Abc");
-                expect(iter[Symbol.iterator]).to.be.a("function");
-                expect(Array.from(iter)).to.deep.equal([65, 98, 99]);
-            });
-    
-            it("shoudl throw an error if str is not a string", () => {
-                expect(() => Text.to_char_codes (10)).to.throw(TypeError);
-            });
-        });
-    
-        describe("Text.find(subStr)(str)", () => {
-    
-            it("should return a function", () => {
-                expect(Text.find("Abc")).to.be.a("function");
-            });
-    
-            it("should throw an error if the sub-string is not a string", () => {
-                expect(() => Text.find(1)).to.throw(TypeError);
-            });
-    
-            describe("fn = Text.find(subStr)", () => {
-    
-                it("should return the first index of subStr in str", async () => {
-                    expect(await Text.find("Abc")("__Abc__def__Abc")).to.equal(2);
+        describe("f = Text.find s1", () => {
+            
+            describe("when s1 is an item", () => {
+                
+                it("should return a function", async () => {
+                    expect(await evaluate("Text.find 'Abc'")).to.be.instanceof(types.Func);
                 });
-    
-                it("should return -1 if no match is found", async () => {
-                    expect(await Text.find("xxx")("__Abc__def__Abc")).to.equal(-1);
-                });
-    
-                it("should throw an error if the passed string is not a string", () => {
-                    const fn = Text.find("abc");
-                    expect(() => fn(1)).to.throw(TypeError);
+
+                describe("i = f s2 ", () => {
+        
+                    it("should return the first index of s1 in s2", async () => {
+                        expect(await evaluate("Text.find 'Abc' '__Abc__def__Abc'")).to.be.Numb(2);
+                    });
+        
+                    it("should return -1 if no match is found", async () => {
+                        expect(await evaluate("Text.find 'xxx' '__Abc__def__Abc'")).to.be.Numb(-1);
+                    });
+        
+                    it("should return Undefined Text if `s1` is not a string", async () => {
+                        expect(await evaluate("Text.find 10")).to.be.instanceof(types.Func);
+                        expect(await evaluate("Text.find 10 'abc'")).to.be.Undefined("Text");
+                    });
+
+                    it("should return Undefined Text if `s2` is not a string", async () => {
+                        expect(await evaluate("Text.find 'abc' 10")).to.be.Undefined("Text");
+                    });
+
+                    it("should return a tuple of values if `s2` is a tuple", async () => {
+                        expect(await evaluate("Text.find 'Abc' ('__Abc__def__Abc', '01234Abc__')")).to.be.Tuple([2,5]);
+                    });
                 });
             });
+
+            describe("when the argument is a tuple", () => {
+                
+                it("should return one `find` function for each item of the argument", async () => {
+                    const F = await evaluate("Text.find('Abc','Def')");
+                    expect(F).to.be.instanceof(types.Tuple);
+
+                    const [f1,f2] = Array.from(F.items());
+                    expect(f1).to.be.instanceof(types.Func)
+                    expect(f2).to.be.instanceof(types.Func)
+                    
+                    expect(await evaluate("Text.find('Abc','Def') '__Abc__def__Def'")).to.be.Tuple([2,12]);
+                    expect(await evaluate("Text.find('Abc','Def')('__Abc__Def__Abc', '01234Abc__')")).to.be.Tuple([2,5,7,-1]);                    
+                });
+            });    
         });    
     
-        describe("Text.rfind(subStr)(str)", () => {
-    
-            it("should return a function", () => {
-                expect(Text.rfind("Abc")).to.be.a("function");
-            });
-    
-            it("should throw an error if the sub-string is not a string", () => {
-                expect(() => Text.rfind(1)).to.throw(TypeError);
-            });
-    
-            describe("fn = Text.rfind(subStr)", () => {
-    
-                it("should return the last index of subStr in str", async () => {
-                    expect(await Text.rfind("Abc")("__Abc__def__Abc")).to.equal(12);
+        describe("f = Text.rfind s1", () => {
+            
+            describe("when s1 is an item", () => {
+                
+                it("should return a function", async () => {
+                    expect(await evaluate("Text.rfind 'Abc'")).to.be.instanceof(types.Func);
                 });
-    
-                it("should return -1 if no match is found", async () => {
-                    expect(await Text.rfind("xxx")("__Abc__def__Abc")).to.equal(-1);
-                });
-    
-                it("should throw an error if the passed string is not a string", () => {
-                    const fn = Text.rfind("abc");
-                    expect(() => fn(1)).to.throw(TypeError);
+
+                describe("i = f s2 ", () => {
+        
+                    it("should return the last index of s1 in s2", async () => {
+                        expect(await evaluate("Text.rfind 'Abc' '__Abc__def__Abc'")).to.be.Numb(12);
+                    });
+        
+                    it("should return -1 if no match is found", async () => {
+                        expect(await evaluate("Text.rfind 'xxx' '__Abc__def__Abc'")).to.be.Numb(-1);
+                    });
+        
+                    it("should return Undefined Text if `s1` is not a string", async () => {
+                        expect(await evaluate("Text.rfind 10")).to.be.instanceof(types.Func);
+                        expect(await evaluate("Text.rfind 10 'abc'")).to.be.Undefined("Text");
+                    });
+
+                    it("should return Undefined Text if `s2` is not a string", async () => {
+                        expect(await evaluate("Text.rfind 'abc' 10")).to.be.Undefined("Text");
+                    });
+
+                    it("should return a tuple of values if `s2` is a tuple", async () => {
+                        expect(await evaluate("Text.rfind 'Abc' ('__Abc__def__Abc', '01234Abc__')")).to.be.Tuple([12,5]);
+                    });
                 });
             });
+
+            describe("when the argument is a tuple", () => {
+                
+                it("should return one `rfind` function for each item of the argument", async () => {
+                    const F = await evaluate("Text.rfind('Abc','Def')");
+                    expect(F).to.be.instanceof(types.Tuple);
+
+                    const [f1,f2] = Array.from(F.items());
+                    expect(f1).to.be.instanceof(types.Func)
+                    expect(f2).to.be.instanceof(types.Func)
+                    
+                    expect(await evaluate("Text.rfind('Abc','Def') '__Abc__Def__Abc'")).to.be.Tuple([12,7]);
+                    expect(await evaluate("Text.rfind('Abc','Def')('__Abc__Def__Abc', '01234Abc__')")).to.be.Tuple([12,5,7,-1]);                    
+                });
+            });    
         });    
     
-        describe("Text.lower(str)", () => {
+        describe("Text.lower - function", () => {
     
             it("should return the given string converted to lower case characters", async () => {
-                expect(await Text.lower("AbcDef")).to.equal("abcdef");
+                expect(await evaluate("Text.lower 'AbcDef'")).to.be.Text("abcdef");
             });
+            
+            it("should return Undefined Text if the argument is not a string", async () => {
+                expect(await evaluate("Text.lower 123")).to.be.Undefined("Text");
+            });
+
+            it("should apply to all the items and return a tuple if the argument is a truple", async () => {
+                expect(await evaluate("Text.lower('ABC','Def')")).to.be.Tuple(["abc","def"]);
+            });                        
         });    
     
-        describe("Text.upper(str)", () => {
+        describe("Text.upper - function", () => {
     
-            it("should return the given string converted to upper case characters", async () => {
-                expect(await Text.upper("AbcDef")).to.equal("ABCDEF");
+            it("should return the given string converted to lower case characters", async () => {
+                expect(await evaluate("Text.upper 'AbcDef'")).to.be.Text("ABCDEF");
             });
+            
+            it("should return Undefined Text if the argument is not a string", async () => {
+                expect(await evaluate("Text.upper 123")).to.be.Undefined("Text");
+            });
+
+            it("should apply to all the items and return a tuple if the argument is a truple", async () => {
+                expect(await evaluate("Text.upper('abc','Def')")).to.be.Tuple(["ABC","DEF"]);
+            });                        
+        });    
+    
+        describe("s2 = Text.trim_head s1", () => {
+            
+            it("should return `s1` without leading spaces", async () => {
+                expect(await evaluate("Text.trim_head '   abc   '")).to.be.Text("abc   ");
+            });
+            
+            it("should return Undefined Text if the argument is not a string", async () => {
+                expect(await evaluate("Text.trim_head 123")).to.be.Undefined("Text");
+            });
+
+            it("should apply to all the items and return a tuple if the argument is a truple", async () => {
+                expect(await evaluate("Text.trim_head(' abc ',' Def ')")).to.be.Tuple(["abc ","Def "]);
+            });                        
         });   
     
-        describe("Text.trim_head(str)", () => {
-            it("should remove the leading spaces", async () => {
-                expect(await Text.trim_head("   abc   ")).to.equal("abc   ");
+        describe("s2 = Text.trim_tail s1", () => {
+            
+            it("should return `s1` without trailing spaces", async () => {
+                expect(await evaluate("Text.trim_tail '   abc   '")).to.be.Text("   abc");
             });
-        });
-    
-        describe("Text.trim_tail(str)", () => {
-            it("should remove the trailing spaces", async () => {
-                expect(await Text.trim_tail("   abc   ")).to.equal("   abc");
+            
+            it("should return Undefined Text if the argument is not a string", async () => {
+                expect(await evaluate("Text.trim_tail 123")).to.be.Undefined("Text");
             });
-        });
-    
-        describe("Text.trim(str)", () => {
-            it("should remove both leading and trailing spaces", async () => {
-                expect(await Text.trim("   abc   ")).to.equal("abc");
-            });
+
+            it("should apply to all the items and return a tuple if the argument is a truple", async () => {
+                expect(await evaluate("Text.trim_tail(' abc ',' Def ')")).to.be.Tuple([" abc"," Def"]);
+            });                        
         });   
     
-        describe("Text.head(index)(str)", () => {
-    
-            it("should return a function", () => {
-                expect(Text.head(3)).to.be.a("function");
+        describe("s2 = Text.trim s1", () => {
+            
+            it("should return `s1` without leading and trailing spaces", async () => {
+                expect(await evaluate("Text.trim '   abc   '")).to.be.Text("abc");
             });
-    
-            it("should throw an error if the index is not a number", () => {
-                expect(() => Text.head('abc')).to.throw(TypeError);
+            
+            it("should return Undefined Text if the argument is not a string", async () => {
+                expect(await evaluate("Text.trim 123")).to.be.Undefined("Text");
             });
+
+            it("should apply to all the items and return a tuple if the argument is a truple", async () => {
+                expect(await evaluate("Text.trim(' abc ',' Def ')")).to.be.Tuple(["abc","Def"]);
+            });                        
+        });   
     
-            describe("fn = Text.head(index)", () => {
+        describe("f = Text.head n", () => {
     
-                it("should return the first `index` characters of the passed string", async () => {
-                    expect(Text.head(3)("Abcdefghi")).to.equal("Abc");
+            describe("when n is an item", () => {
+                
+                it("should return a function", async () => {
+                    expect(await evaluate("Text.head 3")).to.be.instanceof(types.Func);
                 });
-    
-                it("should interpret negative indices as relative to the end of the string", async () => {
-                    expect(Text.head(-5)("Abcdefghi")).to.equal("Abcd");
-                });
-    
-                it("should throw an error if the passed string is not a string", () => {
-                    const fn = Text.head(3);
-                    expect(() => fn(1)).to.throw(TypeError);
+
+                describe("s2 = f s1 ", () => {
+        
+                    it("should return the first n characters of s1", async () => {
+                        expect(await evaluate("Text.head 3 'abcdef'")).to.be.Text('abc');
+                    });
+        
+                    it("should consider n relative to the end of the string if it is negative", async () => {
+                        expect(await evaluate("Text.head (-2) 'abcdef'")).to.be.Text('abcd');
+                    });
+
+                    it("should return Undefined Text if `n` is not a number", async () => {
+                        expect(await evaluate("Text.head 'abc'")).to.be.instanceof(types.Func);
+                        expect(await evaluate("Text.head 'abc' 'def'")).to.be.Undefined("Text");
+                    });
+
+                    it("should return Undefined Text if `s1` is not a string", async () => {
+                        expect(await evaluate("Text.head 3 10")).to.be.Undefined("Text");
+                    });
+
+                    it("should return a tuple of values if `s1` is a tuple", async () => {
+                        expect(await evaluate("Text.head 2 ('abc', 'def', 'ghi')")).to.be.Tuple(['ab','de','gh']);
+                    });
                 });
             });
+
+            describe("when the argument is a tuple", () => {
+                
+                it("should return one `f` function for each item of the argument", async () => {
+                    const F = await evaluate("Text.head(2,3)");
+                    expect(F).to.be.instanceof(types.Tuple);
+
+                    const [f1,f2] = Array.from(F.items());
+                    expect(f1).to.be.instanceof(types.Func)
+                    expect(f2).to.be.instanceof(types.Func)
+                    
+                    expect(await evaluate("Text.head(2,3) 'abcdef'")).to.be.Tuple(['ab','abc']);
+                    expect(await evaluate("Text.head(2,3)('abcdef', 'ghijkl')")).to.be.Tuple(['ab','gh','abc','ghi']);                    
+                });
+            });    
         });              
     
-        describe("Text.tail(index)(str)", () => {
+        describe("f = Text.tail n", () => {
     
-            it("should return a function", () => {
-                expect(Text.tail(3)).to.be.a("function");
-            });
-    
-            it("should throw an error if the index is not a number", () => {
-                expect(() => Text.tail('abc')).to.throw(TypeError);
-            });
-    
-            describe("fn = Text.tail(index)", () => {
-    
-                it("should return the substring made of all the character after `index`", async () => {
-                    expect(Text.tail(3)("Abcdefghi")).to.equal("defghi");
+            describe("when n is an item", () => {
+                
+                it("should return a function", async () => {
+                    expect(await evaluate("Text.tail 3")).to.be.instanceof(types.Func);
                 });
-    
-                it("should interpret negative indices as relative to the end of the string", async () => {
-                    expect(Text.tail(-5)("Abcdefghi")).to.equal("efghi");
-                });
-    
-                it("should throw an error if the passed string is not a string", () => {
-                    const fn = Text.tail(3);
-                    expect(() => fn(1)).to.throw(TypeError);
+
+                describe("s2 = f s1 ", () => {
+        
+                    it("should return the last characters of s1, starting with the n-th", async () => {
+                        expect(await evaluate("Text.tail 2 'abcdef'")).to.be.Text('cdef');
+                    });
+        
+                    it("should consider n relative to the end of the string if it is negative", async () => {
+                        expect(await evaluate("Text.tail (-2) 'abcdef'")).to.be.Text('ef');
+                    });
+
+                    it("should return Undefined Text if `n` is not a number", async () => {
+                        expect(await evaluate("Text.tail 'abc'")).to.be.instanceof(types.Func);
+                        expect(await evaluate("Text.tail 'abc' 'def'")).to.be.Undefined("Text");
+                    });
+
+                    it("should return Undefined Text if `s1` is not a string", async () => {
+                        expect(await evaluate("Text.tail 3 10")).to.be.Undefined("Text");
+                    });
+
+                    it("should return a tuple of values if `s1` is a tuple", async () => {
+                        expect(await evaluate("Text.tail (-2) ('abc', 'def', 'ghi')")).to.be.Tuple(['bc','ef','hi']);
+                    });
                 });
             });
+
+            describe("when the argument is a tuple", () => {
+                
+                it("should return one `f` function for each item of the argument", async () => {
+                    const F = await evaluate("Text.tail(2,3)");
+                    expect(F).to.be.instanceof(types.Tuple);
+
+                    const [f1,f2] = Array.from(F.items());
+                    expect(f1).to.be.instanceof(types.Func)
+                    expect(f2).to.be.instanceof(types.Func)
+                    
+                    expect(await evaluate("Text.tail(-2,-3) 'abcdef'")).to.be.Tuple(['ef','def']);
+                    expect(await evaluate("Text.tail(-2,-3)('abcdef', 'ghijkl')")).to.be.Tuple(['ef','kl','def','jkl']);                    
+                });
+            });    
         });              
     
-        describe("Text.split(divider)(str)", () => {
+        describe("f = Text.split s1", () => {
     
-            it("should return a function", () => {
-                expect(Text.split(",")).to.be.a("function");
-            });
-    
-            it("should throw an error if the sub-string is not a string", () => {
-                expect(() => Text.split(1)).to.throw(TypeError);
-            });
-    
-            describe("fn = Text.split(divider)", () => {
-    
-                it("should return an iterator yielding the `str` substrings between the `divider`", async () => {
-                    const iter = await Text.split(",")("Abc,def,hij");
-                    expect(iter[Symbol.iterator]).to.be.a("function");
-                    expect(Array.from(iter)).to.deep.equal(["Abc", "def", "hij"]);
+            describe("when s1 is an item", () => {
+                
+                it("should return a function", async () => {
+                    expect(await evaluate("Text.split '::'")).to.be.instanceof(types.Func);
                 });
-    
-                it("should throw an error if the passed string is not a string", () => {
-                    const fn = Text.split("abc");
-                    expect(() => fn(1)).to.throw(TypeError);
+
+                describe("l = f s2 ", () => {
+        
+                    it("should return the list of the s2 substrings separated by s1", async () => {
+                        expect(await evaluate("Text.split '::' 'ab::cd::ef'")).to.be.List(["ab","cd","ef"]);
+                        expect(await evaluate("Text.split '::' 'abcdef'")).to.be.List(["abcdef"]);
+                    });
+
+                    it("should return Undefined Text if `s1` is not a string", async () => {
+                        expect(await evaluate("Text.split 10")).to.be.instanceof(types.Func);
+                        expect(await evaluate("Text.split 10 'def'")).to.be.Undefined("Text");
+                    });
+
+                    it("should return Undefined Text if `s2` is not a string", async () => {
+                        expect(await evaluate("Text.split '::' 10")).to.be.Undefined("Text");
+                    });
+
+                    it("should return a tuple of values if `s2` is a tuple", async () => {
+                        expect(await evaluate("Text.split '::' ('ab::cd', 'de::fg')")).to.be.Tuple([["ab","cd"], ["de","fg"]]);
+                    });
                 });
             });
+
+            describe("when s1 is a tuple", () => {
+                
+                it("should return one `f` function for each item of the argument", async () => {
+                    const F = await evaluate("Text.split('::','!!')");
+                    expect(F).to.be.instanceof(types.Tuple);
+
+                    const [f1,f2] = Array.from(F.items());
+                    expect(f1).to.be.instanceof(types.Func)
+                    expect(f2).to.be.instanceof(types.Func)
+                    
+                    expect(await evaluate("Text.split('::','!!') 'a!!b::c!!d'")).to.be.Tuple([["a!!b","c!!d"],["a","b::c","d"]]);
+                    expect(await evaluate("Text.split('::','!!')('ab::cd!!ef', 'gh::ij!!kl')")).to.be.Tuple([["ab","cd!!ef"], ["gh","ij!!kl"], ["ab::cd","ef"], ["gh::ij","kl"]]);
+                });
+            });    
         });              
     });
     
