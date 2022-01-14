@@ -1,5 +1,6 @@
 const expect = require("./expect");
 
+
 const {
     Term,
         Tuple,
@@ -667,17 +668,17 @@ describe("types", () => {
             });
         });
 
-        describe(".f(i)", () => {
+        describe(".vget(i)", () => {
             
             it("should return i-th character of the string", () => {
-                expect(new Text("abc").f(1)).to.equal('b')
+                expect(new Text("abc").vget(1)).to.equal('b')
             });
 
             it("should return undefined if i is not in the Text domain", () => {
                 const item = new Text("abc");
-                expect(item.f(-1)).to.be.undefined;
-                expect(item.f(10)).to.be.undefined;
-                expect(item.f('xx')).to.be.undefined;
+                expect(item.vget(-1)).to.be.undefined;
+                expect(item.vget(10)).to.be.undefined;
+                expect(item.vget('xx')).to.be.undefined;
             });
         });
         
@@ -693,7 +694,7 @@ describe("types", () => {
             
             it("should return the tuple of characters of the string", () => {
                 const item = new Text("abc");
-                expect(item.image).to.deep.equal(['a','b','c']);
+                expect(item.image).to.be.List(['a','b','c']);
             });
         });
         
@@ -944,17 +945,17 @@ describe("types", () => {
             });
         });
 
-        describe(".f(i)", () => {
+        describe(".vget(i)", () => {
             
             it("should return i-th value of the list", () => {
-                expect(new List([10,20,30]).f(1)).to.equal(20)
+                expect(new List([10,20,30]).vget(1)).to.equal(20)
             });
 
             it("should return undefined if i is not in the List domain", () => {
                 const item = new List([10,20,30]);
-                expect(item.f(-1)).to.be.undefined;
-                expect(item.f(10)).to.be.undefined;
-                expect(item.f('xx')).to.be.undefined;
+                expect(item.vget(-1)).to.be.undefined;
+                expect(item.vget(10)).to.be.undefined;
+                expect(item.vget('xx')).to.be.undefined;
             });
         });
         
@@ -970,7 +971,7 @@ describe("types", () => {
             
             it("should return the tuple of characters of the string", () => {
                 const item = new List([10,20,30]);
-                expect(item.image).to.deep.equal([10,20,30]);
+                expect(item.image).to.be.List([10,20,30]);
             });
         });
         
@@ -1223,17 +1224,17 @@ describe("types", () => {
             });
         });
 
-        describe(".f(key)", () => {
+        describe(".vget(key)", () => {
             
             it("should return the value mapped to the given identifier", () => {
-                expect(new Namespace({k1:1, k2:2, k3:3}).f('k2')).to.equal(2)
+                expect(new Namespace({k1:1, k2:2, k3:3}).vget('k2')).to.equal(2)
             });
 
             it("should return undefined if key is not in the Namespace domain", () => {
                 const item = new Namespace({k1:1, k2:2, k3:3, $k4:4});
-                expect(item.f(10)).to.be.undefined;
-                expect(item.f('xx')).to.be.undefined;
-                expect(item.f('$k4')).to.be.undefined;
+                expect(item.vget(10)).to.be.undefined;
+                expect(item.vget('xx')).to.be.undefined;
+                expect(item.vget('$k4')).to.be.undefined;
             });
         });
         
@@ -1253,7 +1254,7 @@ describe("types", () => {
             
             it("should return the array of values of the namespace", () => {
                 const item = new Namespace({k1:1, k2:2, k3:3, $k4:4});
-                expect(item.image).to.deep.equal([1,2,3]);
+                expect(item.image).to.be.List([1,2,3]);
             });
         });
         
@@ -1283,33 +1284,7 @@ describe("types", () => {
                 });
                 expect(Array.from(tuple)[2]).to.equal(4);
             });
-        })
-        
-        describe(".assign(term1, term2)", () => {
-            
-            it("should assign the values in term2 to the identifiers in term1", () => {
-                const item = new Namespace({})
-                item.assign(new Tuple('k1', 'k2', 'k3'), new Tuple(10,20,30));
-                expect(item.f('k1')).to.equal(10);
-                expect(item.f('k2')).to.equal(20);
-                expect(item.f('k3')).to.equal(30);
-            });
-            
-            it("should assign `()` to the names in excess", () => {
-                const item = new Namespace({})
-                item.assign(new Tuple('k1', 'k2', 'k3'), new Tuple(10));
-                expect(item.f('k1')).to.equal(10);
-                expect(item.f('k2')).to.be.null;
-                expect(item.f('k3')).to.be.null;
-            });
-            
-            it("should assign the tuple of values in excess to the last identifier", () => {
-                const item = new Namespace({})
-                item.assign(new Tuple('k1', 'k2'), new Tuple(10,20,30,40));
-                expect(item.f('k1')).to.equal(10);
-                expect(item.f('k2')).to.be.Tuple([20,30,40]);
-            });
-        });
+        })        
     });
     
     describe("Func", () => {

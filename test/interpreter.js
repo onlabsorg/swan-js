@@ -8,13 +8,14 @@ const {
         Item,
             Bool, 
             Numb, 
-            Func, 
+            Applicable,
+                Mapping, 
+                    Sequence, 
+                        Text, 
+                        List, 
+                    Namespace,
+                Func, 
             Undefined, 
-            Mapping, 
-                Sequence, 
-                    Text, 
-                    List, 
-                Namespace,
                 
     wrap, unwrap 
 } = require('../lib/types');
@@ -98,18 +99,18 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
         });
     
         it("should return `Undefined Mapping` if the name is not mapped", async () => {
-            expect( await parse("undefined_key")({a:10, _b:20}) ).to.be.Undefined("Mapping", arg0 => {
+            expect( await parse("undefined_key")({a:10, _b:20}) ).to.be.Undefined("NameReference", arg0 => {
                 expect(arg0).to.equal("undefined_key");                
             });
         });
     
         it("should return `Undefined Mapping` if name is a property inherited from Object", async () => {
             
-            expect( await parse("isPrototypeOf")({}) ).to.be.Undefined("Mapping", arg0 => {
+            expect( await parse("isPrototypeOf")({}) ).to.be.Undefined("NameReference", arg0 => {
                 expect(arg0).to.equal("isPrototypeOf");                
             });
             
-            expect( await parse("hasOwnProperty")({}) ).to.be.Undefined("Mapping", arg0 => {
+            expect( await parse("hasOwnProperty")({}) ).to.be.Undefined("NameReference", arg0 => {
                 expect(arg0).to.equal("hasOwnProperty");                
             });
         });
@@ -128,7 +129,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
     
             it("should return `Undefined Mapping` if the name is not mapped in the child context nor in the parent context", async () => {
                 var context = Object.assign(Object.create({a:10, b:20}), {a:100});
-                expect( await parse("undefined_key")(context) ).to.be.Undefined("Mapping", arg0 => {
+                expect( await parse("undefined_key")(context) ).to.be.Undefined("NameReference", arg0 => {
                     expect(arg0).to.equal("undefined_key");
                 });
             });
@@ -227,7 +228,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 });
                 expect(arg1).to.equal(2);
             });
-        });
+        });        
     });
     
     describe("assignment operation: name = expression", () => {
@@ -349,28 +350,27 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
         it("should return a function resolving the expression in a context augumented with the argument names", async () => {
             var foo = await parse("(x, y) -> [y,x]")();
             expect(foo).to.be.instanceof(Func);
-            expect(await unwrap(foo)(10,20)).to.deep.equal([20,10]);
+            expect(await unwrap(foo)(10,20)).to.be.List([20,10]);
         });
     
         it("should follow the assignment rules when mapping argument names to parameters", async () => {    
-            var foo = unwrap( await parse("(x, y) -> {a=x,b=y}")() );
+            var retval, foo = await parse("(x, y) -> {a=x,b=y}")();
             
-            expect(await foo(10)).to.deep.equal({a:10, b:null});
+            retval = await unwrap(foo)(10);
+            expect(retval).to.be.Namespace({a:10, b:null});
+            expect(unwrap(retval).a).to.equal(10);
+            expect(unwrap(retval).b).to.be.null;
     
-            var retval = await foo(10,20,30);
-            expect(retval.a).to.equal(10);
-            expect(retval.b).to.be.Tuple([20,30]);
-
-            var retval = await foo(10);
-            expect(retval.a).to.equal(10);
-            expect(retval.b).to.be.null;
+            retval = await unwrap(foo)(10,20,30);
+            expect(unwrap(retval).a).to.equal(10);
+            expect(unwrap(retval).b).to.be.Tuple([20,30]);
         });
     
         it("should be righ-to-left associative", async () => {
-            var foo = unwrap( await parse("x -> y -> {a=x,b=y}")() );
-            var foo10 = await foo(10);
-            expect(foo10).to.be.a("function");
-            expect(await foo10(20)).to.deep.equal({a:10, b:20});
+            var foo = await parse("x -> y -> {a=x,b=y}")();
+            var foo10 = await unwrap(foo)(10);
+            expect(foo10).to.be.instanceof(Func);
+            expect(await unwrap(foo10)(20)).to.be.Namespace({a:10, b:20});
         });
         
         it("should return Undefined FunctionDefinition when non-valid name are defined as parameters", async () => {
@@ -474,10 +474,11 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 }
             });
 
-            it("shoudl return Undefined Mapping if X is a name inherited from Object", async () => {
+            it("shoudl return Undefined Mapping if X is not an own property", async () => {
+                const ns = Object.assign(Object.create({a:10}), {b:20});
 
-                for (let name of ['isPrototypeOf', 'hasOwnProperty']) {
-                    expect( await parse("{x:10}(name)")({name}) ).to.be.Undefined("Mapping", arg0 => {
+                for (let name of ['a', 'isPrototypeOf', 'hasOwnProperty']) {
+                    expect( await parse("ns(name)")({ns, name})).to.be.Undefined("Mapping", arg0 => {
                         expect(arg0).to.equal(name);
                     });
                 }
@@ -1055,11 +1056,11 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("{a=1} == {a=1,b=2}"    )()).to.be.Bool(false);
             expect(await parse("{} == {a=1,b=2}"       )()).to.be.Bool(false);
     
-            // Should include inherited properties in the comparison
+            // Should not include inherited properties in the comparison
             var context = {};
             context.ns1 = {x:10};
             context.ns2 = Object.assign(Object.create(context.ns1), {y:20});
-            expect(await parse("ns2 == {x:10,y:20}")(context)).to.be.Bool(true);
+            expect(await parse("ns2 == {x:10,y:20}")(context)).to.be.Bool(false);
     
             // Should ignore non-valid swan names
             var context = {};
@@ -1842,10 +1843,10 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 const context = {};
     
                 await parse("f : x -> 2 * x")(context);
-                expect(await context.f(2)).to.equal(4);
+                expect(await context.f(2)).to.be.Numb(4);
     
                 await parse("g = x -> 3 * x")(context);
-                expect(await context.g(2)).to.equal(6);
+                expect(await context.g(2)).to.be.Numb(6);
             });
         });
     
