@@ -896,7 +896,7 @@ describe("builtins", () => {
         });              
     });
     
-    describe("List", () => {
+    describe.skip("List", () => {
     
         describe.skip("List.size(array)", () => {
     
