@@ -46,8 +46,8 @@ describe("numb module", () => {
             expect(await evaluate("numb.parse 10")).to.be.Undefined("Number");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("numb.parse('10', '0b11', '0o33')")).to.be.Tuple([10,3,27]);
+        it("should apply the first item only, if the argument is a truple", async () => {
+            expect(await evaluate("numb.parse('10', '0b11', '0o33')")).to.be.Numb(10);
         });            
     });
 
@@ -63,8 +63,8 @@ describe("numb module", () => {
             expect(await evaluate("numb.abs 'abc'")).to.be.Undefined("Number");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("numb.abs(-1, 0, 1)")).to.be.Tuple([1,0,1]);
+        it("should apply the first item only, if the argument is a truple", async () => {
+            expect(await evaluate("numb.abs(-1, 0, 1)")).to.be.Numb(1);
         });            
     });
 
@@ -78,8 +78,8 @@ describe("numb module", () => {
             expect(await evaluate("numb.acos 'abc'")).to.be.Undefined("Number");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("numb.acos(0, 0.5, 1)")).to.be.Tuple([Math.acos(0), Math.acos(0.5), Math.acos(1)]);
+        it("should apply the first item only, if the argument is a truple", async () => {
+            expect(await evaluate("numb.acos(0.5, 0.6, 1)")).to.be.Numb(Math.acos(0.5));
         });            
     });
 
@@ -93,8 +93,8 @@ describe("numb module", () => {
             expect(await evaluate("numb.acosh 'abc'")).to.be.Undefined("Number");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("numb.acosh(1, 1.5, 2)")).to.be.Tuple([Math.acosh(1), Math.acosh(1.5), Math.acosh(2)]);
+        it("should apply the first item only, if the argument is a truple", async () => {
+            expect(await evaluate("numb.acosh(1, 1.5, 2)")).to.be.Numb(Math.acosh(1));
         });            
     });
 
@@ -108,8 +108,8 @@ describe("numb module", () => {
             expect(await evaluate("numb.asin 'abc'")).to.be.Undefined("Number");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("numb.asin(0, 0.5, 1)")).to.be.Tuple([Math.asin(0), Math.asin(0.5), Math.asin(1)]);
+        it("should apply the first item only, if the argument is a truple", async () => {
+            expect(await evaluate("numb.asin(0.4, 0.5, 1)")).to.be.Numb(Math.asin(0.4));
         });            
     });
 
@@ -123,8 +123,8 @@ describe("numb module", () => {
             expect(await evaluate("numb.asinh 'abc'")).to.be.Undefined("Number");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("numb.asinh(0, 0.5, 1)")).to.be.Tuple([Math.asinh(0), Math.asinh(0.5), Math.asinh(1)]);
+        it("should apply the first item only, if the argument is a truple", async () => {
+            expect(await evaluate("numb.asinh(0.4, 0.5, 1)")).to.be.Numb(Math.asinh(0.4));
         });            
     });
 
@@ -138,8 +138,8 @@ describe("numb module", () => {
             expect(await evaluate("numb.atan 'abc'")).to.be.Undefined("Number");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("numb.atan(0, 0.5, 1)")).to.be.Tuple([Math.atan(0), Math.atan(0.5), Math.atan(1)]);
+        it("should apply the first item only, if the argument is a truple", async () => {
+            expect(await evaluate("numb.atan(0.4, 0.5, 1)")).to.be.Numb(Math.atan(0.4));
         });            
     });
 
@@ -153,8 +153,8 @@ describe("numb module", () => {
             expect(await evaluate("numb.atanh 'abc'")).to.be.Undefined("Number");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("numb.atanh(0, 0.5, 1)")).to.be.Tuple([Math.atanh(0), Math.atanh(0.5), Math.atanh(1)]);
+        it("should apply the first item only, if the argument is a truple", async () => {
+            expect(await evaluate("numb.atanh(0.4, 0.5, 1)")).to.be.Numb(Math.atanh(0.4));
         });            
     });
 
@@ -169,8 +169,8 @@ describe("numb module", () => {
             expect(await evaluate("numb.ceil 'abc'")).to.be.Undefined("Number");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("numb.ceil(12.3,1.4,2.1)")).to.be.Tuple([13,2,3]);
+        it("should apply the first item only, if the argument is a truple", async () => {
+            expect(await evaluate("numb.ceil(12.3,1.4,2.1)")).to.be.Numb(13);
         });            
     });
 
@@ -184,8 +184,8 @@ describe("numb module", () => {
             expect(await evaluate("numb.cos 'abc'")).to.be.Undefined("Number");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("numb.cos(0, 0.5, 1)")).to.be.Tuple([Math.cos(0), Math.cos(0.5), Math.cos(1)]);
+        it("should apply the first item only, if the argument is a truple", async () => {
+            expect(await evaluate("numb.cos(0.4, 0.5, 1)")).to.be.Numb(Math.cos(0.4));
         });            
     });
 
@@ -199,8 +199,8 @@ describe("numb module", () => {
             expect(await evaluate("numb.cosh 'abc'")).to.be.Undefined("Number");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("numb.cosh(0, 0.5, 1)")).to.be.Tuple([Math.cosh(0), Math.cosh(0.5), Math.cosh(1)]);
+        it("should apply the first item only, if the argument is a truple", async () => {
+            expect(await evaluate("numb.cosh(0.4, 0.5, 1)")).to.be.Numb(Math.cosh(0.4));
         });            
     });
 
@@ -214,8 +214,8 @@ describe("numb module", () => {
             expect(await evaluate("numb.exp 'abc'")).to.be.Undefined("Number");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("numb.exp(0, 0.5, 1)")).to.be.Tuple([Math.exp(0), Math.exp(0.5), Math.exp(1)]);
+        it("should apply the first item only, if the argument is a truple", async () => {
+            expect(await evaluate("numb.exp(0.4, 0.5, 1)")).to.be.Numb(Math.exp(0.4));
         });            
     });
 
@@ -230,8 +230,8 @@ describe("numb module", () => {
             expect(await evaluate("numb.floor 'abc'")).to.be.Undefined("Number");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("numb.floor(12.3,1.4,2.1)")).to.be.Tuple([12,1,2]);
+        it("should apply the first item only, if the argument is a truple", async () => {
+            expect(await evaluate("numb.floor(12.3,1.4,2.1)")).to.be.Numb(12);
         });            
     });
 
@@ -245,8 +245,8 @@ describe("numb module", () => {
             expect(await evaluate("numb.log 'abc'")).to.be.Undefined("Number");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("numb.log(0.1, 0.5, 1)")).to.be.Tuple([Math.log(0.1), Math.log(0.5), Math.log(1)]);
+        it("should apply the first item only, if the argument is a truple", async () => {
+            expect(await evaluate("numb.log(0.1, 0.5, 1)")).to.be.Numb(Math.log(0.1));
         });            
     });
 
@@ -260,8 +260,8 @@ describe("numb module", () => {
             expect(await evaluate("numb.log10 'abc'")).to.be.Undefined("Number");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("numb.log10(0.1, 0.5, 1)")).to.be.Tuple([Math.log10(0.1), Math.log10(0.5), Math.log10(1)]);
+        it("should apply the first item only, if the argument is a truple", async () => {
+            expect(await evaluate("numb.log10(0.1, 0.5, 1)")).to.be.Numb(Math.log10(0.1));
         });            
     });
 
@@ -306,11 +306,14 @@ describe("numb module", () => {
             expect(await evaluate("numb.random 'abc'")).to.be.Undefined("Number");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            const tuple = await evaluate("numb.random(2, 2, 2)");
-            expect(tuple).to.be.instanceof(types.Tuple);
-            const [value1, value2, value3] = Array.from(tuple);
+        it("should apply the first item only, if the argument is a truple", async () => {
+            const item1 = await evaluate("numb.random(2,5,7)");
+            expect(item1).to.be.instanceof(types.Numb);
+            const value1 = item1.unwrap();
             expect(0 <= value1 && value1 <= 2).to.be.true;
+            
+            const value2 = types.unwrap(await evaluate("numb.random(2,5,7)"));
+            const value3 = types.unwrap(await evaluate("numb.random(2,5,7)"));
             expect(value1).to.not.equal(value2);
             expect(value1).to.not.equal(value3);
             expect(value2).to.not.equal(value3);
@@ -334,8 +337,8 @@ describe("numb module", () => {
             expect(await evaluate("numb.round 'abc'")).to.be.Undefined("Number");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("numb.round(12.3,1.6,2.5)")).to.be.Tuple([12,2,3]);
+        it("should apply the first item only, if the argument is a truple", async () => {
+            expect(await evaluate("numb.round(12.3,1.6,2.5)")).to.be.Numb(12);
         });            
     });
 
@@ -349,8 +352,8 @@ describe("numb module", () => {
             expect(await evaluate("numb.sin 'abc'")).to.be.Undefined("Number");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("numb.sin(0, 0.5, 1)")).to.be.Tuple([Math.sin(0), Math.sin(0.5), Math.sin(1)]);
+        it("should apply the first item only, if the argument is a truple", async () => {
+            expect(await evaluate("numb.sin(0.4, 0.5, 1)")).to.be.Numb(Math.sin(0.4));
         });            
     });
 
@@ -364,8 +367,8 @@ describe("numb module", () => {
             expect(await evaluate("numb.sinh 'abc'")).to.be.Undefined("Number");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("numb.sinh(0, 0.5, 1)")).to.be.Tuple([Math.sinh(0), Math.sinh(0.5), Math.sinh(1)]);
+        it("should apply the first item only, if the argument is a truple", async () => {
+            expect(await evaluate("numb.sinh(0.4, 0.5, 1)")).to.be.Numb(Math.sinh(0.4));
         });            
     });
 
@@ -380,13 +383,9 @@ describe("numb module", () => {
             expect(await evaluate("numb.sqrt 'abc'")).to.be.Undefined("Number");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("numb.sqrt(4, 9, 16)")).to.be.Tuple([2,3,4]);
-
-            const tuple = await evaluate("numb.sqrt(4, 9, 'xxx')");
-            expect(Array.from(tuple)[0]).to.equal(2);
-            expect(Array.from(tuple)[1]).to.equal(3);
-            expect(Array.from(tuple)[2]).to.be.Undefined("Number");
+        it("should apply the first item only, if the argument is a truple", async () => {
+            expect(await evaluate("numb.sqrt(4, 9, 160)")).to.be.Numb(2);
+            expect(await evaluate("numb.sqrt(4, 9, 'x')")).to.be.Numb(2);
         });                        
     });
 
@@ -400,8 +399,8 @@ describe("numb module", () => {
             expect(await evaluate("numb.tan 'abc'")).to.be.Undefined("Number");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("numb.tan(0, 0.5, 1)")).to.be.Tuple([Math.tan(0), Math.tan(0.5), Math.tan(1)]);
+        it("should apply the first item only, if the argument is a truple", async () => {
+            expect(await evaluate("numb.tan(0.4, 0.5, 1)")).to.be.Numb(Math.tan(0.4));
         });            
     });
 
@@ -415,8 +414,8 @@ describe("numb module", () => {
             expect(await evaluate("numb.tanh 'abc'")).to.be.Undefined("Number");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("numb.tanh(0, 0.5, 1)")).to.be.Tuple([Math.tanh(0), Math.tanh(0.5), Math.tanh(1)]);
+        it("should apply the first item only, if the argument is a truple", async () => {
+            expect(await evaluate("numb.tanh(0.4, 0.5, 1)")).to.be.Numb(Math.tanh(0.4));
         });            
     });
 
@@ -437,8 +436,8 @@ describe("numb module", () => {
             expect(await evaluate("numb.trunc 'abc'")).to.be.Undefined("Number");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("numb.trunc(12.3,1.6,2.5)")).to.be.Tuple([12,1,2]);
+        it("should apply the first item only, if the argument is a truple", async () => {
+            expect(await evaluate("numb.trunc(12.3,1.6,2.5)")).to.be.Numb(12);
         });            
     });
 });
