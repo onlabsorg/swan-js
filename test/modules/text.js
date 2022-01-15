@@ -74,8 +74,8 @@ describe("text", () => {
             expect(await evaluate("text.size 123")).to.be.Undefined("Number");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("text.size('ABC','Defg')")).to.be.Tuple([3,4]);
+        it("should apply to the first items only, if the argument is a truple", async () => {
+            expect(await evaluate("text.size('ABC','Defg')")).to.be.Numb(3);
         });                        
     });
 
@@ -106,24 +106,18 @@ describe("text", () => {
                     expect(await evaluate("text.find 'abc' 10")).to.be.Undefined("Number");
                 });
 
-                it("should return a tuple of values if `s2` is a tuple", async () => {
-                    expect(await evaluate("text.find 'Abc' ('__Abc__def__Abc', '01234Abc__')")).to.be.Tuple([2,5]);
+                it("should apply only to the first item if the parameter is a tuple", async () => {
+                    expect(await evaluate("text.find 'Abc' ('__Abc__def__Abc', '01234Abc__')")).to.be.Numb(2);
                 });
             });
         });
 
         describe("when the argument is a tuple", () => {
             
-            it("should return one `find` function for each item of the argument", async () => {
-                const F = await evaluate("text.find('Abc','Def')");
-                expect(F).to.be.instanceof(types.Tuple);
-
-                const [f1,f2] = Array.from(F.items());
-                expect(f1).to.be.instanceof(types.Func)
-                expect(f2).to.be.instanceof(types.Func)
-                
-                expect(await evaluate("text.find('Abc','Def') '__Abc__def__Def'")).to.be.Tuple([2,12]);
-                expect(await evaluate("text.find('Abc','Def')('__Abc__Def__Abc', '01234Abc__')")).to.be.Tuple([2,5,7,-1]);                    
+            it("should apply only to the first item", async () => {
+                expect(await evaluate("text.find('Abc','Def')")).to.be.instanceof(types.Func);
+                expect(await evaluate("text.find('Abc','Def') '__Abc__def__Def'")).to.be.Numb(2);
+                expect(await evaluate("text.find('Abc','Def')('__Abc__Def__Abc', '01234Abc__')")).to.be.Numb(2);                    
             });
         });    
     });    
@@ -155,24 +149,18 @@ describe("text", () => {
                     expect(await evaluate("text.rfind 'abc' 10")).to.be.Undefined("Number");
                 });
 
-                it("should return a tuple of values if `s2` is a tuple", async () => {
-                    expect(await evaluate("text.rfind 'Abc' ('__Abc__def__Abc', '01234Abc__')")).to.be.Tuple([12,5]);
+                it("should apply only to the first item if the parameter is a tuple", async () => {
+                    expect(await evaluate("text.rfind 'Abc' ('__Abc__def__Abc', '01234Abc__')")).to.be.Numb(12);
                 });
             });
         });
 
         describe("when the argument is a tuple", () => {
             
-            it("should return one `rfind` function for each item of the argument", async () => {
-                const F = await evaluate("text.rfind('Abc','Def')");
-                expect(F).to.be.instanceof(types.Tuple);
-
-                const [f1,f2] = Array.from(F.items());
-                expect(f1).to.be.instanceof(types.Func)
-                expect(f2).to.be.instanceof(types.Func)
-                
-                expect(await evaluate("text.rfind('Abc','Def') '__Abc__Def__Abc'")).to.be.Tuple([12,7]);
-                expect(await evaluate("text.rfind('Abc','Def')('__Abc__Def__Abc', '01234Abc__')")).to.be.Tuple([12,5,7,-1]);                    
+            it("should apply only to the first item", async () => {
+                expect(await evaluate("text.rfind('Abc','Def')")).to.be.instanceof(types.Func);
+                expect(await evaluate("text.rfind('Abc','Def') '__Abc__Def__Abc'")).to.be.Numb(12);
+                expect(await evaluate("text.rfind('Abc','Def')('__Abc__Def__Abc', '01234Abc__')")).to.be.Numb(12);
             });
         });    
     });    
@@ -187,8 +175,8 @@ describe("text", () => {
             expect(await evaluate("text.lower 123")).to.be.Undefined("Text");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("text.lower('ABC','Def')")).to.be.Tuple(["abc","def"]);
+        it("should apply to the first items only, if the argument is a truple", async () => {
+            expect(await evaluate("text.lower('ABC','Def')")).to.be.Text("abc");
         });                        
     });    
 
@@ -202,8 +190,8 @@ describe("text", () => {
             expect(await evaluate("text.upper 123")).to.be.Undefined("Text");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("text.upper('abc','Def')")).to.be.Tuple(["ABC","DEF"]);
+        it("should apply to the first items only, if the argument is a truple", async () => {
+            expect(await evaluate("text.upper('abc','Def')")).to.be.Text("ABC");
         });                        
     });    
 
@@ -217,8 +205,8 @@ describe("text", () => {
             expect(await evaluate("text.trim_head 123")).to.be.Undefined("Text");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("text.trim_head(' abc ',' Def ')")).to.be.Tuple(["abc ","Def "]);
+        it("should apply to the first items only, if the argument is a truple", async () => {
+            expect(await evaluate("text.trim_head(' abc ',' Def ')")).to.be.Text("abc ");
         });                        
     });   
 
@@ -232,8 +220,8 @@ describe("text", () => {
             expect(await evaluate("text.trim_tail 123")).to.be.Undefined("Text");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("text.trim_tail(' abc ',' Def ')")).to.be.Tuple([" abc"," Def"]);
+        it("should apply to the first items only, if the argument is a truple", async () => {
+            expect(await evaluate("text.trim_tail(' abc ',' Def ')")).to.be.Text(" abc");
         });                        
     });   
 
@@ -247,8 +235,8 @@ describe("text", () => {
             expect(await evaluate("text.trim 123")).to.be.Undefined("Text");
         });
 
-        it("should apply to all the items and return a tuple if the argument is a truple", async () => {
-            expect(await evaluate("text.trim(' abc ',' Def ')")).to.be.Tuple(["abc","Def"]);
+        it("should apply to the first items only, if the argument is a truple", async () => {
+            expect(await evaluate("text.trim(' abc ',' Def ')")).to.be.Text("abc");
         });                        
     });   
 
@@ -279,24 +267,18 @@ describe("text", () => {
                     expect(await evaluate("text.head 3 10")).to.be.Undefined("Text");
                 });
 
-                it("should return a tuple of values if `s1` is a tuple", async () => {
-                    expect(await evaluate("text.head 2 ('abc', 'def', 'ghi')")).to.be.Tuple(['ab','de','gh']);
+                it("should apply only to the first item if the parameter is a tuple", async () => {
+                    expect(await evaluate("text.head 2 ('abc', 'def', 'ghi')")).to.be.Text('ab');
                 });
             });
         });
 
         describe("when the argument is a tuple", () => {
             
-            it("should return one `f` function for each item of the argument", async () => {
-                const F = await evaluate("text.head(2,3)");
-                expect(F).to.be.instanceof(types.Tuple);
-
-                const [f1,f2] = Array.from(F.items());
-                expect(f1).to.be.instanceof(types.Func)
-                expect(f2).to.be.instanceof(types.Func)
-                
-                expect(await evaluate("text.head(2,3) 'abcdef'")).to.be.Tuple(['ab','abc']);
-                expect(await evaluate("text.head(2,3)('abcdef', 'ghijkl')")).to.be.Tuple(['ab','gh','abc','ghi']);                    
+            it("should apply only to the first item", async () => {
+                expect(await evaluate("text.head(2,3)")).to.be.instanceof(types.Func);
+                expect(await evaluate("text.head(2,3) 'abcdef'")).to.be.Text('ab');
+                expect(await evaluate("text.head(2,3)('abcdef', 'ghijkl')")).to.be.Text('ab');                    
             });
         });    
     });              
@@ -328,24 +310,18 @@ describe("text", () => {
                     expect(await evaluate("text.tail 3 10")).to.be.Undefined("Text");
                 });
 
-                it("should return a tuple of values if `s1` is a tuple", async () => {
-                    expect(await evaluate("text.tail (-2) ('abc', 'def', 'ghi')")).to.be.Tuple(['bc','ef','hi']);
+                it("should apply only to the first item if the parameter is a tuple", async () => {
+                    expect(await evaluate("text.tail (-2) ('abc', 'def', 'ghi')")).to.be.Text('bc');
                 });
             });
         });
 
         describe("when the argument is a tuple", () => {
             
-            it("should return one `f` function for each item of the argument", async () => {
-                const F = await evaluate("text.tail(2,3)");
-                expect(F).to.be.instanceof(types.Tuple);
-
-                const [f1,f2] = Array.from(F.items());
-                expect(f1).to.be.instanceof(types.Func)
-                expect(f2).to.be.instanceof(types.Func)
-                
-                expect(await evaluate("text.tail(-2,-3) 'abcdef'")).to.be.Tuple(['ef','def']);
-                expect(await evaluate("text.tail(-2,-3)('abcdef', 'ghijkl')")).to.be.Tuple(['ef','kl','def','jkl']);                    
+            it("should apply only to the first item", async () => {
+                expect(await evaluate("text.tail(2,3)")).to.be.instanceof(types.Func);
+                expect(await evaluate("text.tail(-2,-3) 'abcdef'")).to.be.Text('ef');
+                expect(await evaluate("text.tail(-2,-3)('abcdef', 'ghijkl')")).to.be.Text('ef');                    
             });
         });    
     });              
@@ -374,24 +350,18 @@ describe("text", () => {
                     expect(await evaluate("text.split '::' 10")).to.be.Undefined("Text");
                 });
 
-                it("should return a tuple of values if `s2` is a tuple", async () => {
-                    expect(await evaluate("text.split '::' ('ab::cd', 'de::fg')")).to.be.Tuple([["ab","cd"], ["de","fg"]]);
+                it("should apply only to the first item if the parameter is a tuple", async () => {
+                    expect(await evaluate("text.split '::' ('ab::cd', 'de::fg')")).to.be.List(["ab","cd"]);
                 });
             });
         });
 
         describe("when s1 is a tuple", () => {
             
-            it("should return one `f` function for each item of the argument", async () => {
-                const F = await evaluate("text.split('::','!!')");
-                expect(F).to.be.instanceof(types.Tuple);
-
-                const [f1,f2] = Array.from(F.items());
-                expect(f1).to.be.instanceof(types.Func)
-                expect(f2).to.be.instanceof(types.Func)
-                
-                expect(await evaluate("text.split('::','!!') 'a!!b::c!!d'")).to.be.Tuple([["a!!b","c!!d"],["a","b::c","d"]]);
-                expect(await evaluate("text.split('::','!!')('ab::cd!!ef', 'gh::ij!!kl')")).to.be.Tuple([["ab","cd!!ef"], ["gh","ij!!kl"], ["ab::cd","ef"], ["gh::ij","kl"]]);
+            it("should apply only to the first item", async () => {
+                expect(await evaluate("text.split('::','!!')")).to.be.instanceof(types.Func);
+                expect(await evaluate("text.split('::','!!') 'a!!b::c!!d'")).to.be.List(["a!!b","c!!d"]);
+                expect(await evaluate("text.split('::','!!')('ab::cd!!ef', 'gh::ij!!kl')")).to.be.List(["ab","cd!!ef"]);
             });
         });    
     });              
