@@ -4,7 +4,13 @@ var {parse, createContext, types} = require('../index');
 describe("SWAN LANGUAGE", () => {
     require('./types');
     require('./interpreter');
-    require('./builtins');
+    
+    describe("modules", () => {
+        require('./modules/bool');
+        require('./modules/numb');
+        require('./modules/text');
+        require('./modules/list');        
+    });
 
     describe("Swan API", () => {
 

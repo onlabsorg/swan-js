@@ -97,13 +97,13 @@ describe("text", () => {
                     expect(await evaluate("text.find 'xxx' '__Abc__def__Abc'")).to.be.Numb(-1);
                 });
     
-                it("should return Undefined Text if `s1` is not a string", async () => {
+                it("should return Undefined Number if `s1` is not a string", async () => {
                     expect(await evaluate("text.find 10")).to.be.instanceof(types.Func);
-                    expect(await evaluate("text.find 10 'abc'")).to.be.Undefined("Text");
+                    expect(await evaluate("text.find 10 'abc'")).to.be.Undefined("Number");
                 });
 
-                it("should return Undefined Text if `s2` is not a string", async () => {
-                    expect(await evaluate("text.find 'abc' 10")).to.be.Undefined("Text");
+                it("should return Undefined Number if `s2` is not a string", async () => {
+                    expect(await evaluate("text.find 'abc' 10")).to.be.Undefined("Number");
                 });
 
                 it("should return a tuple of values if `s2` is a tuple", async () => {
@@ -146,13 +146,13 @@ describe("text", () => {
                     expect(await evaluate("text.rfind 'xxx' '__Abc__def__Abc'")).to.be.Numb(-1);
                 });
     
-                it("should return Undefined Text if `s1` is not a string", async () => {
+                it("should return Undefined Number if `s1` is not a string", async () => {
                     expect(await evaluate("text.rfind 10")).to.be.instanceof(types.Func);
-                    expect(await evaluate("text.rfind 10 'abc'")).to.be.Undefined("Text");
+                    expect(await evaluate("text.rfind 10 'abc'")).to.be.Undefined("Number");
                 });
 
-                it("should return Undefined Text if `s2` is not a string", async () => {
-                    expect(await evaluate("text.rfind 'abc' 10")).to.be.Undefined("Text");
+                it("should return Undefined Number if `s2` is not a string", async () => {
+                    expect(await evaluate("text.rfind 'abc' 10")).to.be.Undefined("Number");
                 });
 
                 it("should return a tuple of values if `s2` is a tuple", async () => {
