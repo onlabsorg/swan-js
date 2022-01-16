@@ -11,7 +11,7 @@ const evaluate = async (expression, presets={}) => {
 
 
 
-describe("text", () => {
+describe("text module", () => {
 
     describe("text.from - function", () => {
         

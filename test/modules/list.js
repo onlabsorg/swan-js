@@ -11,7 +11,7 @@ const evaluate = async (expression, presets={}) => {
 
 
 
-describe("list", () => {
+describe("list module", () => {
 
     describe("n = list.size L", () => {
 

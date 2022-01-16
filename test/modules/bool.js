@@ -11,7 +11,7 @@ const evaluate = async (expression, presets={}) => {
 
 
 
-describe("bool", () => {
+describe("bool module", () => {
     
     describe("bool.TRUE", () => {
         
