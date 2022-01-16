@@ -10,6 +10,7 @@ describe("SWAN LANGUAGE", () => {
         require('./modules/numb');
         require('./modules/text');
         require('./modules/list');        
+        require('./modules/namespace');        
         require('./modules/time');
     });
 
