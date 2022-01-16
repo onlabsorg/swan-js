@@ -14,6 +14,8 @@ describe("SWAN LANGUAGE", () => {
         require('./modules/time');
     });
 
+    require('./builtins');
+
     describe("Swan API", () => {
 
         describe("createContext(...namespaces)", () => {

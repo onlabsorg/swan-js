@@ -1055,6 +1055,15 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
         });
     });
     
+    describe("X % Y", () => {
+        
+        it.skip("should return the reminder of X/Y if both X and Y are numbers", async () => {});
+
+        it.skip("should return Undefined ModuloOperation if X and Y are of any other type", async () => {});
+
+        it.skip("should return (x1%y1, x2%y2, ...) if X and/or Y is a tuple", async () => {});
+    });
+    
     
     
     // COMPARISON OPERATIONS

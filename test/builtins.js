@@ -1,168 +1,75 @@
 const expect = require("./expect");
 
 const types = require("../lib/types");
+const builtins = require("../lib/builtins");
 
 const parse = require("../lib/interpreter");
 const evaluate = (expression, presets={}) => parse(expression)(Object.assign(Object.create(builtins), presets));
 
-const {Bool, Numb, Text, List, Namespace, Func, Time, Tuple, Undefined} = builtins = require("../lib/builtins");
 
 
 
 describe("builtins", () => {
     
-    describe("Namespace", () => {
-    
-        describe("Namespace.size(object)", () => {
-    
-            it("should return the number of items in the namespace", () => {
-                expect(Namespace.size({a:1,b:2,$c:3})).to.equal(2);
-                expect(Namespace.size({})).to.equal(0);
-            });
-    
-            it("shoudl throw a type error if the passed argument is not a string", () => {
-                expect(() => Namespace.size([])).to.throw(TypeError);
-            });
+    describe("type: Item x -> Text t", () => {
+        
+        it("should return the type name of the passed item", async () => {
+            expect(await evaluate("type(1==1)")).to.be.Text("Bool");
+            expect(await evaluate("type 10   ")).to.be.Text("Numb");
+            expect(await evaluate("type 'abc'")).to.be.Text("Text");
+            expect(await evaluate("type [10] ")).to.be.Text("List");
+            expect(await evaluate("type {a:1}")).to.be.Text("Namespace");
+            expect(await evaluate("type(x->x)")).to.be.Text("Func");
+            expect(await evaluate("type(2*[])")).to.be.Text("Undefined");
+        });
+        
+        it("should return a tuple of strings if the argument is a tuple", async () => {
+            expect(await evaluate("type(10,'abc',[])")).to.be.Tuple(["Numb","Text","List"]);
         });
     
-        describe("Namespace.map(fn)(object)", () => {
+    });    
     
-            it("should return an object containing the image through fn of the entries of the passed parameter", async () => {
-                const fn = x => 2*x;
-                expect(await Namespace.map(fn)({x:1,y:2,z:3,$w:4})).to.deep.equal({x:2,y:4,z:6});
-            });
-    
-            it("should throw an error if the passed parameter is not an object", async () => {
-                try {
-                    await Namespace.map(x=>x)([]);
-                    throw new Error("It did not throw!");
-                } catch (e) {
-                    expect(e).to.be.instanceof(TypeError);
-                    expect(e.message).to.equal("Namespace type expected");
-                }
-            });
-        });        
-    });
-    
-    describe("Func", () => {
-    
-        describe("Func.pipe(...funcs)", () => {
-    
-            it("should return a function that pipes all the passed functions", async () => {
-                const fn = Func.pipe(x => 2*x, [10,20,30,40,50,60,70,80], x => [x]);
-                expect(fn).to.be.a("function");
-                expect(await fn(3)).to.deep.equal([70]);
-            });
+    describe("range: Numb n -> Numb Tuple r", () => {
+        
+        it("should return a tuple of integer numbers between 0 and n (excluded)", async () => {
+            expect(await evaluate("range 4")).to.be.Tuple([0,1,2,3]);
+            expect(await evaluate("range 4.1")).to.be.Tuple([0,1,2,3,4]);
         });
-    
-        describe("Func.compose(...funcs)", () => {
-    
-            it("should return a function that composes all the passed functions", async () => {
-                const fn = Func.compose(x => [x], [10,20,30,40,50,60,70,80], x => 2*x);
-                expect(fn).to.be.a("function");
-                expect(await fn(3)).to.deep.equal([70]);
-            });
+        
+        it("should return Undefined Tuple if n is not a Numb item", async () => {
+            expect(await evaluate("range 'abc'")).to.be.Undefined("Tuple");
+        });
+        
+        it("should apply only to the first item if n is a tuple", async () => {
+            expect(await evaluate("range(4,2)")).to.be.Tuple([0,1,2,3]);
         });
     });
-    
-    describe("Tuple", () => {
-    
-        describe("Tuple.from(value)", () => {
-    
-            it("should return the tuple of characters of value if it is a string", () => {
-    
-                expect(Tuple.from("abc")).to.be.instanceof(types.Tuple);
-                expect(Array.from(Tuple.from("abc"))).to.be.deep.equal(['a','b','c']);
-    
-                expect(Tuple.from("a")).to.equal('a');
-            });
-    
-            it("should return the tuple of items of value if it is an array", () => {
-    
-                expect(Tuple.from([1,2,3])).to.be.instanceof(types.Tuple);
-                expect(Array.from(Tuple.from([1,2,3]))).to.be.deep.equal([1,2,3]);
-    
-                expect(Tuple.from([1])).to.equal(1);                
-            });
-    
-            it("should return the tuple of keys of value if it is an object", () => {
-    
-                expect(Tuple.from({yy:20,xx:10,$z:30})).to.be.instanceof(types.Tuple);
-                expect(Array.from(Tuple.from({yy:20,xx:10,$z:30}))).to.be.deep.equal(['xx','yy']);
-    
-                expect(Tuple.from({x:10, $y:10})).to.equal('x');
-            });
-    
-            it("should return the null for all the other types", () => {
-                expect(Tuple.from(null                 )).to.be.null;
-                expect(Tuple.from(true                 )).to.be.null;
-                expect(Tuple.from(false                )).to.be.null;
-                expect(Tuple.from(10                   )).to.be.null;
-                expect(Tuple.from(x=>x                 )).to.be.null;
-                expect(Tuple.from(new types.Undefined())).to.be.null;
-            });
+
+    describe("undefined: Tuple t -> Undefined u", () => {
+        
+        it("should return and Undefined data type", async () => {
+            expect(await evaluate("undefined('Test',1,2)")).to.be.Undefined("Test", (...args) => {
+                expect(args.length).to.equal(2);
+                expect(args[0]).to.equal(1);
+                expect(args[1]).to.equal(2);
+            })
         });
+    });    
     
-        describe("Tuple.map(fn)(...values)", () => {
-    
-            it("should return a tuple containing the image through fn of the passed items", async () => {
-                const fn = x => 2*x;
-    
-                const tuple = await Tuple.map(fn)(1,2,3);
-                expect(tuple).to.be.instanceof(types.Tuple);
-                expect(Array.from(tuple)).to.deep.equal([2,4,6]);
-    
-                expect(await Tuple.map(fn)(4)).to.equal(8);
-            });
-        });
-    });
-    
-    describe("Undefined", () => {
-    
-        describe("Undefined.create(type, ...args)", () => {
-    
-            it("should return a types.Undefined object", () => {
-                const undef = Undefined.create("TestCase", 1, 2, 3);
-                expect(undef).to.be.instanceof(types.Undefined);
-                expect(undef.type).to.equal("TestCase");
-                expect(undef.args).to.deep.equal([1,2,3]);
-            });
-        });
-    
-        describe("Undefined.type(undef)", () => {
-    
-            it("should return the type of the undefined argument", () => {
-                const undef = Undefined.create("TestCase", 1, 2, 3);
-                expect(Undefined.type(undef)).to.equal("TestCase");
-            });
-    
-            it("should throw an error if the passed parameter is not Undefined", async () => {
-                try {
-                    Undefined.type([]);
-                    throw new Error("It did not throw!");
-                } catch (e) {
-                    expect(e).to.be.instanceof(TypeError);
-                    expect(e.message).to.equal("Undefined type expected");
-                }
-            });
-        });
-    
-        describe("Undefined.args(undef)", () => {
-    
-            it("should return the args of the undefined argument", () => {
-                const undef = Undefined.create("TestCase", 1, 2, 3);
-                expect(Undefined.args(undef)).to.deep.equal([1,2,3]);
-            });
-    
-            it("should throw an error if the passed parameter is not Undefined", async () => {
-                try {
-                    Undefined.args([]);
-                    throw new Error("It did not throw!");
-                } catch (e) {
-                    expect(e).to.be.instanceof(TypeError);
-                    expect(e.message).to.equal("Undefined type expected");
-                }
-            });
+    describe("require: Text id -> Namespace m", () => {
+        
+        it("should return the standard library module identified by the passed id", async () => {
+            
+            // Test content
+            const time1 = require("../lib/modules/time")(types);
+            const time2 = await evaluate("require 'time'");
+            expect(time2).to.be.instanceof(types.Namespace);
+            for (let key in time1) {
+                expect(typeof time1[key]).to.equal(typeof time2.vget(key));
+            }
+            
+            // Test in action
+            expect(await evaluate("require 'list' .size [10,20,30]")).to.be.Numb(3);
         });
     });
 });
