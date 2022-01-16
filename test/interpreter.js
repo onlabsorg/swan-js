@@ -517,6 +517,55 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
         });
     });
     
+    describe("tuple mapping operation: X => Y", () => {
+        
+        it("should apply Y to each item of X and return the resulting tuple", async () => {
+            expect(await parse("(1,2,3) => x -> 2*x")()).to.be.Tuple([2,4,6]);
+            expect(await parse("(1,2,3) => 'abcdef'")()).to.be.Tuple(['b','c','d']);
+            expect(await parse("(1,2,3) => (x->2*x,x->3*x)")()).to.be.Tuple([2,3,4,6,6,9]);
+        });
+    });
+    
+    describe("Function composition: G << F", () => {
+        
+        it("should return the function X -> G(F(X))", async () => {
+            var context = {f: x=>2*x, g: x=>[x]};
+            expect(await parse("g << f")(context)).to.be.instanceof(Func);
+            expect(await parse("(g << f) 2")(context)).to.be.List([4]);
+        });
+        
+        it("should work with tuples of functions", async () => {
+            var context = {f2: x=>2*x, f3: x=>3*x, f4: x=>4*x, g: (...x)=>[...new Tuple(...x)]};
+            expect(await parse("g << (f2,f3,f4)")(context)).to.be.instanceof(Func);
+            expect(await parse("(g << (f2,f3,f4)) 2")(context)).to.be.List([4, 6, 8]);
+        });
+        
+        it("should be righ-to-left associative", async () => {
+            var context = {f: x=>2*x, g: x=>x**2, h: x=>[x]};
+            
+            expect(await parse("h << g << f")(context)).to.be.instanceof(Func);
+            expect(await parse("(h << g << f) 2")(context)).to.be.List([16]);
+
+            expect(await parse("h << f << g")(context)).to.be.instanceof(Func);
+            expect(await parse("(h << f << g) 2")(context)).to.be.List([8]);
+        });
+    });
+
+    describe("Function piping: F >> G", () => {
+        
+        it("should return the function X -> G(F(X))", async () => {
+            var context = {f: x=>2*x, g: x=>[x]};
+            expect(await parse("f >> g")(context)).to.be.instanceof(Func);
+            expect(await parse("(f >> g) 2")(context)).to.be.List([4]);
+        });
+
+        it("should work with tuples of functions", async () => {
+            var context = {f2: x=>2*x, f3: x=>3*x, f4: x=>4*x, g: (...x)=>[...new Tuple(...x)]};
+            expect(await parse("(f2,f3,f4) >> g")(context)).to.be.instanceof(Func);
+            expect(await parse("((f2,f3,f4) >> g) 2")(context)).to.be.List([4, 6, 8]);
+        });
+    });    
+
     describe("sub-contexting: X.Y", () => {
     
         describe("when X is a namespace", () => {
