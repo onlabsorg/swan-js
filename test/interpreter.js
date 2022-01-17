@@ -1057,11 +1057,49 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
     
     describe("X % Y", () => {
         
-        it.skip("should return the reminder of X/Y if both X and Y are numbers", async () => {});
+        it("should return () if both X and Y are nothing", async () => {
+            expect(await parse("() % ()")(context)).to.be.Tuple([]);
+        });
 
-        it.skip("should return Undefined ModuloOperation if X and Y are of any other type", async () => {});
+        it("should return the reminder of X/Y if both X and Y are numbers", async () => {
+            expect(await parse("10 % 4"   )()).to.be.Numb(2);
+            expect(await parse("10 % 5"   )()).to.be.Numb(0);
+            expect(await parse("10 % (-4)")()).to.be.Numb(2);
+            expect(await parse("10 % 0"   )()).to.be.Undefined("Number");
+        });
 
-        it.skip("should return (x1%y1, x2%y2, ...) if X and/or Y is a tuple", async () => {});
+        it("should return Undefined ModOperation if X and Y are of any other type", async () => {
+            var T=true, F=false, n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x, u=new Undefined(), no=null;
+            for (let [L,R] of [
+                             [no,T], [n ,F], [no,n ], [no,s], [no,ls], [no,ns], [no,fn], [no,u ],
+                    [T ,no], [T ,T], [T, F], [T ,n ], [T ,s], [T ,ls], [T ,ns], [T ,fn], [T ,u ],
+                    [F ,no], [F ,T], [F, F], [F ,n ], [F ,s], [F ,ls], [F ,ns], [F ,fn], [F ,u ],
+                    [n ,no], [n ,T], [n ,F],          [n ,s], [n ,ls], [n ,ns], [n ,fn], [n ,u ],
+                    [s ,no], [s ,T], [s ,F], [s ,n ], [s, s], [s ,ls], [s ,ns], [s ,fn], [s ,u ],
+                    [ls,no], [ls,T], [ls,F], [ls,n ], [ls,s], [ls,ls], [ls,ns], [ls,fn], [ls,u ],
+                    [ns,no], [ns,T], [ns,F], [ns,n ], [ns,s], [ns,ls], [ns,ns], [ns,fn], [ns,u ],
+                    [fn,no], [fn,T], [fn,F], [fn,n ], [fn,s], [fn,ls], [fn,ns], [fn,fn], [fn,u ],
+                    [u ,no], [u ,T], [u ,F], [u ,n ], [u ,s], [u ,ls], [u ,ns], [u ,fn], [u ,u ] ]) {
+    
+                expect( await parse("L % R")({L,R}) ).to.be.Undefined('ModOperation', (arg0, arg1) => {
+                    expect(arg0).to.deep.equal(L);
+                    expect(arg1).to.deep.equal(R);
+                });
+            }            
+        });
+
+        it("should return (x1%y1, x2%y2, ...) if X and/or Y is a tuple", async () => {
+            expect(await parse("(10,20,30) % (4,7,6)")(context)).to.be.Tuple([2,6,0]);
+    
+            // partial exception
+            var tuple = await parse("(10,20,30) % (4,7)")();
+            expect(Array.from(tuple)[0]).to.equal(2);
+            expect(Array.from(tuple)[1]).to.equal(6);
+            expect(Array.from(tuple)[2]).to.be.Undefined('ModOperation', (arg0, arg1) => {
+                expect(arg0).to.equal(30);
+                expect(arg1).to.equal(null);
+            });            
+        });
     });
     
     
