@@ -16,6 +16,9 @@
     "lib": "lib",
     "test": "test"
   },
+  "bin": {
+    "swan": "./bin/swan"  
+  },
   "scripts": {
     "develop": "webpack --mode development --watch",
     "build": "bin/build",
@@ -38,6 +41,7 @@
     "webpack-cli": "^4.1.0"
   },
   "dependencies": {
+    "commander": "^8.3.0",
     "isomorphic-fetch": "^3.0.0",
     "path-browserify": "^1.0.1"
   }

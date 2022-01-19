@@ -1,5 +1,5 @@
 var expect = require("chai").expect;
-var {parse, createContext, types} = require('../index');
+var {parse, createContext, defineModule, types} = require('../index');
 
 describe("SWAN LANGUAGE", () => {
     require('./types');
@@ -47,10 +47,13 @@ describe("SWAN LANGUAGE", () => {
             });
         });
         
-        describe("types", () => {
+        describe("defineModule(id, load)", () => {
             
-            it("should point to the types module", () => {
-                expect(types).to.equal(require("../lib/types"));
+            it("should create a new module loadable via `require`", async () => {
+                defineModule('my-mod', () => ({foo: x => 2*x}));
+                const context = createContext();
+                expect(await parse("require 'my-mod' .foo 2")(context)).to.equal(4);
+                
             });
         });
     });

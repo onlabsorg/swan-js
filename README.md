@@ -25,7 +25,7 @@ parenthesis (...), square braces [...] or curly braces {...}.
 
 The available binary operations are:
 
-- Arithmetic operations: `x + y`, `x - y`, `x * y`, `x / y`, `x % y`, `x ^ y`
+- Arithmetic operations: `x + y`, `x - y`, `x * y`, `x / y`, `x % y`, `x ** y`
 - Comparison operations: `x == y`, `x != y`, `x > y`, `x >= y`, `x < y`, `x <= y`
 - Logic operations: `x & y`, `x | y`
 - Conditional and alternative operations: `x ? y`, `x ; y`, or combined `x ? y ; z`
@@ -34,10 +34,8 @@ The available binary operations are:
 - Function definition: `x -> y`
 - Composition operations: `g << f`, `f >> g`
 - Mapping operation: `x => f`
-- Undefined inspection operation: `x ?> f`
 - Assignment operations: `name = x`, `name: x`
 - Sub-contexting operation: `x.y`
-- Referencing operation: `x @ y`
 
 The types of grouping available are:
 
@@ -58,12 +56,8 @@ The data types defined in swan are:
 - Tuple: `x1, x2, x3, ...`
 
 The swan built-in functions are:
-- `bool x`, converts x to boolean
-- `not x`, return `FALSE` if `bool x` is true, otherwise `TRUE`
-- `enum x`, returns the tuple of the items contained in x
-- `size x`, returns the number of items in `x`
-- `str x`, converts `x` to a string
 - `type x`, returns the type name of `x`
+- `range n`, returns the numeric tuple (0, 1, 2, ..., n-1)
 - `undefined x`, returns an Undefined value
 - `require x`, loads a standard library module
 
@@ -73,6 +67,7 @@ Learn more
 - [Swan expression language guide](./docs/swan.md)
 - [Standard library](./docs/modules.md)
 - [JavaScript API](./docs/api.md)
+- [Swan REPL](./docs/repl.md)
 
 
 License
