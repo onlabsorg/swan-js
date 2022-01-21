@@ -1,21 +1,34 @@
 # Swan language
 
-`Swan` is a an expression-oriented programming language. Syntactically speaking, 
-a swan expression is a sequence of binary operations
+`Swan` is a an interpreted expression language. 
+
+Syntactically speaking, a swan expression is a sequence of binary operations
 `(operand operator operand operator operand ...)`, eventually grouped with 
 parenthesis `(...)`, square braces `[...]` or curly braces `{...}`. For example, 
 the expression `(12 + 2) * 3 - 4` resolves to `38`.
 
-The operands of a swan expression can be of any of the following types:
+Each operand of a swan expression is a `Term` and it can be either an `Item` or 
+a [Tuple](#tuple-data-type-and-pairing-operator). An Item holds a single value, 
+while a Tuple is a sequence of Items: a product type. Any Item is also isomorphic 
+to a 1-d Tuple, while the empty Tuple `()` is the swan unit type, used to
+represent the concept of nothingness. 
 
-- [Boolean](#boolean-data-type) (either `TRUE` or `FALSE`) 
-- [Number](#numeric-data-type) (e.g. `-123.4e3`)
-- [String](#string-data-type) (e.g. `"abc"`)
-- [List](#list-data-type) (the array type)
-- [Namespace](#namespace-data-type) (associative array mapping identifiers to values)
-- [Function](#function-data-type) (asynchronous function)
-- [Undefined](#undefined-data-type) (swan expression never fail; they rather return undefined values)
-- [Tuple](#tuple-data-type-and-pairing-operator) (the swan product type; everything in swan is a tuple)
+The Item types defined in swan are:
+
+- [Bool](#boolean-data-type) type, representing booleans (either `TRUE` or `FALSE`) 
+- [Numb](#numeric-data-type) type, representing real numbers (e.g. `-123.4e3`)
+- `Applicable` type, an abstract data type representing any Item for which an 
+  apply operation is defined
+- `Mapping` type, an abstract Applicable representing discrete mappings
+- [Text](#string-data-type) type, a Mapping between integer numbers and 
+  characters (e.g. `"abc"`).
+- [List](#list-data-type) type, a Mapping between integer numbers and Items
+- [Namespace](#namespace-data-type) type, a Mapping between identifiers and
+  Terms
+- [Func](#function-data-type) type, an Applicable representing a function
+- [Undefined](#undefined-data-type) type, an Item representing an undefined
+  operation or value (swan expressions never fail; they rather return undefined 
+  values)
 
 The following binary operators are defined in swan (see also the 
 [operators precedence](#operators-precedence)), while the only 

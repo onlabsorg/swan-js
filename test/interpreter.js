@@ -174,6 +174,10 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             
             expect(await parse("d")(context)).to.be.Tuple([]);
             expect(context.d).to.be.null;
+            
+            await parse("(e,f) : ()")(context);
+            expect(context.e).to.be.null;
+            expect(context.f).to.be.null;
         });
     
         it("should assign to the last name the tuple of remaining values if the names tuple is smaller than the values tuple", async () => {
@@ -269,6 +273,10 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             
             expect(await parse("d")(context)).to.be.Tuple([]);
             expect(context.d).to.be.null;
+
+            await parse("(e,f) = ()")(context);
+            expect(context.e).to.be.null;
+            expect(context.f).to.be.null;
         });
     
         it("should assign to the last name the tuple of remaining values if the names tuple is smaller than the values tuple", async () => {

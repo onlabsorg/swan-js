@@ -3,8 +3,6 @@
  *  ============================================================================
  *  The swan JavaScript API include a `parse` function and a `createContext`
  *  function to parse and evaluate expressions. 
- *  Furthermore, it contains a `defineModule` function that allows the 
- *  definition of custom swan modules.
  */
 
 const types = require("./lib/types");
@@ -55,26 +53,9 @@ exports.parse = function (expression) {
  *    all the properties of the passed namespaces, added in order.
  */
 exports.createContext = function (...namespaces) {
-    let context = new types.Namespace(builtins);
-    for (let namespaceValue of namespaces) {
-        context = context.sum( new types.Namespace(namespaceValue) );
+    let context = Object.create(builtins);
+    for (let namespace of namespaces) {
+        context = Object.assign(Object.create(context), namespace);
     }
-    return types.unwrap(context);
+    return context;
 }
-
-
-/**
- *  swan.defineModule - function
- *  ----------------------------------------------------------------------------
- *  Adds a module to the swan library. The module can be then loaded with the 
- *  built-in require function.
- *  
- *  ```js
- *  swan.defineModule(moduleId, moduleLoader)
- *  ```
- *  
- *  Where:
- *  - `modulePath` is a unique module identifier string
- *  - `moduleLoader` is an asynchronous function that returns the module
- */
-exports.defineModule = require("./lib/modules").define;

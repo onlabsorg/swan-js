@@ -58,7 +58,7 @@ describe("builtins", () => {
     
     describe("require: Text id -> Namespace m", () => {
         
-        it("should return the standard library module identified by the passed id", async () => {
+        it("should return the standard library module identified by the passed module id", async () => {
             
             // Test content
             const time1 = require("../lib/modules/time")(types);

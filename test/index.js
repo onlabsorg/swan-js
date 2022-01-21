@@ -46,15 +46,5 @@ describe("SWAN LANGUAGE", () => {
                 expect(await parse("2+1")()).to.equal(3)
             });
         });
-        
-        describe("defineModule(id, load)", () => {
-            
-            it("should create a new module loadable via `require`", async () => {
-                defineModule('my-mod', () => ({foo: x => 2*x}));
-                const context = createContext();
-                expect(await parse("require 'my-mod' .foo 2")(context)).to.equal(4);
-                
-            });
-        });
     });
 });

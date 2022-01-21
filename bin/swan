@@ -4,6 +4,7 @@
 
     const {Command} = require("commander");
     const swan = require('..');
+    const types = require('../lib/types');
     const version = require("../package.json").version;
 
     // Heading message
@@ -52,7 +53,7 @@
         rl.question(prompt, resolve);
     });
     
-    const text = require('../lib/modules/text')(swan.types);
+    const text = require('../lib/modules/text')(types);
     while (true) {
         const expression = await read('>>> ');
         const evaluate = swan.parse(expression);

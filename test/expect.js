@@ -47,7 +47,7 @@ chai.use(function (chai, utils) {
     chai.Assertion.addMethod('Namespace', function (object) {
         const item = utils.flag(this, 'object').normalize();
         expect(item).to.be.instanceof(Namespace)
-        expect(unwrap(item)).to.deep.equal(object);
+        expect(Object.assign({}, unwrap(item))).to.deep.equal(object);
     });
     
     chai.Assertion.addMethod('Tuple', function (itemArray) {

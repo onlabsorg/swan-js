@@ -1,0 +1,27 @@
+debug = require 'debug',
+
+run = namespace -> namespace "return",
+
+
+count = tuple -> run {
+
+        f: (n, head, tail) -> head == () ? n ; f(n+1, tail),
+        return: f(0, tuple)
+    
+    },
+
+
+map = f -> tuple -> run {
+
+        _map: (head, tail) -> head != () ? (f head, _map tail),
+        return: _map tuple
+
+    },
+
+factorial = n -> run {
+
+        fac: n -> n == 0 ? 1 ; n * fac(n-1),
+        return: fac n
+        
+}    
+    
