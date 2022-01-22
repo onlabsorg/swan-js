@@ -4,10 +4,15 @@
 
 Syntactically speaking, a swan expression is a sequence of binary operations
 `(operand operator operand operator operand ...)`, eventually grouped with 
-parenthesis `(...)`, square braces `[...]` or curly braces `{...}`. For example, 
-the expression `(12 + 2) * 3 - 4` resolves to `38`.
+parenthesis `(...)`, square braces `[...]` or curly braces `{...}`. Finally,
+there are [line comments](#comments): `# any text at the end of the line`.
 
-Each operand of a swan expression is a `Term` and it can be either an `Item` or 
+For example:
+```
+(12 + 2) * 3 - 4   # expression resolving to 38
+```
+
+Each operand of a swan expression is a `Term`, which can be either an `Item` or 
 a [Tuple](#tuple-data-type-and-pairing-operator). An Item holds a single value, 
 while a Tuple is a sequence of Items: a product type. Any Item is also isomorphic 
 to a 1-d Tuple, while the empty Tuple `()` is the swan unit type, used to
@@ -30,15 +35,13 @@ The Item types defined in swan are:
   operation or value (swan expressions never fail; they rather return undefined 
   values)
 
-The following binary operators are defined in swan (see also the 
-[operators precedence](#operators-precedence)), while the only 
-[unary operators](#unary-operators) are `+` and `-`.
+The following operators are defined in swan (see also the 
+[operators precedence](#operators-precedence)): 
 
-- [Arithmetic operators](#arithmetic-operators): `+`, `-`, `*`, `/`, `%`, `^`
+- [Arithmetic operators](#arithmetic-operators): `+`, `-`, `*`, `/`, `%`, `**`
 - [Comparison operators](#comparison-operators): `==`, `!=`, `>`, `>=`, `<`, `<=`
 - [Logic operators](#logic-operators): `&`, `|`
 - [Selection operators](#selection-operators): `?`, `;`
-- [Selective undefined mapping operator](#undefined-data-type): `?>`
 - [Pairing operator](#tuple-data-type-and-pairing-operator): `,`
 - [Application operator](#application-operator) (empty operator): ` `
 - [Function definition operator](#function-data-type): `->`
@@ -46,7 +49,7 @@ The following binary operators are defined in swan (see also the
 - [Mapping operator](#mapping-operator): `=>`
 - [Assignment operators](#names-and-assignment-operators): `=`, `:`
 - [Subcontexting operator](#subcontexting-operator): `.`
-- [Referencing operator](#referencing-operator): `@`
+- [Unary operators](#unary-operators): `+`, `-`
 
 The swan built-in functions are:
 
@@ -59,13 +62,10 @@ The swan built-in functions are:
 - [undefined](#undefined-data-type): generates an undefined value
 - [require](#require-function): loads a [standard library](./modules.md) module
 
-The swan pre-defined constants are:
+The built-in constants are:
 
-- [TRUE](#boolean-data-type)
-- [FALSE](#boolean-data-type)
-- [INFINITY](#numeric-data-type)
-
-Finally, swan features [line comments](#comments), starting with `#`.
+- `TRUE`: ...
+- `FALSE`: ...
 
 
 ## Boolean data type

@@ -13,21 +13,6 @@ const evaluate = async (expression, presets={}) => {
 
 describe("list module", () => {
 
-    describe("n = list.size L", () => {
-
-        it("should return the number of items of the list", async () => {
-            expect(await evaluate("list.size [1,2,3]")).to.be.Numb(3);            
-        });
-                
-        it("should return Undefined Number if the argument is not a List item", async () => {
-            expect(await evaluate("list.size 123")).to.be.Undefined("Number");
-        });
-        
-        it("should apply only to the first item, if the parameter is a tuple", async () => {
-            expect(await evaluate("list.size ([1,2,3], [4,5])")).to.be.Numb(3);                        
-        });
-    });
-
     describe("L2 = list.reverse L1", () => {
 
         it("should return a new array with the items of L in reversed order", async () => {
@@ -240,46 +225,6 @@ describe("list module", () => {
                 expect(await evaluate("list.join(':','~')")).to.be.instanceof(types.Func);
                 expect(await evaluate("list.join(':','~') ['a','b']")).to.be.Text("a:b");
                 expect(await evaluate("list.join(':','~')(['a','b'],['c','d'])")).to.be.Text("a:b");                    
-            });
-        });    
-    });              
-    
-    describe("f = list.map F", () => {
-    
-        describe("when F is an item", () => {
-    
-            it("should return a function", async () => {
-                expect(await evaluate("list.map(x->2*x)")).to.be.instanceof(types.Func);
-            });
-    
-            describe("ML = f L ", () => {
-    
-                it("should map the items of L via the function F", async () => {
-                    expect(await evaluate("list.map(x->2*x) [1,2,3]")).to.be.List([2,4,6]);
-                });
-    
-                it("should return Undefined List if F is not a Func item", async () => {
-                    expect(await evaluate("list.map 10")).to.be.instanceof(types.Func);
-                    expect(await evaluate("list.map 10 [1,2,3]")).to.be.Undefined("List");
-                });
-    
-                it("should return Undefined List if `L` is not a List item", async () => {
-                    expect(await evaluate("list.map(x->x)")).to.be.instanceof(types.Func);
-                    expect(await evaluate("list.map(x->x) 10")).to.be.Undefined("List");
-                });
-    
-                it("should apply only to the first item, if the parameter is a tuple", async () => {
-                    expect(await evaluate("list.map(x->2*x)([1,2],[3,4])")).to.be.List([2,4]);
-                });
-            });
-        });
-    
-        describe("when the argument is a tuple", () => {
-    
-            it("should apply only to the first item", async () => {
-                expect(await evaluate("list.map(x->2*x,x->3*x)")).to.be.instanceof(types.Func);
-                expect(await evaluate("list.map(x->2*x,x->3*x) [1,2]")).to.be.List([2,4]);
-                expect(await evaluate("list.map(x->2*x,x->3*x)([1,2],[3,4])")).to.be.List([2,4]);
             });
         });    
     });              

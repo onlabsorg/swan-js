@@ -7,10 +7,171 @@ const parse = require("../lib/interpreter");
 const evaluate = (expression, presets={}) => parse(expression)(Object.assign(Object.create(builtins), presets));
 
 
-
-
 describe("builtins", () => {
     
+    describe("bool.TRUE", () => {
+        
+        it("should be true", async () => {
+            expect(await evaluate("TRUE")).to.be.Bool(true);
+        });
+    });
+    
+    describe("bool.FALSE", () => {
+        
+        it("should be true", async () => {
+            expect(await evaluate("FALSE")).to.be.Bool(false);
+        });
+    });
+
+    describe("bool: Term t -> Bool b", () => {
+        
+        it("should return FALSE if the argument is a falsy term", async () => {
+            expect(await evaluate("bool ()       ")).to.be.Bool(false);
+            expect(await evaluate("bool (1 == 2) ")).to.be.Bool(false);
+            expect(await evaluate("bool 0        ")).to.be.Bool(false);
+            expect(await evaluate("bool ''       ")).to.be.Bool(false);
+            expect(await evaluate("bool []       ")).to.be.Bool(false);
+            expect(await evaluate("bool {}       ")).to.be.Bool(false);
+            expect(await evaluate("bool ('a'/'b')")).to.be.Bool(false);
+            expect(await evaluate("bool (0,'',[])")).to.be.Bool(false);
+        });
+
+        it("should return TRUE if the argument is a truty term", async () => {
+            expect(await evaluate("bool (x->x)   ")).to.be.Bool(true);
+            expect(await evaluate("bool (1 == 1) ")).to.be.Bool(true);
+            expect(await evaluate("bool 10       ")).to.be.Bool(true);
+            expect(await evaluate("bool 'abc'    ")).to.be.Bool(true);
+            expect(await evaluate("bool [1,2,3]  ")).to.be.Bool(true);
+            expect(await evaluate("bool {a:1}    ")).to.be.Bool(true);
+            expect(await evaluate("bool (1,'',[])")).to.be.Bool(true);
+        });
+    });
+    
+    describe("not: Term t -> Bool b", () => {
+        
+        it("should return TRUE if the argument is a falsy term", async () => {
+            expect(await evaluate("not ()       ")).to.be.Bool(true);
+            expect(await evaluate("not (1 == 2) ")).to.be.Bool(true);
+            expect(await evaluate("not 0        ")).to.be.Bool(true);
+            expect(await evaluate("not ''       ")).to.be.Bool(true);
+            expect(await evaluate("not []       ")).to.be.Bool(true);
+            expect(await evaluate("not {}       ")).to.be.Bool(true);
+            expect(await evaluate("not ('a'/'b')")).to.be.Bool(true);
+            expect(await evaluate("not (0,'',[])")).to.be.Bool(true);
+        });
+
+        it("should return FALSE if the argument is a truty term", async () => {
+            expect(await evaluate("not (x->x)   ")).to.be.Bool(false);
+            expect(await evaluate("not (1 == 1) ")).to.be.Bool(false);
+            expect(await evaluate("not 10       ")).to.be.Bool(false);
+            expect(await evaluate("not 'abc'    ")).to.be.Bool(false);
+            expect(await evaluate("not [1,2,3]  ")).to.be.Bool(false);
+            expect(await evaluate("not {a:1}    ")).to.be.Bool(false);
+            expect(await evaluate("not (1,'',[])")).to.be.Bool(false);
+        });
+    });            
+    
+    describe("str: Term t -> Text s", () => {
+        
+        it("should return either 'TRUE' or 'FALSE' if the argument is a Bool item", async () => {
+            expect(await evaluate("str(1==1)")).to.be.Text("TRUE");
+            expect(await evaluate("str(1!=1)")).to.be.Text("FALSE");
+        });
+        
+        it("should return the stringified decimal if the argument is a Numb item", async () => {
+            expect(await evaluate("str 123.45")).to.be.Text("123.45");
+        });
+
+        it("should return the argument itself if is a Text item", async () => {
+            expect(await evaluate("str 'abc'")).to.be.Text("abc");
+        });
+
+        it("should return '[[List of <n> items]]' if the argument is a List item", async () => {
+            expect(await evaluate("str [10,20,30]")).to.be.Text("[[List of 3 items]]");
+            expect(await evaluate("str [10]      ")).to.be.Text("[[List of 1 item]]");
+            expect(await evaluate("str []        ")).to.be.Text("[[List of 0 items]]");
+        });
+        
+        it("should return '[[Func]]' if the argument is a Func item", async () => {
+            expect(await evaluate("str(x->x)")).to.be.Text("[[Func]]");
+        });
+        
+        it("should return '[[Undefined <type>]]' if the argument is an Undefined item", async () => {
+            const u = new types.Undefined("TestOp")
+            expect(await evaluate("str(u)", {u})).to.be.Text("[[Undefined TestOp]]");
+        });
+        
+        it("should concatenate the stringified items if the argument is a tuple", async () => {
+            expect(await evaluate("str(12,'+',10)")).to.be.Text("12+10");
+            expect(await evaluate("str()         ")).to.be.Text("");
+        });
+        
+        describe("when the argument is a Namespace item NS", () => {
+            
+            it("should return its comma-separated list of keys, enclosed between curly braces", async () => {
+                expect(await evaluate("str{k1:1,k2:2,k3:3}")).to.be.Text("{k1, k2, k3}")
+            });
+            
+            it("should return `str(NS.__text__)` if `NS.__text__` exists and is not a Func item", async () => {
+                expect(await evaluate("str{__text__:123}")).to.be.Text("123")
+            });
+            
+            it("should return `str(NS.__text__(NS))` if `NS.__text__` is a Func item", async () => {
+                expect(await evaluate("str{t:456, __text__: self -> self.t}")).to.be.Text("456");
+            });
+        });
+    });
+    
+    describe("size: Mapping m -> Numb n", () => {
+        
+        it("should return the number of characters if m is a Text item", async () => {
+            expect(await evaluate("size 'abc'")).to.be.Numb(3);
+        });
+        
+        it("should return the number of items if m is a List item", async () => {
+            expect(await evaluate("size [10,20,30]")).to.be.Numb(3);
+        });
+        
+        it("should return the number of name:value pairs if m is a Namespace item", async () => {
+            expect(await evaluate("size {a:2,b:4,c:6}")).to.be.Numb(3);
+        });
+
+        it("should return Undefined Number if the argument is not a mapping", async () => {
+            expect(await evaluate("size TRUE")).to.be.Undefined("Number");
+            expect(await evaluate("size 123")).to.be.Undefined("Number");
+            expect(await evaluate("size(x->x)")).to.be.Undefined("Number");
+        });
+
+        it("should apply to the first items only, if the argument is a truple", async () => {
+            expect(await evaluate("size('ABC','Defg')")).to.be.Numb(3);
+        });                        
+    });
+
+    describe("dom: Mapping m -> Tuple t", () => {
+        
+        it("should return (0,1,2,...,Len-1) if m is a Text item", async () => {
+            expect(await evaluate("dom 'abc'")).to.be.Tuple([0,1,2]);
+        });
+        
+        it("should return (0,1,2,...,Len-1) if m is a List item", async () => {
+            expect(await evaluate("dom [10,20,30]")).to.be.Tuple([0,1,2]);
+        });
+        
+        it("should return the tuple of name:value pairs if m is a Namespace item", async () => {
+            expect(await evaluate("dom {a:2,b:4,c:6}")).to.be.Tuple(['a','b','c']);
+        });
+
+        it("should return Undefined Term if the argument is not a mapping", async () => {
+            expect(await evaluate("dom TRUE")).to.be.Undefined("Term");
+            expect(await evaluate("dom 123")).to.be.Undefined("Term");
+            expect(await evaluate("dom(x->x)")).to.be.Undefined("Term");
+        });
+
+        it("should apply to the first items only, if the argument is a truple", async () => {
+            expect(await evaluate("dom('ABC','Defg')")).to.be.Tuple([0,1,2]);
+        });                        
+    });
+
     describe("type: Item x -> Text t", () => {
         
         it("should return the type name of the passed item", async () => {
@@ -69,11 +230,9 @@ describe("builtins", () => {
             }
             
             // Test in action
-            expect(await evaluate("require 'bool' .not (1,22,3,4) ")).to.be.Bool(false);
             expect(await evaluate("require 'numb' .max (1,22,3,4) ")).to.be.Numb(22);
             expect(await evaluate("require 'text' .size 'abc'     ")).to.be.Numb(3);
             expect(await evaluate("require 'list' .size [10,20,30]")).to.be.Numb(3);
-            expect(await evaluate("require 'namespace' .size {a:1,b:2}")).to.be.Numb(2);
             expect(await evaluate("require 'time' .to_ISO_string 1639513675.900")).to.be.Text("2021-12-14T20:27:55.900Z");
             expect(await evaluate("type(require 'debug' .log [])")).to.be.Text("Text");
         });

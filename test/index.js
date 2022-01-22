@@ -6,15 +6,16 @@ describe("SWAN LANGUAGE", () => {
     require('./interpreter');
     
     describe("modules", () => {
-        require('./modules/bool');
         require('./modules/numb');
         require('./modules/text');
         require('./modules/list');        
-        require('./modules/namespace');        
         require('./modules/time');
+        require('./modules/debug');
     });
 
     require('./builtins');
+    
+    require("./test-script");
 
     describe("Swan API", () => {
 

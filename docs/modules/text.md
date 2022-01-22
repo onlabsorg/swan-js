@@ -3,34 +3,6 @@ text module
 
 This module contains functions that operate on the swan Text data type.
   
-### text.from: Term x -> Text s
-
-This function takes any term `X` as argument and converts it into a Text
-item according to the following rules:
-
-- if `X` is a `Bool` item it either returns `"TRUE"` or `"FALSE"`
-- if `X` is a `Numb` item it returns the number as a string
-- if `X` is a `Text` item it teturns `X`
-- if `X` is a `List` item it returns `"[[List of <n> items]]"` where 
-  `<n>` is the size of `X`
-- if `X` is a `Namespace` item it returns its comma-separated list of
-  keys, enclosed between curly braces.
-    - if `X` is a `Namespace` item and `X.__text__` exists and is not a 
-      Func item, it returns `Text.from(X.__text__)`
-    - if `X` is a `Namespace` item and `X.__text__` is not a Func item,
-      it returns `Text.from(X.__text__(X))`
-- if `X` is a `Func` item, it returns `"[[Func]]"`
-- if `X` is a `Undefined` item it returns `"[[Undefined <type>]]"`,
-  where `<type>` is the Undefined operaton type.
-- if `X` is a `Tuple` term, it returns the concatenation of all its
-  items stringified with `Text.from`.
-    - As a particular case, if `X` is an empty tuple, it returns `""`
-  
-### text.size: Text s -> Numb n
-Returns a string length
-If the argument is not a Text item, this functions return Undefined text.
-If the parameter is a tuple, this function applies to its first item only.
-  
 ### text.find: Text s -> Text S -> Numb k
 Takes a string `s` as argument and returns a function `f`. 
 If the argument is a tuple, it applies only to its first item.
