@@ -360,7 +360,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(foo).to.be.instanceof(Func);
             expect(await unwrap(foo)(10,20)).to.be.List([20,10]);
         });
-    
+        
         it("should follow the assignment rules when mapping argument names to parameters", async () => {    
             var retval, foo = await parse("(x, y) -> {a=x,b=y}")();
             
@@ -374,6 +374,15 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(unwrap(retval).b).to.be.Tuple([20,30]);
         });
     
+        it("should add a `self` function to the function context, pointing to the function itself", async () => {
+            const count = await parse("((n, head, tail) -> head == () ? n ; self(n+1, tail))(0, 10,20,30)")()
+            expect(count).to.be.Numb(3);
+            
+            // self should be overriden by parameters with the same name
+            expect(await parse("(self -> 2*self)(10)")()).to.be.Numb(20);
+        });
+    
+
         it("should be righ-to-left associative", async () => {
             var foo = await parse("x -> y -> {a=x,b=y}")();
             var foo10 = await unwrap(foo)(10);

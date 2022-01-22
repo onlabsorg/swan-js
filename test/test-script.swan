@@ -3,12 +3,7 @@ debug = require 'debug',
 run = namespace -> namespace "return",
 
 
-count = tuple -> run {
-
-        f: (n, head, tail) -> head == () ? n ; f(n+1, tail),
-        return: f(0, tuple)
-    
-    },
+count = tuple -> ((n, head, tail) -> head == () ? n ; self(n+1, tail))(0, tuple),
 
 
 map = f -> tuple -> run {
@@ -17,6 +12,7 @@ map = f -> tuple -> run {
         return: _map tuple
 
     },
+
 
 factorial = n -> run {
 
