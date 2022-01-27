@@ -1,5 +1,5 @@
 numb module
-----------------------------------------------------------------------------
+============================================================================
 
 This module contains functions and constants that operate on the swan Numb
 data type.
@@ -9,19 +9,22 @@ their parameter is an item (1-d tuple). If more that one item is passed
 to a function, only the first item will be used and the others will be
 ignored.
   
-### Math constants
+Math constants
+------------------------------------------------------------------------
 The following constants are defined:
 
 - `numb.INFINITY`: Infinity.
 - `numb.PI`: Ratio of the a circle's circumference to its diameter, approximately 3.14159.
 - `numb.E`: Euler's constant and the base of natural logarithms, approximately 2.718.
   
-### numb.parse: Text s -> Numb n
+numb.parse: Text s -> Numb n
+------------------------------------------------------------------------
 Converts a string to a number. It accepts also binary (0b...), octal
 (0o...) and exadecimal (0x...) string representations of numbers.
 If the argument is not a valid string, this function returns Undefined Number.
   
-### Trigonometric functions
+Trigonometric functions
+------------------------------------------------------------------------
 The Numb namespace contains the following trigonometric functions: 
 
 - `numb.cos`:  Returns the cosine of a number.
@@ -33,7 +36,8 @@ The Numb namespace contains the following trigonometric functions:
 
 If the argument is not a number, these functions return Undefined Number.
   
-### Hyperbolic functions
+Hyperbolic functions
+------------------------------------------------------------------------
 The Numb namespace contains the following hyperbolic functions: 
 
 - `numb.cosh`:  Returns the hyperbolic cosine of a number.
@@ -45,7 +49,8 @@ The Numb namespace contains the following hyperbolic functions:
 
 If the argument is not a number, these functions return Undefined Number.
   
-### Rounding
+Rounding
+------------------------------------------------------------------------
 The following functions perform number rounding. 
 
 - `Math.ceil`: Returns the smallest integer greater than or equal to a number.
@@ -55,35 +60,43 @@ The following functions perform number rounding.
 
 If the argument is not a number, these functions return Undefined Number.
   
-### numb.abs - function
+numb.abs - function
+------------------------------------------------------------------------
 Returns the absolute value of a number. 
 If the argument is not a number, this functions return Undefined Number.
   
-### numb.exp - function
+numb.exp - function
+------------------------------------------------------------------------
 Returns E^x, where x is the argument, and E is Euler's constant. 
 If the argument is not a number, this functions return Undefined Number.
   
-### numb.log - function
+numb.log - function
+------------------------------------------------------------------------
 Returns the natural logarithm of a number. 
 If the argument is not a number, this functions return Undefined Number.
   
-### numb.log10 - function
+numb.log10 - function
+------------------------------------------------------------------------
 Returns the base 10 logarithm of a number. 
 If the argument is not a number, this functions return Undefined Number.
   
-### numb.max - function
+numb.max - function
+------------------------------------------------------------------------
 Returns the largest of zero or more numbers.
 If any argument is not a number, this functions return Undefined Number.
   
-### numb.min - function
+numb.min - function
+------------------------------------------------------------------------
 Returns the smallest of zero or more numbers.
 If any argument is not a number, this functions return Undefined Number.
   
-### numb.random - function
+numb.random - function
+------------------------------------------------------------------------
 Returns a pseudo-random number between 0 and the given argument.
 If the argument is not a number, this functions return Undefined Number.
   
-### numb.sqrt - function
+numb.sqrt - function
+------------------------------------------------------------------------
 Returns the positive square root of a number.
 If any argument is not a number, this functions return Undefined Number.
   

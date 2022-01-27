@@ -9,14 +9,14 @@ const evaluate = (expression, presets={}) => parse(expression)(Object.assign(Obj
 
 describe("builtins", () => {
     
-    describe("bool.TRUE", () => {
+    describe("TRUE", () => {
         
         it("should be true", async () => {
             expect(await evaluate("TRUE")).to.be.Bool(true);
         });
     });
     
-    describe("bool.FALSE", () => {
+    describe("FALSE", () => {
         
         it("should be true", async () => {
             expect(await evaluate("FALSE")).to.be.Bool(false);
@@ -112,12 +112,9 @@ describe("builtins", () => {
                 expect(await evaluate("str{k1:1,k2:2,k3:3}")).to.be.Text("{k1, k2, k3}")
             });
             
-            it("should return `str(NS.__text__)` if `NS.__text__` exists and is not a Func item", async () => {
-                expect(await evaluate("str{__text__:123}")).to.be.Text("123")
-            });
-            
-            it("should return `str(NS.__text__(NS))` if `NS.__text__` is a Func item", async () => {
-                expect(await evaluate("str{t:456, __text__: self -> self.t}")).to.be.Text("456");
+            it("should return `str(NS.__str__(NS))` if `NS.__str__` is a Func item", async () => {
+                expect(await evaluate("str{t:456, __str__: self -> self.t}")).to.be.Text("456");
+                expect(await evaluate("str{t:456, __str__: 'abc'}")).to.be.Text("{t, __str__}");
             });
         });
     });
@@ -186,6 +183,7 @@ describe("builtins", () => {
         
         it("should return a tuple of strings if the argument is a tuple", async () => {
             expect(await evaluate("type(10,'abc',[])")).to.be.Tuple(["Numb","Text","List"]);
+            expect(await evaluate("type()")).to.be.Tuple([]);
         });
     
     });    
