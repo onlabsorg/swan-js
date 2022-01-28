@@ -15,8 +15,6 @@ describe("SWAN LANGUAGE", () => {
 
     require('./builtins');
     
-    require("./test-script");
-
     describe("Swan API", () => {
 
         describe("createContext(...namespaces)", () => {
