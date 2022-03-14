@@ -776,22 +776,22 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("10 ? [1,2,3]"  )(context)).to.be.List([1,2,3]);
         });
     
-        it("should return null if X booleanizes to false", async () => {
+        it("should return Undefined Term if X booleanizes to false", async () => {
             const context = {TRUE:true, FALSE:false};
     
-            expect(await parse("FALSE ? [1,2,3]")(context)).to.be.Tuple([]);
-            expect(await parse("0 ? [1,2,3]"    )(context)).to.be.Tuple([]);
+            expect(await parse("FALSE ? [1,2,3]")(context)).to.be.Undefined('Term');
+            expect(await parse("0 ? [1,2,3]"    )(context)).to.be.Undefined('Term');
         });
     });
     
     describe("X ; Y", () => {
     
-        it("should return X if it is not ()", async () => {
+        it("should return X if it is not Undefined", async () => {
             expect(await parse("[1,2,3] ; [3,4,5]")({})).to.be.List([1,2,3]);
         });
     
-        it("should return Y if X is ()", async () => {
-            expect(await parse("() ; [3,4,5]")({})).to.be.List([3,4,5]);
+        it("should return Y if X is Undefined", async () => {
+            expect(await parse("(2:2) ; [3,4,5]")({})).to.be.List([3,4,5]);
         });
     });
     
@@ -1921,7 +1921,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 expect(await parse("1 ? 2 ; 3 ")()).to.be.Numb(2);
                 expect(await parse("0 ? 2 ; 3 ")()).to.be.Numb(3);                
                 expect(await parse("1 ; 2 ? 3 ")()).to.be.Numb(1);  
-                expect(await parse("() ; 2 ? 3")()).to.be.Numb(3);  
+                expect(await parse("(2:2) ; 2 ? 3")()).to.be.Numb(3);  
             });
     
             it("should execute logic operations after comparison operations", async () => {

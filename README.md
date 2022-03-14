@@ -56,10 +56,15 @@ The data types defined in swan are:
 - Tuple: `x1, x2, x3, ...`
 
 The swan built-in functions are:
-- `type x`, returns the type name of `x`
-- `range n`, returns the numeric tuple (0, 1, 2, ..., n-1)
-- `undefined x`, returns an Undefined value
-- `require x`, loads a standard library module
+- `bool x`, converts a value to boolean
+- `dom m`, returns the domain of a Text, List or Namespace item as a tuple
+- `not x`, returns `FALSE` if `bool x` is true, otherwise `TRUE`
+- `range n`, returns the tuple of integers between 0 and the given parameter (excluded)
+- `require id`, loads a standard library module
+- `size m`, returns the number of mappings in a Text, List of Namespace item
+- `str x`, converts its argument to a string
+- `type x`, returns the type name of its argument
+- `undefined x`, generates an Undefined item
 
 
 Learn more

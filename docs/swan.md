@@ -355,7 +355,7 @@ consistent with the following algebraic characterization of the swan types:
 The sum of a tuple `t1=(x1,x2,x3)` and a tuple `t2=(y1,y2,y3)` is the tuple
 `(x1+y1, x2+y2, x3+y3)`. The same goes for subtraction, product, division,
 modulo and exponentiation. As a consequence of this rule, any operation
-between two empty tuples `()` returns and empty tuple.
+between two empty tuples `()` returns an empty tuple.
 
 #### Arithmetic operations between Bool items
 * `B1 + B2` returns the logic `or` between `B1` and `B2`
@@ -534,17 +534,17 @@ otherwise it returns `B`. For example:
 
 ## Selection operators
 A conditional expression `X ? Y` resolves to `Y` if `X` is 
-[TRUTY](#truty-and-falsy-terms), otherwise it resolves to `()`. For example:
+[TRUTY](#truty-and-falsy-terms), otherwise it resolves to `Undefined`. For example:
 
 * `2 > 1 ? "ok"` resoves to `"ok"`
-* `2 < 1 ? "ok"` resoves to `()`
+* `2 < 1 ? "ok"` resoves to `undefined('Term')`
 * `"abc" ? "ok"` resoves to `"ok"`
-* `"" ? "ok"` resoves to `()`
+* `"" ? "ok"` resoves to `undefined('Term')`
 
-An alternative expression `X ; Y` resolves to `X` if it is not an empty tuple;
+An alternative expression `X ; Y` resolves to `X` if it is not an undefined term;
 otherwise it resolves to `Y`. For example:
 
-* `() ; 3` resolves to `3`
+* `undefined() ; 3` resolves to `3`
 * `10 ; 2` resolves to `10`
 
 When combined together, the conditional and the alternative expression work as
@@ -631,7 +631,7 @@ means that the mapping operator can be also used to filter tuples. For example:
 
 ```
 isEven = x -> x % 2 == 0            # returns TRUE if x is an even number
-ifEven = x -> isEven(x) ? x         # returns x if it is an even number, or else ()
+ifEven = x -> isEven(x) ? x ; ()    # returns x if it is an even number, or else ()
 (1,2,3,4,5) => ifEven               # resolves to (2,4) 
 ```
 
