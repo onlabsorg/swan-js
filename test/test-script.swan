@@ -8,7 +8,7 @@ count = tuple -> ((n, head, tail) -> head == () ? n ; self(n+1, tail))(0, tuple)
 
 map = f -> tuple -> run {
 
-        _map: (head, tail) -> head != () ? (f head, _map tail),
+        _map: (head, tail) -> head != () ? (f head, _map tail) ; (),
         return: _map tuple
 
     },
