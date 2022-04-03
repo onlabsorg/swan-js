@@ -19,7 +19,10 @@
 
     // Create the swan execution context
     const context = swan.createContext({
-        exit: () => {process.exit(0)}
+        exit: () => {
+            console.log();
+            process.exit(0)
+        }
     });
 
     // Import the external script
@@ -53,11 +56,13 @@
         rl.question(prompt, resolve);
     });
     
-    const text = require('../lib/modules/text')(types);
     while (true) {
-        const expression = await read('>>> ');
+        const expression = await read('%> ');
         const evaluate = swan.parse(expression);
         const value = await evaluate(context);
-        console.log(await text.from(value));
+        if (value !== null) {
+            console.log(await context.str(value));
+            console.log();
+        }
     }    
 })();
