@@ -5,7 +5,7 @@
  *  function to parse and evaluate expressions. 
  */
 
-const types = require("./lib/types");
+const types = exports.types = require("./lib/types");
 const parse = require("./lib/interpreter");
 const builtins = require("./lib/builtins");
 
