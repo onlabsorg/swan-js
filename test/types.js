@@ -1850,7 +1850,17 @@ describe("types", () => {
         
         describe(".typeName", () => {
             
-            it("should return the item class name", () => {
+            it("should return 'Nothing' if the tuple is empty", () => {
+                const tuple = new Tuple();
+                expect(tuple.typeName).to.equal("Nothing");
+            });
+
+            it("should return the item typeName if the tuple contains only than one element", () => {
+                const tuple = new Tuple(1);
+                expect(tuple.typeName).to.equal("Numb");
+            });
+
+            it("should return the 'Tuple' if the tuple contains more than one element", () => {
                 const tuple = new Tuple(1,2,3);
                 expect(tuple.typeName).to.equal("Tuple");
             });
