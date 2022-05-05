@@ -702,8 +702,8 @@ item according to the following rules:
 - if `X` is a `Text` item it teturns `X`
 - if `X` is a `List` item it returns `"[[List of <n> items]]"` where 
   `<n>` is the size of `X`
-- if `X` is a `Namespace` item it returns its comma-separated list of
-  keys, enclosed between curly braces.
+- if `X` is a `Namespace` item it returns `"[[Namespace if <n> items]]"` where
+  `<n>` is the size of `X`.
 - if `X` is a `Namespace` item and `X.__str__` is a Func item,
   it returns `X.__str__(X)` stringified. This is not recursive: if the return
   value of the `__str__` function is a Namespace item containing another 

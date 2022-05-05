@@ -1095,8 +1095,10 @@ describe("types", () => {
         
         describe(".toString()", () => {
             
-            it("should retun a comma-separated list of valid names enclosed between curly braces", () => {
-                expect((new Namespace({key1:1, key2:2, key3:3, $key4:4})).toString()).to.equal("{key1, key2, key3}");
+            it("should retun '[[Namespace of n items]]'", () => {
+                expect((new Namespace({key1:1, key2:2, key3:3, $key4:4})).toString()).to.equal("[[Namespace of 3 items]]");
+                expect((new Namespace({key1:1                         })).toString()).to.equal("[[Namespace of 1 item]]");
+                expect((new Namespace({                               })).toString()).to.equal("[[Namespace of 0 items]]");
             });
         });
         

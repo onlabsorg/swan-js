@@ -108,13 +108,15 @@ describe("builtins", () => {
         
         describe("when the argument is a Namespace item NS", () => {
             
-            it("should return its comma-separated list of keys, enclosed between curly braces", async () => {
-                expect(await evaluate("str{k1:1,k2:2,k3:3}")).to.be.Text("{k1, k2, k3}")
+            it("should return '[[Namespace of n items]]' if no __str__ name is defined", async () => {
+                expect(await evaluate("str{k1:1,k2:2,k3:3}")).to.be.Text("[[Namespace of 3 items]]");
+                expect(await evaluate("str{k1:1          }")).to.be.Text("[[Namespace of 1 item]]");
+                expect(await evaluate("str{              }")).to.be.Text("[[Namespace of 0 items]]");
             });
             
             it("should return `str(NS.__str__(NS))` if `NS.__str__` is a Func item", async () => {
                 expect(await evaluate("str{t:456, __str__: self -> self.t}")).to.be.Text("456");
-                expect(await evaluate("str{t:456, __str__: 'abc'}")).to.be.Text("{t, __str__}");
+                expect(await evaluate("str{t:456, __str__: 'abc'}")).to.be.Text("[[Namespace of 2 items]]");
             });
         });
     });
