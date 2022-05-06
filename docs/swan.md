@@ -679,6 +679,7 @@ the box are:
 - [numb](./modules/numb.md) - containing functions operating on the Numb type
 - [text](./modules/text.md) - containing functions operating on the Text type
 - [list](./modules/list.md) - containing functions operating on the List type
+- [json](./modules/json.md) - containing functions to parse and serialize JSON data
 - [time](./modules/time.md) - containing functions to operate with date and time
 - [debug](./modules/debug.md) - containing debugging functions
 
