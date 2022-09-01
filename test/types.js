@@ -1286,6 +1286,11 @@ describe("types", () => {
                 });
                 expect(Array.from(tuple)[2]).to.equal(4);
             });
+            
+            it("should call the __apply__ item if it is a function", async () => {
+                const item = new Namespace({k1:1, __apply__: (ns, k2, k3) => ns.k1 + k2 + k3});
+                expect(await item.apply(10, 100)).to.be.Numb(111);
+            });            
         })        
     });
     

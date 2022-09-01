@@ -323,6 +323,9 @@ result is a tuple of mapped values. For example:
 - `[10,20,30](1,2)` returns `(20, 30)`
 - `{a:1, b:2, c:3}("b", "c")` returns `(2, 3)`
 
+**When F is a Namespace** that contains a `F.__apply__` function, the normal
+mapping application operation is overridden and resolves to `F.__apply__(F, X)`.
+
 **When F is a tuple `(f1, f2, ...)`**, the `F X` operation returns the tuple
 `(f1 X, f2 X, ...)`
 
@@ -737,5 +740,3 @@ The `undefined` function generates an Undefined item programmatically. It
 takes and arbitrary tuple of items as parameters, of which the first should be
 a Text item that describes the type of undefined entity (e.g. "Number", 
 "DivOperation", etc.).
-
-
