@@ -24,8 +24,11 @@ describe("SWAN LANGUAGE", () => {
                 const builtins = require("../lib/builtins");
                 const context = swan.createContext({});
                 for (let key in builtins) {
-                    expect(context[key]).to.equal(builtins[key]);
+                    if (key !== "this") {
+                        expect(context[key]).to.equal(builtins[key]);
+                    }
                 }
+                expect(context.this).to.equal(context);
             });
             
             it("should contain all the properties of the passed namespaces", () => {
