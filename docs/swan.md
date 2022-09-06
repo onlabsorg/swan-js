@@ -83,6 +83,7 @@ The swan built-in functions are:
 - [str](#str-function): converts its argument to a string
 - [type](#type-function): returns the type name of its argument
 - [undefined](#undefined-function): generates an Undefined item
+- [this](#this-namespace): returns the current context
 
 The built-in constants are:
 
@@ -740,3 +741,6 @@ The `undefined` function generates an Undefined item programmatically. It
 takes and arbitrary tuple of items as parameters, of which the first should be
 a Text item that describes the type of undefined entity (e.g. "Number", 
 "DivOperation", etc.).
+
+### `this` namespace
+The `this` namespace returns the current context.
