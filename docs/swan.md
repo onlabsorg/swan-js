@@ -226,14 +226,13 @@ between curly braces returns a Namespace item. For example:
 {
     x = 10,
     y = 20,
-    z = 30
+    z = 30,
+    3 + 5
 }
 ```
 
-In this example, we basically assigned three values to three names, but those 
-names are not available in the global context, but wrapped in the namespace 
-item instead. Any non-assignment operation between curly braces is just
-ignored.
+In this example, we basically assigned three values to three names, while any 
+non-assignment operation between curly braces is just ignored. 
 
 In order to access the names inside a namespace, you can use either the 
 [apply operator](#application-operator) or the 
@@ -243,6 +242,25 @@ In order to access the names inside a namespace, you can use either the
 * `ns "a"` resolves to `1` 
 * `ns("b")` resolves to `2` 
 * `ns.c` resolves to `3`
+
+Another import property of namespace is inheritance: every namespace inherits
+the names of its `parent namespace`. The following example shows how child 
+namespace inherit the names define in their parent namespaces. 
+
+```
+    x = 10
+    ns1 = {
+        y = x + 1   # the name `x` is defined in the parent namespace
+        ns2 = {
+            z = x + y   # the name `y` is defined in the parent namespace `ns1`,
+                        # the name `x` is defined in the parent's parent namespace
+        }
+    }
+```
+
+>   Notice that the [apply operator](#application-operator) gives access only to
+>   the `own` names of a namespace, while the [subcontexting operator](#subcontexting-operator)
+>   gives access also to all the parent's names.
 
 
 ## Func data type
@@ -324,7 +342,12 @@ result is a tuple of mapped values. For example:
 - `[10,20,30](1,2)` returns `(20, 30)`
 - `{a:1, b:2, c:3}("b", "c")` returns `(2, 3)`
 
-**When F is a Namespace** that contains a `F.__apply__` function, the normal
+When `F` is a Namespace and `X` is a name defined in its parent namespace, the
+application operation returns `undefined('Mapping')`. In other words, the
+application operation gives access only to the `own` names of a namespace and
+not to the inherited names.
+
+When `F` is a Namespace that contains a `F.__apply__` function, the normal
 mapping application operation is overridden and resolves to `F.__apply__(F, X)`.
 
 **When F is a tuple `(f1, f2, ...)`**, the `F X` operation returns the tuple
@@ -568,12 +591,10 @@ you are defining names in a sub-namespace and you can access the associated
 values with an apply operation `{a=1}("a")`.
 
 A subcontexting operation `ns . expression` executes the right-hand expression
-in a sub-context obtained by extending the parent context with the names 
-contained in the namespace `ns`. For example, `{a=2,b=3}.(a+b)` will resolve 
-to `5`.
+in the context of `ns`. For example, `{a=2,b=3}.(a+b)` will resolve to `5`.
 
-The global names are still visible in the righ-hand expression, unless they are
-overridden by local namespace names. For example:
+The inherited names are still visible in the righ-hand expression, unless they 
+are overridden by local namespace names. For example:
 
 ```
 x = 10,
@@ -589,6 +610,10 @@ not be found in `ns` and will be taken from the global namespace.
 The subcontexting can be also used as an alternative way to access names defined
 inside a namespace. In the example above, the expression `ns.z` will indeed
 resolve to the value of `z` inside the namespace `ns`.
+
+The subcontexting operation can be used also the define child namespaces. For 
+example, `ns.{u:1, v:2, w:3}` will resolve to a namespace that has `ns` as 
+parent.
 
 If the left-hand operand `X` of a `X.Y` operation is not a  Namespace, the `.` 
 operation returns `undefined('SubcontextingOperation', X, Y)`.

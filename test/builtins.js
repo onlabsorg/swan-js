@@ -231,8 +231,8 @@ describe("builtins", () => {
             
             // Test in action
             expect(await evaluate("require 'numb' .max (1,22,3,4) ")).to.be.Numb(22);
-            expect(await evaluate("require 'text' .size 'abc'     ")).to.be.Numb(3);
-            expect(await evaluate("require 'list' .size [10,20,30]")).to.be.Numb(3);
+            expect(await evaluate("require 'text' .upper 'aBc'     ")).to.be.Text("ABC");
+            expect(await evaluate("require 'list' .reverse [10,20,30]")).to.be.List([30,20,10]);
             expect(await evaluate("require 'time' .to_ISO_string 1639513675.900")).to.be.Text("2021-12-14T20:27:55.900Z");
             expect(await evaluate("type(require 'debug' .log [])")).to.be.Text("Text");
         });

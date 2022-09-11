@@ -24,9 +24,9 @@ describe("debug module", function () {
         });
         
         it("should log the passed arguments to the console", async () => {
-            await evaluate("debug.log(1,'abc',[1,2,3],{a:1})");            
+            await evaluate("debug.log(1,'abc',[1,2,3])");            
             expect(logId).to.equal("Log 1:");
-            expect(logged).to.be.Tuple([1,'abc',[1,2,3],{a:1}]);
+            expect(logged).to.be.Tuple([1,'abc',[1,2,3]]);
 
             await evaluate("debug.log(11)");            
             expect(logId).to.equal("Log 2:");
@@ -177,4 +177,3 @@ describe("debug module", function () {
         });
     });
 });
-

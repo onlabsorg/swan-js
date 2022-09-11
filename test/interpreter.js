@@ -600,11 +600,19 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 expect(await parse("ns.[x,y,z]")(context)).to.be.List([10,20,30]);
             });
         
-            it("should see the global contexts", async () => {
+            it("should see the prototype chain", async () => {
                 var context = {x:10};
+                
+                // context prototype
                 await parse("ns = {y=20}")(context);
                 expect(await parse("ns.x")(context)).to.be.Numb(10);
                 expect(await parse("ns.y")(context)).to.be.Numb(20);
+                
+                // namespace prototype
+                await parse("ns1 = {x=11}")(context);
+                await parse("ns2 = ns1.{y=20}")(context);
+                expect(await parse("ns2.x")(context)).to.be.Numb(11);
+                expect(await parse("ns2.y")(context)).to.be.Numb(20);                
             });
         
             it("should see the function parameters in a function expressions", async () => {
@@ -612,6 +620,9 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 await parse("ns = {x=10}, nsp = {x=20}")(context);
                 await parse("f = nsp -> nsp.x")(context);
                 expect(await parse("f ns")(context)).to.be.Numb(10);
+                
+                await parse("f2 = (x,y,z) -> {}")(context);
+                expect(await parse("f2(1,2,3).y")(context)).to.be.Numb(2);
             });            
         });
     
