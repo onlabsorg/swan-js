@@ -205,6 +205,24 @@ describe("builtins", () => {
             expect(await evaluate("range(4,2)")).to.be.Tuple([0,1,2,3]);
         });
     });
+    
+    describe("parent: Namespace x -> Namespace u", () => {
+        
+        it("should return the prototype of x", async () => {
+            const presets = {p:{x:10}};
+            presets.c = Object.create(presets.p);
+            expect(await evaluate("parent c", presets)).to.be.Namespace(presets.p);
+        });
+
+        it("should return Undefined Namespace if x has no prototype", async () => {
+            const presets = { o: Object.create(null) };
+            expect(await evaluate("parent o", presets)).to.be.Undefined("Namespace");
+        });
+
+        it("should return Undefined Namespace if x is not a namespace", async () => {
+            expect(await evaluate("parent 123")).to.be.Undefined("Namespace");
+        });
+    });
 
     describe("undefined: Tuple t -> Undefined u", () => {
         

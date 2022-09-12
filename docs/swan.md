@@ -82,6 +82,7 @@ The swan built-in functions are:
 - [size](#size-function): returns the number of mappings in a Mapping item
 - [str](#str-function): converts its argument to a string
 - [type](#type-function): returns the type name of its argument
+- [parent](#parent-function): returns the parent namespace of a given namespace
 - [undefined](#undefined-function): generates an Undefined item
 - [this](#this-namespace): returns the current context
 
@@ -760,6 +761,17 @@ The `type` function takes a parameter `X` and returns its type name, that is:
 In general, if `X` is a Tuple `(x1, x2, ...)`, the `type X` function returns
 `(type x1, type x2, ...)`. As a consequence of this behavior, if `X` is an
 empty tuple, `type X` returns an empty tuple `()`.
+
+### `parent` function
+The `parent` function takes a parameter `X` and returns: 
+
+- The parent namespace of `X` if `X` is a Namespace
+- `Undefined Namespace` if `X` is a Namespace without parent
+- `Undefined Namespace` if `X` is not a Namespace
+
+In general, if `X` is a Tuple `(x1, x2, ...)`, the `parent X` function returns
+`(parent x1, parent x2, ...)`. As a consequence of this behavior, if `X` is an
+empty tuple, `parent X` returns an empty tuple `()`.
 
 ### `undefined` function
 The `undefined` function generates an Undefined item programmatically. It
