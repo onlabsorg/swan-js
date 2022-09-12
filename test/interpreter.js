@@ -1818,18 +1818,6 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
     
     // MISCELLANEOUS
     
-    describe("string templates", () => {
-    
-        it("should evaluate string literals between accent quotes '``'", async () => {
-            expect(await parse("`ab\nc`")()).to.be.Text("ab\nc");
-            expect(await parse("``")()).to.be.Text("");
-        });
-    
-        it("should replace expressions between `${` and `}` with their value", async () => {
-            expect(await parse("`aaa ${2*x} bbb`")({x:10})).to.be.Text("aaa 20 bbb");
-        });
-    });
-    
     describe("precedence", () => {
     
         describe("Arithmetic operations", () => {

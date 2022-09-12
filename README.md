@@ -46,12 +46,12 @@ The types of grouping available are:
 The data types defined in swan are:
 
 - Nothing, or empty tuple: `()`
-- Boolean: `TRUE`, `FALSE`
-- Number: `123.4`
-- String: `"abc"`, `'abc'`, `` `abc` ``
+- Bool: `TRUE`, `FALSE`
+- Numb: `123.4`
+- Text: `"abc"`, `'abc'`
 - List: `[a, b, c, ...]`
 - Namespace: `{n1:v1, n2=v2, n3=v3, ...}`
-- Function: `names -> expression`
+- Func: `names -> expression`
 - Undefined: `undefined(operationName, operands)`
 - Tuple: `x1, x2, x3, ...`
 
@@ -64,13 +64,14 @@ The swan built-in functions are:
 - `size m`, returns the number of mappings in a Text, List of Namespace item
 - `str x`, converts its argument to a string
 - `type x`, returns the type name of its argument
+- `parent x`, returns the parent namespace of x
+- `owns x`, returns a parent-less copy of the namespace x
 - `undefined x`, generates an Undefined item
 
 
 Learn more
 --------------------------------------------------------------------------------
 - [Swan expression language guide](./docs/swan.md)
-- [Standard library](./docs/modules.md)
 - [JavaScript API](./docs/api.md)
 - [Swan REPL](./docs/repl.md)
 
