@@ -83,6 +83,7 @@ The swan built-in functions are:
 - [str](#str-function): converts its argument to a string
 - [type](#type-function): returns the type name of its argument
 - [parent](#parent-function): returns the parent namespace of a given namespace
+- [owns](#owns-function): returns the own namespace of a given namespace
 - [undefined](#undefined-function): generates an Undefined item
 - [this](#this-namespace): returns the current context
 
@@ -772,6 +773,15 @@ The `parent` function takes a parameter `X` and returns:
 In general, if `X` is a Tuple `(x1, x2, ...)`, the `parent X` function returns
 `(parent x1, parent x2, ...)`. As a consequence of this behavior, if `X` is an
 empty tuple, `parent X` returns an empty tuple `()`.
+
+### `owns` function
+The `owns` function takes a Namespace `X` as argument and return a parent-less 
+namespace, containing a copy of all the own names of `X`. If `X` is not a 
+Namespace, it returns `Undefined Namespace`.
+
+In general, if `X` is a Tuple `(x1, x2, ...)`, the `owns X` function returns
+`(owns x1, owns x2, ...)`. As a consequence of this behavior, if `X` is an
+empty tuple, `owns X` returns an empty tuple `()`.
 
 ### `undefined` function
 The `undefined` function generates an Undefined item programmatically. It

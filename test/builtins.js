@@ -206,7 +206,7 @@ describe("builtins", () => {
         });
     });
     
-    describe("parent: Namespace x -> Namespace u", () => {
+    describe("parent: Namespace x -> Namespace p", () => {
         
         it("should return the prototype of x", async () => {
             const presets = {p:{x:10}};
@@ -221,6 +221,21 @@ describe("builtins", () => {
 
         it("should return Undefined Namespace if x is not a namespace", async () => {
             expect(await evaluate("parent 123")).to.be.Undefined("Namespace");
+        });
+    });
+
+    describe("owns: Namespace x -> Namespace o", () => {
+        
+        it("should return the own namespace of x", async () => {
+            const presets = {p:{x:10}};
+            presets.c = Object.create(presets.p);
+            presets.c.y = 20;
+            expect(await evaluate("owns c", presets)).to.be.Namespace({y:20});
+            expect(await evaluate("parent(owns c)", presets)).to.be.Undefined("Namespace");
+        });
+
+        it("should return Undefined Namespace if x is not a namespace", async () => {
+            expect(await evaluate("owns 123")).to.be.Undefined("Namespace");
         });
     });
 
