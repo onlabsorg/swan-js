@@ -65,7 +65,7 @@ The swan built-in functions are:
 - `str x`, converts its argument to a string
 - `type x`, returns the type name of its argument
 - `parent x`, returns the parent namespace of x
-- `owns x`, returns a parent-less copy of the namespace x
+- `own x`, returns a parent-less copy of the namespace x
 - `undefined x`, generates an Undefined item
 
 

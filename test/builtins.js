@@ -224,18 +224,18 @@ describe("builtins", () => {
         });
     });
 
-    describe("owns: Namespace x -> Namespace o", () => {
+    describe("own: Namespace x -> Namespace o", () => {
         
         it("should return the own namespace of x", async () => {
             const presets = {p:{x:10}};
             presets.c = Object.create(presets.p);
             presets.c.y = 20;
-            expect(await evaluate("owns c", presets)).to.be.Namespace({y:20});
-            expect(await evaluate("parent(owns c)", presets)).to.be.Undefined("Namespace");
+            expect(await evaluate("own c", presets)).to.be.Namespace({y:20});
+            expect(await evaluate("parent(own c)", presets)).to.be.Undefined("Namespace");
         });
 
         it("should return Undefined Namespace if x is not a namespace", async () => {
-            expect(await evaluate("owns 123")).to.be.Undefined("Namespace");
+            expect(await evaluate("own 123")).to.be.Undefined("Namespace");
         });
     });
 
