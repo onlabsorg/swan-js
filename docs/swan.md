@@ -116,6 +116,11 @@ following literals:
 
 * `"double quotes string"`
 * `'single quotes string'`
+* `` `accent quotes string` ``
+
+A string within accent quotes is a template string. Within a template strings,
+expressions eventually enclosed between `{%` and `%}` get evaluated and replaced. 
+For example, the expression `` `2*10 = {% 2*10 %}` `` returns the string `"2*10 = 20"`.
 
 The n-th character of a Text item can be accessed via an
 [apply operation](#application-operator). For example:

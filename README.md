@@ -48,7 +48,7 @@ The data types defined in swan are:
 - Nothing, or empty tuple: `()`
 - Bool: `TRUE`, `FALSE`
 - Numb: `123.4`
-- Text: `"abc"`, `'abc'`
+- Text: `"abc"`, `'abc'`, `` `abc` ``
 - List: `[a, b, c, ...]`
 - Namespace: `{n1:v1, n2=v2, n3=v3, ...}`
 - Func: `names -> expression`
