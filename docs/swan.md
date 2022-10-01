@@ -74,9 +74,9 @@ expression `x -> y -> x+y` is equivalent to `x -> (y -> x+y)`.
 
 The swan built-in functions are:
 
-- [bool](#bool-function): converts a value to boolean
+- [Bool](#bool-callable-namespace): converts a value to boolean
 - [dom](#dom-function): returns the domain of a Mapping item as a tuple
-- [not](#not-function): returns `FALSE` if `bool x` is true, otherwise `TRUE`
+- [Bool.not](#bool.not-function): returns `FALSE` if `bool x` is true, otherwise `TRUE`
 - [range](#range-function): returns the tuple of integers between 0 and the given parameter (excluded)
 - [require](#require-function): loads a standard library module
 - [size](#size-function): returns the number of mappings in a Mapping item
@@ -89,8 +89,8 @@ The swan built-in functions are:
 
 The built-in constants are:
 
-- `TRUE`: representing the boolean true value
-- `FALSE`: representing the boolean false value
+- `Bool.TRUE`: representing the boolean true value
+- `Bool.FALSE`: representing the boolean false value
 
 
 ## Bool data type
@@ -98,8 +98,8 @@ A Bool item can be either true or false. It can be created either:
 
 - by referencing the built-in constants `TRUE` or `FALSE`
 - as return value of a [comparison expressions](#comparison-operators)
-- as result of calling the [bool](#bool-function) function or the 
-  [not](#not-function) function
+- as result of calling the [Bool](#bool-callable-namespace) function or the 
+  [Bool.not](#bool.not-function) function
 
 
 ## Numb data type
@@ -669,8 +669,8 @@ ifEven = x -> isEven(x) ? x ; ()    # returns x if it is an even number, or else
 
 ## Built-in functions
 
-### `bool` function
-The `bool` function takes an argument `X` and returns:
+### `Bool` callable namespace
+The `Bool` callable takes an argument `X` and returns:
 
 - `TRUE` if `X` is [TRUTY](#truty-and-falsy-terms)
 - `FALSE` if `X` is [FALSY](#truty-and-falsy-terms)
@@ -685,8 +685,8 @@ Returns the domain of the passed Mapping item `m`, which is:
 If `m` is not a Mapping item, it returns `undefined("Term")`.
 If the argument is a tuple, it applies only to its first item.
 
-### `not` function
-The `not` function takes an argument `X` and returns:
+### `Bool.not` function
+The `Bool.not` function takes an argument `X` and returns:
 
 - `FALSE` if `X` is [TRUTY](#truty-and-falsy-terms)
 - `TRUE` if `X` is [FALSY](#truty-and-falsy-terms)

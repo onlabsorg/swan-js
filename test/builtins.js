@@ -9,65 +9,65 @@ const evaluate = (expression, presets={}) => parse(expression)(Object.assign(Obj
 
 describe("builtins", () => {
     
-    describe("TRUE", () => {
+    describe("Bool.TRUE", () => {
         
         it("should be true", async () => {
-            expect(await evaluate("TRUE")).to.be.Bool(true);
+            expect(await evaluate("Bool.TRUE")).to.be.Bool(true);
         });
     });
     
-    describe("FALSE", () => {
+    describe("Bool.FALSE", () => {
         
         it("should be true", async () => {
-            expect(await evaluate("FALSE")).to.be.Bool(false);
+            expect(await evaluate("Bool.FALSE")).to.be.Bool(false);
         });
     });
 
-    describe("bool: Term t -> Bool b", () => {
+    describe("Bool: Term t -> Bool b", () => {
         
         it("should return FALSE if the argument is a falsy term", async () => {
-            expect(await evaluate("bool ()       ")).to.be.Bool(false);
-            expect(await evaluate("bool (1 == 2) ")).to.be.Bool(false);
-            expect(await evaluate("bool 0        ")).to.be.Bool(false);
-            expect(await evaluate("bool ''       ")).to.be.Bool(false);
-            expect(await evaluate("bool []       ")).to.be.Bool(false);
-            expect(await evaluate("bool {}       ")).to.be.Bool(false);
-            expect(await evaluate("bool ('a'/'b')")).to.be.Bool(false);
-            expect(await evaluate("bool (0,'',[])")).to.be.Bool(false);
+            expect(await evaluate("Bool ()       ")).to.be.Bool(false);
+            expect(await evaluate("Bool (1 == 2) ")).to.be.Bool(false);
+            expect(await evaluate("Bool 0        ")).to.be.Bool(false);
+            expect(await evaluate("Bool ''       ")).to.be.Bool(false);
+            expect(await evaluate("Bool []       ")).to.be.Bool(false);
+            expect(await evaluate("Bool {}       ")).to.be.Bool(false);
+            expect(await evaluate("Bool ('a'/'b')")).to.be.Bool(false);
+            expect(await evaluate("Bool (0,'',[])")).to.be.Bool(false);
         });
 
         it("should return TRUE if the argument is a truty term", async () => {
-            expect(await evaluate("bool (x->x)   ")).to.be.Bool(true);
-            expect(await evaluate("bool (1 == 1) ")).to.be.Bool(true);
-            expect(await evaluate("bool 10       ")).to.be.Bool(true);
-            expect(await evaluate("bool 'abc'    ")).to.be.Bool(true);
-            expect(await evaluate("bool [1,2,3]  ")).to.be.Bool(true);
-            expect(await evaluate("bool {a:1}    ")).to.be.Bool(true);
-            expect(await evaluate("bool (1,'',[])")).to.be.Bool(true);
+            expect(await evaluate("Bool (x->x)   ")).to.be.Bool(true);
+            expect(await evaluate("Bool (1 == 1) ")).to.be.Bool(true);
+            expect(await evaluate("Bool 10       ")).to.be.Bool(true);
+            expect(await evaluate("Bool 'abc'    ")).to.be.Bool(true);
+            expect(await evaluate("Bool [1,2,3]  ")).to.be.Bool(true);
+            expect(await evaluate("Bool {a:1}    ")).to.be.Bool(true);
+            expect(await evaluate("Bool (1,'',[])")).to.be.Bool(true);
         });
     });
     
-    describe("not: Term t -> Bool b", () => {
+    describe("Bool.not: Term t -> Bool b", () => {
         
         it("should return TRUE if the argument is a falsy term", async () => {
-            expect(await evaluate("not ()       ")).to.be.Bool(true);
-            expect(await evaluate("not (1 == 2) ")).to.be.Bool(true);
-            expect(await evaluate("not 0        ")).to.be.Bool(true);
-            expect(await evaluate("not ''       ")).to.be.Bool(true);
-            expect(await evaluate("not []       ")).to.be.Bool(true);
-            expect(await evaluate("not {}       ")).to.be.Bool(true);
-            expect(await evaluate("not ('a'/'b')")).to.be.Bool(true);
-            expect(await evaluate("not (0,'',[])")).to.be.Bool(true);
+            expect(await evaluate("Bool.not ()       ")).to.be.Bool(true);
+            expect(await evaluate("Bool.not (1 == 2) ")).to.be.Bool(true);
+            expect(await evaluate("Bool.not 0        ")).to.be.Bool(true);
+            expect(await evaluate("Bool.not ''       ")).to.be.Bool(true);
+            expect(await evaluate("Bool.not []       ")).to.be.Bool(true);
+            expect(await evaluate("Bool.not {}       ")).to.be.Bool(true);
+            expect(await evaluate("Bool.not ('a'/'b')")).to.be.Bool(true);
+            expect(await evaluate("Bool.not (0,'',[])")).to.be.Bool(true);
         });
 
         it("should return FALSE if the argument is a truty term", async () => {
-            expect(await evaluate("not (x->x)   ")).to.be.Bool(false);
-            expect(await evaluate("not (1 == 1) ")).to.be.Bool(false);
-            expect(await evaluate("not 10       ")).to.be.Bool(false);
-            expect(await evaluate("not 'abc'    ")).to.be.Bool(false);
-            expect(await evaluate("not [1,2,3]  ")).to.be.Bool(false);
-            expect(await evaluate("not {a:1}    ")).to.be.Bool(false);
-            expect(await evaluate("not (1,'',[])")).to.be.Bool(false);
+            expect(await evaluate("Bool.not (x->x)   ")).to.be.Bool(false);
+            expect(await evaluate("Bool.not (1 == 1) ")).to.be.Bool(false);
+            expect(await evaluate("Bool.not 10       ")).to.be.Bool(false);
+            expect(await evaluate("Bool.not 'abc'    ")).to.be.Bool(false);
+            expect(await evaluate("Bool.not [1,2,3]  ")).to.be.Bool(false);
+            expect(await evaluate("Bool.not {a:1}    ")).to.be.Bool(false);
+            expect(await evaluate("Bool.not (1,'',[])")).to.be.Bool(false);
         });
     });            
     
