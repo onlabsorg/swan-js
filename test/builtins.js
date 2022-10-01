@@ -756,6 +756,14 @@ describe("builtins", () => {
             expect(await evaluate("Namespace.own 123")).to.be.Undefined("Namespace");
         });
     });
+    
+    describe("Func.ID: Term t -> Term t", () => {
+        
+        it("should return the passed term unchanged", async () => {
+            expect(await evaluate("Func.ID 'xxx'")).to.be.Text('xxx');
+            expect(await evaluate("Func.ID('xxx',123,[])")).to.be.Tuple(['xxx',123,[]]);
+        });
+    }); 
 
     describe("Undefined: Tuple t -> Undefined u", () => {
         

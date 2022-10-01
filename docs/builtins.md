@@ -278,8 +278,24 @@ a namespace.
 
 If `x` is a tuple, it returns a tuple of own namespaces.
   
+Func.ID: Term t -> Term t
+--------------------------------------------------------------------
+Takes any term and returns it unchanged.
+  
 Undefined: (Text t, Tuple a) -> Undefined u
 ----------------------------------------------------------------------------
 This function returns an `Undefined` item with type `t` and arguments `a`.
+  
+Undefined.type: Undefined u -> Text t
+--------------------------------------------------------------------
+Given an undefined item, it returns its type as Text.
+
+If `u` is not undefined returns Undefined Text
+  
+Undefined.args: Undefined u -> Tuple t
+--------------------------------------------------------------------
+Given an undefined item, it returns its arguments Tuple.
+
+If `u` is not undefined returns Undefined Undefined
   
 
