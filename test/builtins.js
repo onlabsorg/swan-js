@@ -114,9 +114,9 @@ describe("builtins", () => {
                 expect(await evaluate("str{              }")).to.be.Text("[[Namespace of 0 items]]");
             });
             
-            it("should return `str(NS.__str__(NS))` if `NS.__str__` is a Func item", async () => {
-                expect(await evaluate("str{t:456, __str__: self -> self.t}")).to.be.Text("456");
-                expect(await evaluate("str{t:456, __str__: 'abc'}")).to.be.Text("[[Namespace of 2 items]]");
+            it("should return `NS.__str__` if `NS.__str__` is a Text item", async () => {
+                expect(await evaluate("str{t:456, __str__: 'abc'}")).to.be.Text("abc");
+                expect(await evaluate("str{t:456, __str__: 457}")).to.be.Text("[[Namespace of 2 items]]");
             });
         });
     });
