@@ -282,7 +282,7 @@ describe("builtins", () => {
             expect(await evaluate("x=10, {y=20}.this 'x'")).to.be.Undefined('Mapping', (arg) => {
                 expect(arg).to.equal("x");
             });
-            expect(await evaluate("__apply__ = (ctx, n) -> 2*n, this 10")).to.be.Numb(20);            
+            expect(await evaluate("__apply__ = (n) -> 2*n, this 10")).to.be.Numb(20);            
             expect(await evaluate("z=30, dom({x:10, y:20}.this)")).to.be.Tuple(['x', 'y'])
         });
     });

@@ -350,7 +350,7 @@ application operation gives access only to the `own` names of a namespace and
 not to the inherited names.
 
 When `F` is a Namespace that contains a `F.__apply__` function, the normal
-mapping application operation is overridden and resolves to `F.__apply__(F, X)`.
+mapping application operation is overridden and resolves to `F.__apply__(X)`.
 
 **When F is a tuple `(f1, f2, ...)`**, the `F X` operation returns the tuple
 `(f1 X, f2 X, ...)`
@@ -736,11 +736,8 @@ item according to the following rules:
   `<n>` is the size of `X`
 - if `X` is a `Namespace` item it returns `"[[Namespace if <n> items]]"` where
   `<n>` is the size of `X`.
-- if `X` is a `Namespace` item and `X.__str__` is a Func item,
-  it returns `X.__str__(X)` stringified. This is not recursive: if the return
-  value of the `__str__` function is a Namespace item containing another 
-  `__str__` function, it will be ignored and rendered as a Namespace without
-  `__str__` function.
+- if `X` is a `Namespace` item and `X.__str__` is a Text item, it returns 
+  `X.__str__(X)`.
 - if `X` is a `Func` item, it returns `"[[Func]]"`
 - if `X` is an `Undefined` item it returns `"[[Undefined <type>]]"`,
   where `<type>` is the Undefined operaton type.
