@@ -18,7 +18,6 @@ echo "- api.md"
 bin/gen-doc index.js > docs/api.md
 
 generate-documentation modules/math
-generate-documentation modules/list
 generate-documentation modules/time
 generate-documentation modules/debug
 generate-documentation modules/json

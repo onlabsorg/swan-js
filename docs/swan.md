@@ -92,12 +92,17 @@ The swan built-in functions are:
 - [Text.head](#text.head-function): returns the first n characters of a string
 - [Text.tail](#text.tail-function): returns the last n characters of a string
 - [Text.split](#text.split-function): splits a string to a tuple of string, fiven a separator
+- [Text.join](#list.join-function): joins a tuple with a separator
+- [List.reverse](#list.reverse-function): reverse the items of a list
+- [List.find](#list.find-function): finds the leftmost position of a list item
+- [List.rfind](#list.rfind-function): finds the rightmost position of a list item
+- [List.head](#list.head-function): returns the first n items of a list, as a list
+- [List.tail](#list.tail-function): returns the last n items of a list, as a list
 - [type](#type-function): returns the type name of its argument
 - [parent](#parent-function): returns the parent namespace of a given namespace
 - [own](#own-function): returns the own namespace of a given namespace
 - [undefined](#undefined-function): generates an Undefined item
-- [this](#this-namespace): returns the current context
-
+- [this](#this-namespace): returns the current context 
 
 The built-in constants are:
 
@@ -844,6 +849,62 @@ The returned function `f`:
 - returns Undefined Text if the argument of `f` is not a Text item
 - applies only on the first item if the parameter of `f` is a tuple
 
+### `Text.join` function
+Takes a separator `s` as argument and returns a function `f`.
+If the argument is a tuple, it applies only to its first item.
+
+The returned function `f` takes a tuple `T` of Text items as argument and 
+returns the string obtained by joining all the items with interposed separator.
+
+### `List.reverse` function
+Given a list l1, returns a new list l2, containing the items of l1 in
+reversed order.
+If the argument is not a List item, this function returns Undefined List.
+If the parameter is a tuple, this function applies only to the first
+item and ignore the others.
+  
+### `List.find` function
+Takes an item `x` as argument and returns a function `f`. If the 
+argument is a tuple, it applies only to its first item.
+
+The returned function `f`: 
+- takes a list `L` as argument and returns the first position of `x` in 
+  `L` or `-1` if `x` is not contained in `L`.
+- returns Undefined List if the argument of `f` is not a List item
+- applies only on the first item if the parameter of `f` is a tuple
+  
+### `List.rfind` function
+Takes an item `x` as argument and returns a function `f`. 
+If the argument is a tuple, it applies only to its first item.
+
+The returned function `f`: 
+- takes a list `L` as argument and returns the last position of `x` in 
+  `L` or `-1` if `x` is not contained in `L`.
+- returns Undefined List if the argument of `f` is not a List item
+- applies only on the first item if the parameter of `f` is a tuple
+  
+### `List.head` function
+Takes a number `n` as argument and returns a function `f`. 
+If the argument is a tuple, it applies only to its first item.
+
+The returned function `f`: 
+- takes a list `L` as argument and returns the sub-list at the left-side 
+  of the n-th item. If n is negative, the item position is computed as 
+  relative to the end of `L`.     
+- returns Undefined List if the argument of `f` is not a List item
+- applies only on the first item if the parameter of `f` is a tuple
+  
+### `List.tail` function
+Takes a number `n` as argument and returns a function `f`. 
+If the argument is a tuple, it applies only to its first item.
+
+The returned function `f`: 
+- takes a list `L` as argument and returns the sub-list at the 
+  right-side of the n-th item (including the latter). If n is negative, 
+  the item position is computed as relative to the end of `L`.     
+- returns Undefined List if the argument of `f` is not a List item
+- applies only on the first item if the parameter of `f` is a tuple
+  
 ### `type` function
 The `type` function takes a parameter `X` and returns its type name, that is:
 

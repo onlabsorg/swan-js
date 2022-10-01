@@ -7,7 +7,6 @@ describe("SWAN LANGUAGE", () => {
     
     describe("modules", () => {
         require('./modules/math');
-        require('./modules/list');        
         require('./modules/json');
         require('./modules/time');
         require('./modules/debug');
