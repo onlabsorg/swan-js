@@ -210,19 +210,19 @@ describe("builtins", () => {
     
     });    
     
-    describe("range: Numb n -> Numb Tuple r", () => {
+    describe("Numb.tuple: Numb n -> Numb Tuple r", () => {
         
         it("should return a tuple of integer numbers between 0 and n (excluded)", async () => {
-            expect(await evaluate("range 4")).to.be.Tuple([0,1,2,3]);
-            expect(await evaluate("range 4.1")).to.be.Tuple([0,1,2,3,4]);
+            expect(await evaluate("Numb.tuple 4")).to.be.Tuple([0,1,2,3]);
+            expect(await evaluate("Numb.tuple 4.1")).to.be.Tuple([0,1,2,3,4]);
         });
         
         it("should return Undefined Tuple if n is not a Numb item", async () => {
-            expect(await evaluate("range 'abc'")).to.be.Undefined("Tuple");
+            expect(await evaluate("Numb.tuple 'abc'")).to.be.Undefined("Tuple");
         });
         
         it("should apply only to the first item if n is a tuple", async () => {
-            expect(await evaluate("range(4,2)")).to.be.Tuple([0,1,2,3]);
+            expect(await evaluate("Numb.tuple(4,2)")).to.be.Tuple([0,1,2,3]);
         });
     });
     

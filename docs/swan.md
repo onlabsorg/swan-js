@@ -78,7 +78,7 @@ The swan built-in functions are:
 - [dom](#dom-function): returns the domain of a Mapping item as a tuple
 - [Bool.not](#bool.not-function): returns `FALSE` if `bool x` is true, otherwise `TRUE`
 - [Numb.parse](#numb.parse-function): converts a string to a number
-- [range](#range-function): returns the tuple of integers between 0 and the given parameter (excluded)
+- [Numb.tuple](#numb.tuple-function): returns the tuple of integers between 0 and the given parameter (excluded)
 - [require](#require-function): loads a standard library module
 - [size](#size-function): returns the number of mappings in a Mapping item
 - [str](#str-function): converts its argument to a string
@@ -701,12 +701,12 @@ If the argument is not a valid string, this function returns Undefined Number.
 It the argument is a tuple, it applies to each item of the tuple and returns a
 tuple of numbers.
 
-### `range` function
+### `Numb.tuple` function
 Given a number `n`, this function returns the tuple of integers
 (0, 1, 2, ..., m), where m is the highest integer lower than m. For example:
 
-- `range 4` returns `(0,1,2,3)`
-- `range 5.1` return `(0,1,2,3,4,5)`
+- `Numb.tuple 4` returns `(0,1,2,3)`
+- `Numb.tuple 5.1` return `(0,1,2,3,4,5)`
 
 If `n` is not a number, this function returns `undefined("Tuple")`.
 If `n` is a tuple, only its first item will be considered.
