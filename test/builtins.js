@@ -69,7 +69,27 @@ describe("builtins", () => {
             expect(await evaluate("Bool.not {a:1}    ")).to.be.Bool(false);
             expect(await evaluate("Bool.not (1,'',[])")).to.be.Bool(false);
         });
-    });            
+    }); 
+    
+    describe("Numb.parse", () => {
+        
+        it("should convert a string representation of a number to a number", async () => {
+            expect(await evaluate("Numb.parse '12'")).to.be.Numb(12);
+            expect(await evaluate("Numb.parse '-12e1'")).to.be.Numb(-120);
+            expect(await evaluate("Numb.parse '0b11'")).to.be.Numb(3);
+            expect(await evaluate("Numb.parse '0o33'")).to.be.Numb(27);
+            expect(await evaluate("Numb.parse '0xA2'")).to.be.Numb(162);
+        });
+        
+        it("should return Undefined Number if the argument is not a valid string", async () => {
+            expect(await evaluate("Numb.parse 'abc'")).to.be.Undefined("Number");
+            expect(await evaluate("Numb.parse 10")).to.be.Undefined("Number");
+        });
+
+        it("should return a tuple, if the argument is a truple", async () => {
+            expect(await evaluate("Numb.parse('10', '0b11', '0o33')")).to.be.Tuple([10, 3, 27]);
+        });                    
+    });           
     
     describe("str: Term t -> Text s", () => {
         
@@ -263,7 +283,7 @@ describe("builtins", () => {
             }
             
             // Test in action
-            expect(await evaluate("require 'numb' .max (1,22,3,4) ")).to.be.Numb(22);
+            expect(await evaluate("require 'math' .max (1,22,3,4) ")).to.be.Numb(22);
             expect(await evaluate("require 'text' .upper 'aBc'     ")).to.be.Text("ABC");
             expect(await evaluate("require 'list' .reverse [10,20,30]")).to.be.List([30,20,10]);
             expect(await evaluate("require 'time' .to_ISO_string 1639513675.900")).to.be.Text("2021-12-14T20:27:55.900Z");

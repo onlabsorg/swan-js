@@ -17,7 +17,7 @@ generate-documentation () {
 echo "- api.md"
 bin/gen-doc index.js > docs/api.md
 
-generate-documentation modules/numb
+generate-documentation modules/math
 generate-documentation modules/text
 generate-documentation modules/list
 generate-documentation modules/time

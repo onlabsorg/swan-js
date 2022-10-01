@@ -77,6 +77,7 @@ The swan built-in functions are:
 - [Bool](#bool-callable-namespace): converts a value to boolean
 - [dom](#dom-function): returns the domain of a Mapping item as a tuple
 - [Bool.not](#bool.not-function): returns `FALSE` if `bool x` is true, otherwise `TRUE`
+- [Numb.parse](#numb.parse-function): converts a string to a number
 - [range](#range-function): returns the tuple of integers between 0 and the given parameter (excluded)
 - [require](#require-function): loads a standard library module
 - [size](#size-function): returns the number of mappings in a Mapping item
@@ -690,6 +691,15 @@ The `Bool.not` function takes an argument `X` and returns:
 
 - `FALSE` if `X` is [TRUTY](#truty-and-falsy-terms)
 - `TRUE` if `X` is [FALSY](#truty-and-falsy-terms)
+
+### `Numb.parse` function
+Takes a Text item as input and converts it to a number. It accepts also binary 
+(0b...), octal (0o...) and exadecimal (0x...) string representations of numbers.
+
+If the argument is not a valid string, this function returns Undefined Number.
+
+It the argument is a tuple, it applies to each item of the tuple and returns a
+tuple of numbers.
 
 ### `range` function
 Given a number `n`, this function returns the tuple of integers
