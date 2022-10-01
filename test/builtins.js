@@ -724,36 +724,36 @@ describe("builtins", () => {
         });
     });
     
-    describe("parent: Namespace x -> Namespace p", () => {
+    describe("Namespace.parent: Namespace x -> Namespace p", () => {
         
         it("should return the prototype of x", async () => {
             const presets = {p:{x:10}};
             presets.c = Object.create(presets.p);
-            expect(await evaluate("parent c", presets)).to.be.Namespace(presets.p);
+            expect(await evaluate("Namespace.parent c", presets)).to.be.Namespace(presets.p);
         });
 
         it("should return Undefined Namespace if x has no prototype", async () => {
             const presets = { o: Object.create(null) };
-            expect(await evaluate("parent o", presets)).to.be.Undefined("Namespace");
+            expect(await evaluate("Namespace.parent o", presets)).to.be.Undefined("Namespace");
         });
 
         it("should return Undefined Namespace if x is not a namespace", async () => {
-            expect(await evaluate("parent 123")).to.be.Undefined("Namespace");
+            expect(await evaluate("Namespace.parent 123")).to.be.Undefined("Namespace");
         });
     });
 
-    describe("own: Namespace x -> Namespace o", () => {
+    describe("Namespace.own: Namespace x -> Namespace o", () => {
         
         it("should return the own namespace of x", async () => {
             const presets = {p:{x:10}};
             presets.c = Object.create(presets.p);
             presets.c.y = 20;
-            expect(await evaluate("own c", presets)).to.be.Namespace({y:20});
-            expect(await evaluate("parent(own c)", presets)).to.be.Undefined("Namespace");
+            expect(await evaluate("Namespace.own c", presets)).to.be.Namespace({y:20});
+            expect(await evaluate("Namespace.parent(Namespace.own c)", presets)).to.be.Undefined("Namespace");
         });
 
         it("should return Undefined Namespace if x is not a namespace", async () => {
-            expect(await evaluate("own 123")).to.be.Undefined("Namespace");
+            expect(await evaluate("Namespace.own 123")).to.be.Undefined("Namespace");
         });
     });
 
