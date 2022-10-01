@@ -40,10 +40,6 @@ Given any item it returns the name of its type: `"Bool"` for Bool items,
 
 If `x` is a tuple, it returns a tuple of type names.
   
-undefined: (Text t, Tuple a) -> Undefined u
-----------------------------------------------------------------------------
-This function returns an `Undefined` item with type `t` and arguments `a`.
-  
 this: Namespace
 ----------------------------------------------------------------------------
 This function returns the current context.
@@ -281,5 +277,9 @@ parent-less namespace. It returns Undefined Namespace if `x` is not
 a namespace.
 
 If `x` is a tuple, it returns a tuple of own namespaces.
+  
+Undefined: (Text t, Tuple a) -> Undefined u
+----------------------------------------------------------------------------
+This function returns an `Undefined` item with type `t` and arguments `a`.
   
 

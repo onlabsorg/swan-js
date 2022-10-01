@@ -757,16 +757,38 @@ describe("builtins", () => {
         });
     });
 
-    describe("undefined: Tuple t -> Undefined u", () => {
+    describe("Undefined: Tuple t -> Undefined u", () => {
         
         it("should return and Undefined data type", async () => {
-            expect(await evaluate("undefined('Test',1,2)")).to.be.Undefined("Test", (...args) => {
+            expect(await evaluate("Undefined('Test',1,2)")).to.be.Undefined("Test", (...args) => {
                 expect(args.length).to.equal(2);
                 expect(args[0]).to.equal(1);
                 expect(args[1]).to.equal(2);
             })
         });
     });    
+    
+    describe("Undefined.type: Undefined u -> Text t", () => {
+        
+        it("should return the type of the passed Undefined item", async () => {
+            expect(await evaluate("Undefined.type(Undefined 'test-undef')")).to.be.Text('test-undef');
+        });
+
+        it("should return Undefined Undefined if the passed item is not undefined", async () => {
+            expect(await evaluate("Undefined.type 10")).to.be.Undefined('Undefined');            
+        });
+    }); 
+    
+    describe("Undefined.args: Undefined u -> Tuple t", () => {
+        
+        it("should return the arguments Tuple of the passed Undefined item", async () => {
+            expect(await evaluate("Undefined.args(Undefined('test-undef', 1, 2, 33))")).to.be.Tuple([1,2,33]);
+        });
+
+        it("should return Undefined Undefined if the passed item is not undefined", async () => {
+            expect(await evaluate("Undefined.args 10")).to.be.Undefined('Undefined');            
+        });
+    }); 
     
     describe("require: Text id -> Namespace m", () => {
         
