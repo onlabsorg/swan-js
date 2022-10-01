@@ -81,12 +81,23 @@ The swan built-in functions are:
 - [Numb.tuple](#numb.tuple-function): returns the tuple of integers between 0 and the given parameter (excluded)
 - [require](#require-function): loads a standard library module
 - [size](#size-function): returns the number of mappings in a Mapping item
-- [str](#str-function): converts its argument to a string
+- [Text](#text-function): converts its argument to a string
+- [Text.find](#text.find-function): Finds the leftmost position of a substring in a string
+- [Text.rfind](#text.rfind-function): Finds the rightmost position of a substring in a string
+- [Text.lower](#text.lower-function): converts a string to lower-case
+- [Text.upper](#text.upper-function): converts a string to upper-case
+- [Text.trim](#text.trim-function): removes leading and trailing spaces from a string
+- [Text.trim_head](#text.trim_head-function): removes leading spaces from a string
+- [Text.trim_tail](#text.trim_tail-function): removes trailing spaces from a string  
+- [Text.head](#text.head-function): returns the first n characters of a string
+- [Text.tail](#text.tail-function): returns the last n characters of a string
+- [Text.split](#text.split-function): splits a string to a tuple of string, fiven a separator
 - [type](#type-function): returns the type name of its argument
 - [parent](#parent-function): returns the parent namespace of a given namespace
 - [own](#own-function): returns the own namespace of a given namespace
 - [undefined](#undefined-function): generates an Undefined item
 - [this](#this-namespace): returns the current context
+
 
 The built-in constants are:
 
@@ -698,8 +709,7 @@ Takes a Text item as input and converts it to a number. It accepts also binary
 
 If the argument is not a valid string, this function returns Undefined Number.
 
-It the argument is a tuple, it applies to each item of the tuple and returns a
-tuple of numbers.
+It the argument is a tuple, it applies only to the first item.
 
 ### `Numb.tuple` function
 Given a number `n`, this function returns the tuple of integers
@@ -735,8 +745,8 @@ which is:
 If `m` is not a Mapping item, it returns `undefined("Number")`.
 If the argument is a tuple, it applies only to its first item.
 
-### `str` function
-The `str` function takes any term `X` as argument and converts it into a Text
+### `Text` function
+The `Text` function takes any term `X` as argument and converts it into a Text
 item according to the following rules:
 
 - if `X` is a `Bool` item it either returns `"TRUE"` or `"FALSE"`
@@ -746,14 +756,93 @@ item according to the following rules:
   `<n>` is the size of `X`
 - if `X` is a `Namespace` item it returns `"[[Namespace if <n> items]]"` where
   `<n>` is the size of `X`.
-- if `X` is a `Namespace` item and `X.__str__` is a Text item, it returns 
-  `X.__str__(X)`.
+- if `X` is a `Namespace` item and `X.__text__` is a Text item, it returns 
+  `X.__text__(X)`.
 - if `X` is a `Func` item, it returns `"[[Func]]"`
 - if `X` is an `Undefined` item it returns `"[[Undefined <type>]]"`,
   where `<type>` is the Undefined operaton type.
 - if `X` is a `Tuple` term, it returns the concatenation of all its
   items stringified with `Text.from`.
     - As a particular case, if `X` is an empty tuple, it returns `""`
+    
+### `Text.find` function
+Takes a string `s` as argument and returns a function `f`. 
+If the argument is a tuple, it applies only to its first item.
+
+The returned function `f`: 
+- takes a string `S` as argument and returns the first position of `s` 
+  in `S` or `-1` if `s` is not contained in `S`.
+- returns Undefined Number if the argument of `f` is not a Text item
+- applies only on the first item if the parameter of `f` is a tuple
+
+### `Text.rfind` function
+Takes a string `s` as argument and returns a function `f`.
+If the argument is a tuple, it applies only to its first item.
+
+The returned function `f`: 
+- takes a string `S` as argument and returns the last position of `s` 
+  in `S` or `-1` if `s` is not contained in `S`.
+- returns Undefined Number if the argument of `f` is not a Text item
+- applies only on the first item if the parameter of `f` is a tuple
+  
+### `Text.lower` function
+Returns the passed string in lower-case. 
+If the argument is not a Text item, this functions return Undefined text.
+If the parameter is a tuple, this function applies to its first item only.
+  
+### `Text.upper` function
+Returns the passed string in upper-case. 
+If the argument is not a Text item, this functions return Undefined text.
+If the parameter is a tuple, this function applies to its first item only.
+  
+### `Text.trim` function
+Removed the leading and trailing spaces from the given string.
+If the argument is not a Text item, this functions return Undefined text.
+If the parameter is a tuple, this function applies to its first item only.
+  
+### `Text.trim_head` function
+Removed the leading spaces from the given string.
+If the argument is not a Text item, this functions return Undefined text.
+If the parameter is a tuple, this function applies to its first item only.
+  
+### `Text.trim_tail` function
+Removed the trailing spaces from the given string.
+If the argument is not a Text item, this functions return Undefined text.
+If the parameter is a tuple, this function applies to its first item only.
+  
+### `Text.head` function
+Takes a number `n` as argument and returns a function `f`.
+If the argument is a tuple, it applies only to its first item.
+
+The returned function `f`: 
+- takes a string `s` as argument and returns the substring at the 
+  left-side of the n-th character. If n is negative, the character 
+  position is computed as relative to the end of `L`.
+- returns Undefined Text if the argument of `f` is not a Text item
+- applies only on the first item if the parameter of `f` is a tuple
+  
+### `Text.tail` function
+Takes a number `n` as argument and returns a function `f`.
+If the argument is a tuple, it applies only to its first item.
+
+The returned function `f`: 
+- takes a string `s` as argument and returns the substring at the 
+  right-side of the n-th character (including the latter). If n is 
+  negative, the character position is computed as relative to the 
+  end of `S`.
+- returns Undefined Text if the argument of `f` is not a Text item
+- applies only on the first item if the parameter of `f` is a tuple
+  
+### `Text.split` function
+Takes a string `s` as argument and returns a function `f`.
+If the argument is a tuple, it applies only to its first item.
+
+The returned function `f`: 
+- takes a string `S` as argument and returns the list of substring 
+  separated by s. For example, if the divider is `s=":"` and the string 
+  is `S="a:b:c"`, the function `f` returns `["a","b","c"]`.
+- returns Undefined Text if the argument of `f` is not a Text item
+- applies only on the first item if the parameter of `f` is a tuple
 
 ### `type` function
 The `type` function takes a parameter `X` and returns its type name, that is:
