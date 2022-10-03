@@ -4,17 +4,6 @@ Swan Builtins
 The swan builtins is a collection of functions and constants that are
 always present in a swan context.
   
-dom: Mapping m -> Tuple t
-------------------------------------------------------------------------
-Returns the domain of the passed mappings m, which is:
-
-- The tuple (0,1,2,...,size(m)-1) if m is a Text item
-- The tuple (0,1,2,...,size(m)-1) if m is a List item
-- The tuple of the name mapped by m if m is a Namespace item
-
-If m is not a Mapping item, it returns Undefined Term.
-If the argument is a tuple, it applies only to its first item.
-  
 require: Text id -> Namespace m
 ----------------------------------------------------------------------------
 This function loads the swan standard module identified by `id` and returns
@@ -268,8 +257,16 @@ The returned function `f`:
 - returns Undefined List if the argument of `f` is not a List item
 - applies only on the first item if the parameter of `f` is a tuple
   
-Namespace.size: Namespace ns -> Numb n
+Namespace.names: Namespace ns -> Tuple t
 ------------------------------------------------------------------------
+Returns the tuple of nams contained in a given Namespace item.
+
+If ns is not a Namespace item, it returns Undefined Term.
+
+If the argument is a tuple, it applies only to its first item.
+  
+Namespace.size: Namespace ns -> Numb n
+--------------------------------------------------------------------
 Returns the number of items contained in a Namespace item.
 
 If ns is not a Namespace item, it returns Undefined Number.
@@ -311,4 +308,3 @@ Given an undefined item, it returns its arguments Tuple.
 
 If `u` is not undefined returns Undefined Undefined
   
-

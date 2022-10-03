@@ -677,31 +677,6 @@ describe("builtins", () => {
         });    
     });              
     
-    describe("dom: Mapping m -> Tuple t", () => {
-        
-        it("should return (0,1,2,...,Len-1) if m is a Text item", async () => {
-            expect(await evaluate("dom 'abc'")).to.be.Tuple([0,1,2]);
-        });
-        
-        it("should return (0,1,2,...,Len-1) if m is a List item", async () => {
-            expect(await evaluate("dom [10,20,30]")).to.be.Tuple([0,1,2]);
-        });
-        
-        it("should return the tuple of name:value pairs if m is a Namespace item", async () => {
-            expect(await evaluate("dom {a:2,b:4,c:6}")).to.be.Tuple(['a','b','c']);
-        });
-
-        it("should return Undefined Term if the argument is not a mapping", async () => {
-            expect(await evaluate("dom TRUE")).to.be.Undefined("Term");
-            expect(await evaluate("dom 123")).to.be.Undefined("Term");
-            expect(await evaluate("dom(x->x)")).to.be.Undefined("Term");
-        });
-
-        it("should apply to the first items only, if the argument is a truple", async () => {
-            expect(await evaluate("dom('ABC','Defg')")).to.be.Tuple([0,1,2]);
-        });                        
-    });
-
     describe("type: Item x -> Text t", () => {
         
         it("should return the type name of the passed item", async () => {
@@ -721,6 +696,25 @@ describe("builtins", () => {
     
     });    
     
+    describe("Namespace.names: Namespace ns -> Tuple t", () => {
+        
+        it("should return the tuple of names contained in ns", async () => {
+            expect(await evaluate("Namespace.names {a:2,b:4,c:6}")).to.be.Tuple(['a','b','c']);
+        });
+
+        it("should return Undefined Term if the argument is not a Namespace item", async () => {
+            expect(await evaluate("Namespace.names TRUE")).to.be.Undefined("Term");
+            expect(await evaluate("Namespace.names 123")).to.be.Undefined("Term");
+            expect(await evaluate("Namespace.names(x->x)")).to.be.Undefined("Term");
+            expect(await evaluate("Namespace.names('abc')")).to.be.Undefined("Term");
+            expect(await evaluate("Namespace.names([1,2,3])")).to.be.Undefined("Term");
+        });
+
+        it("should apply to the first items only, if the argument is a truple", async () => {
+            expect(await evaluate("Namespace.names({a:1,b:2},{c:3})")).to.be.Tuple(['a','b']);
+        });                        
+    });
+
     describe("Numb.tuple: Numb n -> Numb Tuple r", () => {
         
         it("should return a tuple of integer numbers between 0 and n (excluded)", async () => {
@@ -861,7 +855,7 @@ describe("builtins", () => {
                 expect(arg).to.equal("x");
             });
             expect(await evaluate("__apply__ = (n) -> 2*n, this 10")).to.be.Numb(20);            
-            expect(await evaluate("z=30, dom({x:10, y:20}.this)")).to.be.Tuple(['x', 'y'])
+            expect(await evaluate("z=30, Namespace.names({x:10, y:20}.this)")).to.be.Tuple(['x', 'y'])
         });
     });
 });
