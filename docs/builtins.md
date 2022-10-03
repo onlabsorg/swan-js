@@ -22,17 +22,6 @@ it as a Namespace item.
 
 If `id` is a tuple, it applies only to its first item.
   
-size: Mapping m -> Numb n
-------------------------------------------------------------------------
-Returns the number of mappings in m, which is:
-
-- The number of characters if m is a Text item
-- The number of items if m is a List item
-- The number of names:value pairs if m is a Namespace item
-
-If m is not a Mapping item, it returns Undefined Number.
-If the argument is a tuple, it applies only to its first item.
-  
 type: Item x -> Text t
 ----------------------------------------------------------------------------
 Given any item it returns the name of its type: `"Bool"` for Bool items,
@@ -110,6 +99,14 @@ item according to the following rules:
 - if `X` is a `Tuple` term, it returns the concatenation of all its
   items stringified with `Text.from`.
     - As a particular case, if `X` is an empty tuple, it returns `""`
+  
+Text.size: Text s -> Numb n
+------------------------------------------------------------------------
+Returns the number of characters in a Text item.
+
+If s is not a Text item, it returns Undefined Number.
+
+If the argument is a tuple, it applies only to its first item.
   
 Text.find: Text s -> Text S -> Numb k
 ------------------------------------------------------------------------
@@ -209,6 +206,14 @@ The returned function `f` takes a Tuple `t` of Text items as
 argument and returns the string obtained by joining all the items 
 with interposed  sparator.
   
+List.size: List l -> Numb n
+------------------------------------------------------------------------
+Returns the number of items contained in a List item.
+
+If l is not a List item, it returns Undefined Number.
+
+If the argument is a tuple, it applies only to its first item.
+  
 List.reverse: List l1 -> List l2
 ------------------------------------------------------------------------
 Given a list l1, returns a new list l2, containing the items of l1 in
@@ -262,6 +267,14 @@ The returned function `f`:
   the item position is computed as relative to the end of `L`.     
 - returns Undefined List if the argument of `f` is not a List item
 - applies only on the first item if the parameter of `f` is a tuple
+  
+Namespace.size: Namespace ns -> Numb n
+------------------------------------------------------------------------
+Returns the number of items contained in a Namespace item.
+
+If ns is not a Namespace item, it returns Undefined Number.
+
+If the argument is a tuple, it applies only to its first item.
   
 Namespace.parent: Namespace x -> Namespace p
 ------------------------------------------------------------------------

@@ -141,6 +141,25 @@ describe("builtins", () => {
         });
     });
     
+    describe("Text.size: Text s -> Numb n", () => {
+        
+        it("should return the number of characters of s", async () => {
+            expect(await evaluate("Text.size 'abc'")).to.be.Numb(3);
+        });
+        
+        it("should return Undefined Number if the argument is not a Text item", async () => {
+            expect(await evaluate("Text.size TRUE")).to.be.Undefined("Number");
+            expect(await evaluate("Text.size 123")).to.be.Undefined("Number");
+            expect(await evaluate("Text.size(x->x)")).to.be.Undefined("Number");
+            expect(await evaluate("Text.size([1,2,3])")).to.be.Undefined("Number");
+            expect(await evaluate("Text.size({x:1})")).to.be.Undefined("Number");
+        });
+
+        it("should apply to the first items only, if the argument is a truple", async () => {
+            expect(await evaluate("Text.size('ABC','Defg')")).to.be.Numb(3);
+        });                        
+    });
+
     describe("Text.find: Text s1 -> Func f", () => {
         
         describe("when s1 is an item", () => {
@@ -462,6 +481,25 @@ describe("builtins", () => {
         });    
     });                                
     
+    describe("List.size: List l -> Numb n", () => {
+        
+        it("should return the number of items of l", async () => {
+            expect(await evaluate("List.size [10,20,30]")).to.be.Numb(3);
+        });
+        
+        it("should return Undefined Number if the argument is not a mapping", async () => {
+            expect(await evaluate("List.size TRUE")).to.be.Undefined("Number");
+            expect(await evaluate("List.size 123")).to.be.Undefined("Number");
+            expect(await evaluate("List.size(x->x)")).to.be.Undefined("Number");
+            expect(await evaluate("List.size('abc')")).to.be.Undefined("Number");
+            expect(await evaluate("List.size({x:1})")).to.be.Undefined("Number");
+        });
+
+        it("should apply to the first items only, if the argument is a truple", async () => {
+            expect(await evaluate("List.size([1,2,3],[4,5])")).to.be.Numb(3);
+        });                        
+    });
+
     describe("List.reverse: List L1 -> List L2", () => {
 
         it("should return a new array with the items of L in reversed order", async () => {
@@ -639,31 +677,6 @@ describe("builtins", () => {
         });    
     });              
     
-    describe("size: Mapping m -> Numb n", () => {
-        
-        it("should return the number of characters if m is a Text item", async () => {
-            expect(await evaluate("size 'abc'")).to.be.Numb(3);
-        });
-        
-        it("should return the number of items if m is a List item", async () => {
-            expect(await evaluate("size [10,20,30]")).to.be.Numb(3);
-        });
-        
-        it("should return the number of name:value pairs if m is a Namespace item", async () => {
-            expect(await evaluate("size {a:2,b:4,c:6}")).to.be.Numb(3);
-        });
-
-        it("should return Undefined Number if the argument is not a mapping", async () => {
-            expect(await evaluate("size TRUE")).to.be.Undefined("Number");
-            expect(await evaluate("size 123")).to.be.Undefined("Number");
-            expect(await evaluate("size(x->x)")).to.be.Undefined("Number");
-        });
-
-        it("should apply to the first items only, if the argument is a truple", async () => {
-            expect(await evaluate("size('ABC','Defg')")).to.be.Numb(3);
-        });                        
-    });
-
     describe("dom: Mapping m -> Tuple t", () => {
         
         it("should return (0,1,2,...,Len-1) if m is a Text item", async () => {
@@ -724,6 +737,25 @@ describe("builtins", () => {
         });
     });
     
+    describe("Namespace.size: Namespace ns -> Numb n", () => {
+        
+        it("should return the number of name:value pairs contained in ns", async () => {
+            expect(await evaluate("Namespace.size {a:2,b:4,c:6}")).to.be.Numb(3);
+        });
+
+        it("should return Undefined Number if the argument is not a Namespace", async () => {
+            expect(await evaluate("Namespace.size TRUE")).to.be.Undefined("Number");
+            expect(await evaluate("Namespace.size 123")).to.be.Undefined("Number");
+            expect(await evaluate("Namespace.size(x->x)")).to.be.Undefined("Number");
+            expect(await evaluate("Namespace.size('abc')")).to.be.Undefined("Number");
+            expect(await evaluate("Namespace.size([1,2,3])")).to.be.Undefined("Number");
+        });
+
+        it("should apply to the first items only, if the argument is a truple", async () => {
+            expect(await evaluate("Namespace.size({a:10,b:20},{c:30})")).to.be.Numb(2);
+        });                        
+    });
+
     describe("Namespace.parent: Namespace x -> Namespace p", () => {
         
         it("should return the prototype of x", async () => {
