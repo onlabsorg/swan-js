@@ -61,7 +61,7 @@
         const evaluate = swan.parse(expression);
         const value = await evaluate(context);
         if (value !== null) {
-            console.log(await context.str(value));
+            console.log(await context.Text.__apply__(value));
             console.log();
         }
     }    

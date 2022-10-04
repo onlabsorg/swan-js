@@ -417,9 +417,9 @@ describe("builtins", () => {
 
             describe("l = f s2 ", () => {
     
-                it("should return the list of the s2 substrings separated by s1", async () => {
-                    expect(await evaluate("Text.split '::' 'ab::cd::ef'")).to.be.List(["ab","cd","ef"]);
-                    expect(await evaluate("Text.split '::' 'abcdef'")).to.be.List(["abcdef"]);
+                it("should return the tuple of the s2 substrings separated by s1", async () => {
+                    expect(await evaluate("Text.split '::' 'ab::cd::ef'")).to.be.Tuple(["ab","cd","ef"]);
+                    expect(await evaluate("Text.split '::' 'abcdef'")).to.be.Text("abcdef");
                 });
 
                 it("should return Undefined Text if `s1` is not a string", async () => {
@@ -432,7 +432,7 @@ describe("builtins", () => {
                 });
 
                 it("should apply only to the first item if the parameter is a tuple", async () => {
-                    expect(await evaluate("Text.split '::' ('ab::cd', 'de::fg')")).to.be.List(["ab","cd"]);
+                    expect(await evaluate("Text.split '::' ('ab::cd', 'de::fg')")).to.be.Tuple(["ab","cd"]);
                 });
             });
         });
@@ -441,8 +441,8 @@ describe("builtins", () => {
             
             it("should apply only to the first item", async () => {
                 expect(await evaluate("Text.split('::','!!')")).to.be.instanceof(types.Func);
-                expect(await evaluate("Text.split('::','!!') 'a!!b::c!!d'")).to.be.List(["a!!b","c!!d"]);
-                expect(await evaluate("Text.split('::','!!')('ab::cd!!ef', 'gh::ij!!kl')")).to.be.List(["ab","cd!!ef"]);
+                expect(await evaluate("Text.split('::','!!') 'a!!b::c!!d'")).to.be.Tuple(["a!!b","c!!d"]);
+                expect(await evaluate("Text.split('::','!!')('ab::cd!!ef', 'gh::ij!!kl')")).to.be.Tuple(["ab","cd!!ef"]);
             });
         });    
     });   
@@ -766,6 +766,13 @@ describe("builtins", () => {
         it("should return Undefined Namespace if x is not a namespace", async () => {
             expect(await evaluate("Namespace.parent 123")).to.be.Undefined("Namespace");
         });
+
+        it("should apply only to the first item if x is a tuple", async () => {
+            const presets = {p1:{x:10}, p2:{y:20}};
+            presets.c1 = Object.create(presets.p1);
+            presets.c2 = Object.create(presets.p2);
+            expect(await evaluate("Namespace.parent(c1,c2)", presets)).to.be.Namespace(presets.p1);
+        });
     });
 
     describe("Namespace.own: Namespace x -> Namespace o", () => {
@@ -780,6 +787,15 @@ describe("builtins", () => {
 
         it("should return Undefined Namespace if x is not a namespace", async () => {
             expect(await evaluate("Namespace.own 123")).to.be.Undefined("Namespace");
+        });
+
+        it("should apply only to the first item if x is a tuple", async () => {
+            const presets = {p1:{x:10}, p2:{y:20}};
+            presets.c1 = Object.create(presets.p1);
+            presets.c1.z1 = 30; 
+            presets.c2 = Object.create(presets.p2);
+            presets.c2.z2 = 30;
+            expect(await evaluate("Namespace.own(c1,c2)", presets)).to.be.Namespace({z1:30});
         });
     });
     
@@ -820,7 +836,7 @@ describe("builtins", () => {
         });
 
         it("should return Undefined Undefined if the passed item is not undefined", async () => {
-            expect(await evaluate("Undefined.args 10")).to.be.Undefined('Undefined');            
+            expect(await evaluate("Undefined.args 10")).to.be.Undefined('Term');            
         });
     }); 
     
