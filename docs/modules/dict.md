@@ -1,8 +1,13 @@
 dict module
 ============================================================================
 
-The `dict` module exports a function that takes as input a tuple of 
-`[key,value]` pairs and returns a dictionary Namespace.
+The `dict` module exports functions to create and detect Namespace item that 
+behaves like a dictionary. 
+  
+`dict.create: List Tuple kv -> Namespace d`
+----------------------------------------------------------------------------
+ This function takes a tuple of `[key,value]` pairs as input and returns
+ a dictionary namespace.
 
 ```
 d = dict(['key1','val1'], [22, 'val2'], ['key3', 30])
@@ -22,5 +27,10 @@ The returned dictionary Namespace `d` contains the following items:
   corresponding value, or `Undefined('Mapping')` if the key doesn't exist.
 - `d.has` is a Func that takes a key as argument and returns `Bool.TRUE` if 
   the dictionary contains that key, otherwise it returns `Bool.FALSE`.
+  
+`dict.isDIct: Namespace d -> Bool b`
+----------------------------------------------------------------------------
+This function returns `Bool.TRUE` if the passed item is a dictionary 
+namespace.
   
 

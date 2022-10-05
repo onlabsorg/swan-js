@@ -855,6 +855,7 @@ describe("builtins", () => {
             // Test in action
             expect(await evaluate("require 'math' .max (1,22,3,4) ")).to.be.Numb(22);
             expect(await evaluate("require 'time' .to_ISO_string 1639513675.900")).to.be.Text("2021-12-14T20:27:55.900Z");
+            expect(await evaluate("require 'dict'")).to.be.instanceof(types.Func);
             expect(await evaluate("type(require 'debug' .log [])")).to.be.Text("Text");
         });
     });
