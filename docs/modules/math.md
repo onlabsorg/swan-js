@@ -1,8 +1,7 @@
-numb module
+math module
 ============================================================================
 
-This module contains functions and constants that operate on the swan Numb
-data type.
+This module contains mathematical functions and constants.
 
 Unless specified otherwise, all the functions of this library assume that
 their parameter is an item (1-d tuple). If more that one item is passed
@@ -13,85 +12,85 @@ Math constants
 ------------------------------------------------------------------------
 The following constants are defined:
 
-- `numb.INFINITY`: Infinity.
-- `numb.PI`: Ratio of the a circle's circumference to its diameter, approximately 3.14159.
-- `numb.E`: Euler's constant and the base of natural logarithms, approximately 2.718.
+- `math.INFINITY`: Infinity.
+- `math.PI`: Ratio of the a circle's circumference to its diameter, approximately 3.14159.
+- `math.E`: Euler's constant and the base of natural logarithms, approximately 2.718.
   
 Trigonometric functions
 ------------------------------------------------------------------------
 The Numb namespace contains the following trigonometric functions: 
 
-- `numb.cos`:  Returns the cosine of a number.
-- `numb.sin`:  Returns the sine of a number.
-- `numb.tan`:  Returns the tangent of a number.
-- `numb.acos`: Returns the arccosine of a number.
-- `numb.asin`: Returns the arcsine of a number.
-- `numb.atan`: Returns the arctangent of a number.
+- `math.cos`:  Returns the cosine of a number.
+- `math.sin`:  Returns the sine of a number.
+- `math.tan`:  Returns the tangent of a number.
+- `math.acos`: Returns the arccosine of a number.
+- `math.asin`: Returns the arcsine of a number.
+- `math.atan`: Returns the arctangent of a number.
 
-If the argument is not a number, these functions return Undefined Number.
+If the argument is not a number, these functions return `Undefined('Number')`.
   
 Hyperbolic functions
 ------------------------------------------------------------------------
 The Numb namespace contains the following hyperbolic functions: 
 
-- `numb.cosh`:  Returns the hyperbolic cosine of a number.
-- `numb.sinh`:  Returns the hyperbolic sine of a number.
-- `numb.tanh`:  Returns the hyperbolic tangent of a number.
-- `numb.acosh`: Returns the hyperbolic arccosine of a number.
-- `numb.asinh`: Returns the hyperbolic arcsine of a number.
-- `numb.atanh`: Returns the hyperbolic arctangent of a number.
+- `math.cosh`:  Returns the hyperbolic cosine of a number.
+- `math.sinh`:  Returns the hyperbolic sine of a number.
+- `math.tanh`:  Returns the hyperbolic tangent of a number.
+- `math.acosh`: Returns the hyperbolic arccosine of a number.
+- `math.asinh`: Returns the hyperbolic arcsine of a number.
+- `math.atanh`: Returns the hyperbolic arctangent of a number.
 
-If the argument is not a number, these functions return Undefined Number.
+If the argument is not a number, these functions return `Undefined('Number')`.
   
 Rounding
 ------------------------------------------------------------------------
 The following functions perform number rounding. 
 
-- `Math.ceil`: Returns the smallest integer greater than or equal to a number.
-- `Math.floor`: Returns the largest integer less than or equal to a number.
-- `Math.trunc`: Returns the integer part of the number x, removing any fractional digits.
-- `Math.round`: Returns the value of a number rounded to the nearest integer.
+- `math.ceil`: Returns the smallest integer greater than or equal to a number.
+- `math.floor`: Returns the largest integer less than or equal to a number.
+- `math.trunc`: Returns the integer part of the number x, removing any fractional digits.
+- `math.round`: Returns the value of a number rounded to the nearest integer.
 
-If the argument is not a number, these functions return Undefined Number.
+If the argument is not a number, these functions return `Undefined('Number')`.
   
-numb.abs - function
+math.abs - function
 ------------------------------------------------------------------------
 Returns the absolute value of a number. 
-If the argument is not a number, this functions return Undefined Number.
+If the argument is not a number, this functions return `Undefined('Number')`.
   
-numb.exp - function
+math.exp - function
 ------------------------------------------------------------------------
 Returns E^x, where x is the argument, and E is Euler's constant. 
-If the argument is not a number, this functions return Undefined Number.
+If the argument is not a number, this functions return `Undefined('Number')`.
   
-numb.log - function
+math.log - function
 ------------------------------------------------------------------------
 Returns the natural logarithm of a number. 
-If the argument is not a number, this functions return Undefined Number.
+If the argument is not a number, this functions return `Undefined('Number')`.
   
-numb.log10 - function
+math.log10 - function
 ------------------------------------------------------------------------
 Returns the base 10 logarithm of a number. 
-If the argument is not a number, this functions return Undefined Number.
+If the argument is not a number, this functions return `Undefined('Number')`.
   
-numb.max - function
+math.max - function
 ------------------------------------------------------------------------
 Returns the largest of zero or more numbers.
-If any argument is not a number, this functions return Undefined Number.
+If any argument is not a number, this functions return `Undefined('Number')`.
   
-numb.min - function
+math.min - function
 ------------------------------------------------------------------------
 Returns the smallest of zero or more numbers.
-If any argument is not a number, this functions return Undefined Number.
+If any argument is not a number, this functions return `Undefined('Number')`.
   
-numb.random - function
+math.random - function
 ------------------------------------------------------------------------
 Returns a pseudo-random number between 0 and the given argument.
-If the argument is not a number, this functions return Undefined Number.
+If the argument is not a number, this functions return `Undefined('Number')`.
   
-numb.sqrt - function
+math.sqrt - function
 ------------------------------------------------------------------------
 Returns the positive square root of a number.
-If any argument is not a number, this functions return Undefined Number.
+If any argument is not a number, this functions return `Undefined('Number')`.
   
 

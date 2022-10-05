@@ -55,23 +55,14 @@ The data types defined in swan are:
 - Undefined: `undefined(operationName, operands)`
 - Tuple: `x1, x2, x3, ...`
 
-The swan built-in functions are:
-- `bool x`, converts a value to boolean
-- `dom m`, returns the domain of a Text, List or Namespace item as a tuple
-- `not x`, returns `FALSE` if `bool x` is true, otherwise `TRUE`
-- `range n`, returns the tuple of integers between 0 and the given parameter (excluded)
-- `require id`, loads a standard library module
-- `size m`, returns the number of mappings in a Text, List of Namespace item
-- `str x`, converts its argument to a string
-- `type x`, returns the type name of its argument
-- `parent x`, returns the parent namespace of x
-- `own x`, returns a parent-less copy of the namespace x
-- `undefined x`, generates an Undefined item
+Besides the operation, Swan defines also some essential [builtins](./docs/builtins.md),
+consisting in functions and namespaces.
 
 
 Learn more
 --------------------------------------------------------------------------------
 - [Swan expression language guide](./docs/swan.md)
+- [Swan standard modules](./docs/modules/index.md)
 - [JavaScript API](./docs/api.md)
 - [Swan REPL](./docs/repl.md)
 

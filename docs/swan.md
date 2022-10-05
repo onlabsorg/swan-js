@@ -21,7 +21,7 @@ represent the concept of nothingness.
 
 The Item types defined in swan are:
 
-- [Bool](#bool-data-type) type, representing booleans (either `TRUE` or `FALSE`) 
+- [Bool](#bool-data-type) type, representing booleans (either `Bool.TRUE` or `Bool.FALSE`) 
 - [Numb](#numb-data-type) type, representing real numbers (e.g. `-123.4e3`)
 - `Applicable` type, an abstract data type representing any Item for which an 
   [apply operation](#application-operator) is defined
@@ -44,7 +44,7 @@ The following operators are defined in swan:
 - [Selection operators](#selection-operators): `?`, `;`
 - [Pairing operator](#tuple-data-type-and-pairing-operator): `,`
 - [Application operator](#application-operator) (empty operator): ` `
-- [Function definition operator](#function-data-type): `->`
+- [Function definition operator](#func-data-type): `->`
 - [Function composition operators](#composition-operators): `<<`, `>>`
 - [Mapping operator](#mapping-operator): `=>`
 - [Assignment operators](#names-and-assignment-operators): `=`, `:`
@@ -73,28 +73,28 @@ expression `x -> y -> x+y` is equivalent to `x -> (y -> x+y)`.
 13. `,`
 
 Besides the operation, Swan defines also some essential [builtins](./builtins.md),
-consisting in functions and namespaces.
+consisting in functions and namespaces and some [standard modules](./modules/index.md)
+that can be loaded using the `require` builtin function.
 
 
 ## Bool data type
 A Bool item can be either true or false. It can be created either:
 
-- by referencing the built-in constants `TRUE` or `FALSE`
+- by referencing the built-in constants `Bool.TRUE` or `Bool.FALSE`
 - as return value of a [comparison expressions](#comparison-operators)
-- as result of calling the [Bool](#bool-callable-namespace) function or the 
-  [Bool.not](#bool.not-function) function
+- as result of calling the `Bool` or the `Bool.not` [builtin functions](./builtins.md)
 
 
 ## Numb data type
 This data type represents a real number. A number can be created either:
 
 - by explicitly defining it as a literal (e.g `10`, `13.14`, `-2.5e3`, ...)
-- as return value of an arithmetic operation
+- as return value of an [arithmetic operation](#arithmetic-operators)
 
 
 ## Text data type
 A Text item is a Mapping between natural numbers and characters; in other words, 
-it is any sequence of characters. A Text item can be defined using one of the
+it is a sequence of characters. A Text item can be defined using one of the
 following literals:
 
 * `"double quotes string"`
@@ -230,7 +230,7 @@ In order to access the names inside a namespace, you can use either the
 
 Another import property of namespace is inheritance: every namespace inherits
 the names of its `parent namespace`. The following example shows how child 
-namespace inherit the names define in their parent namespaces. 
+namespace inherit the names defined in their parent namespaces. 
 
 ```
     x = 10
@@ -259,7 +259,7 @@ For example, the expression:
 defines a function that takes two parameters `x` and `y` as input and produces
 their sum as output.
 
-In order to execute a function, you use the [application operator](#Application-operator);
+In order to execute a function, you use the [application operator](#application-operator);
 for example:
 
 * `f = x -> 2*x` defines a function that takes one parameter and doubles it
@@ -279,7 +279,7 @@ n -> n == 0 ? 1 ; n * self(n-1)
 Swan operations never fail: they returns an Undefined item instead; for 
 example the sum of a number and a list returns an Undefined item.
 Besides being returned by undefined operations, Undefined items can be 
-created via the [undefined function](#undefined-function).
+created via the `Undefined` [builtin](./builtins.md) callable.
 
 
 ## Application operator
@@ -309,12 +309,12 @@ tuple-values to tuple-names assignment:
   will be `(2,3)`
   
 If the function `F` throws an error, the application operation resolves to
-`undefined('Term', error)`.
+`Undefined('Term', error)`.
 
 **When F is a Mapping item** (namely a [Text](#text-data-type),
 [List](#list-data-type) or [Namespace](#namespace-data-type) item), the 
 application operation returns the value mapped to the given parameter or 
-`undefined('Mapping')` if no mapping is defined. In particular:
+`Undefined('Mapping')` if no mapping is defined. In particular:
 
 - `"abc"(1)` returns `"b"`
 - `[10,20,30](1)` returns `20`
@@ -328,7 +328,7 @@ result is a tuple of mapped values. For example:
 - `{a:1, b:2, c:3}("b", "c")` returns `(2, 3)`
 
 When `F` is a Namespace and `X` is a name defined in its parent namespace, the
-application operation returns `undefined('Mapping')`. In other words, the
+application operation returns `Undefined('Mapping')`. In other words, the
 application operation gives access only to the `own` names of a namespace and
 not to the inherited names.
 
@@ -346,12 +346,12 @@ The `+X` expression is equivalent to just `X`.
 
 The `-X` expression returns the additive inverse of `X`, which is actually
 defined only on Numb items. For all the other types `-X` returns 
-`undefined("NegationOperation")`. If `X` is a tuple `(x1, x2, ...)`, the `-X` 
+`Undefined("NegationOperation")`. If `X` is a tuple `(x1, x2, ...)`, the `-X` 
 operation returns `(-x1, -x2, ...)`.
 
 
 ## Arithmetic operators
-The arithmetic operators are sum (`+`), subtraction (`-`), product (`*`),
+The arithmetic operators are: sum (`+`), subtraction (`-`), product (`*`),
 division (`/`), modulo (`%`) and exponentiation (`**`). These operations are
 consistent with the following algebraic characterization of the swan types:
 
@@ -359,10 +359,10 @@ consistent with the following algebraic characterization of the swan types:
 |--------------------------------|:--------:|:------:|:---------:|:---------:|:---------:|:--------:|:---------:|
 | Sum operation                  | `OR`     | `X+Y`  | `Concat.` | `Concat.` | `Merge`   | *Undef.* | *Undef.*  |
 | Additive inverse               | *Undef.* | `-X`   | *Undef.*  | *Undef.*  | *Undef.*  | *Undef.* | *Undef.*  |
-| Additive neutral element       | `FALSE`  | `0`    | `""`      | `[]`      | `{}`      | *Undef.* | *Undef.*  |
+| Additive neutral element       | `Bool.FALSE`  | `0`    | `""`      | `[]`      | `{}`      | *Undef.* | *Undef.*  |
 | Product operation              | `AND`    | `X*Y`  | *Undef.*  | *Undef.*  | *Undef.*  | *Undef.* | *Undef.*  |
 | Multiplicative inverse         | *Undef.* | `1/X`  | *Undef.*  | *Undef.*  | *Undef.*  | *Undef.* | *Undef.*  |
-| Multiplicative neutral element | `TRUE`   | `1`    | *Undef.*  | *Undef.*  | *Undef.*  | *Undef.* | *Undef.*  |
+| Multiplicative neutral element | `Bool.TRUE`   | `1`    | *Undef.*  | *Undef.*  | *Undef.*  | *Undef.* | *Undef.*  |
 
 The sum of a tuple `t1=(x1,x2,x3)` and a tuple `t2=(y1,y2,y3)` is the tuple
 `(x1+y1, x2+y2, x3+y3)`. The same goes for subtraction, product, division,
@@ -407,17 +407,17 @@ example `{a=1,b=2} + {b=3, c=4}` returns `{a=1, b=3, c=4}`.
 When an arithmetic operation is not defined between two items, the result is an
 Undefined item. In particular:
 
-- `x + y` resolves to `undefined('SumOperation', x, y)`
-- `x - y` resolves to `undefined('SubOperation', x, y)`
-- `x * y` resolves to `undefined('MulOperation', x, y)`
-- `x / y` resolves to `undefined('DivOperation', x, y)`
-- `x % y` resolves to `undefined('ModOperation', x, y)`
-- `x ^ y` resolves to `undefined('PowOperation', x, y)`
+- `x + y` resolves to `Undefined('SumOperation', x, y)`
+- `x - y` resolves to `Undefined('SubOperation', x, y)`
+- `x * y` resolves to `Undefined('MulOperation', x, y)`
+- `x / y` resolves to `Undefined('DivOperation', x, y)`
+- `x % y` resolves to `Undefined('ModOperation', x, y)`
+- `x ^ y` resolves to `Undefined('PowOperation', x, y)`
 
 
 ## Comparison operators
-The comparison operations compare two values and return `TRUE` or `FALSE`. 
-Swan defines the following comparison operators:
+The comparison operations compare two values and return `Bool.TRUE` or 
+`Bool.FALSE`. Swan defines the following comparison operators:
 
 * Equal: `==`
 * Not equal: `!=` 
@@ -433,12 +433,12 @@ Tuples are compared lexicographically and the empty tuple `()` is less than any
 other item and equal only to itself.
 
 #### Comparison operations between Bool items
-Two Bool items are equal if they are both `TRUE` or both `FALSE`. Furthermore 
-`FALSE` is less than `TRUE`.
+Two Bool items are equal if they are both `Bool.TRUE` or both `Bool.FALSE`. 
+Furthermore `Bool.FALSE` is less than `Bool.TRUE`.
 
 #### Comparison operations between Numb items
 The comparison between numbers works as expected. For example, the following
-expressions resolve to `TRUE`:
+expressions resolve to `Bool.TRUE`:
 
 * `10 == 10`
 * `10 != 11`
@@ -448,32 +448,34 @@ expressions resolve to `TRUE`:
 
 #### Comparison operations between Text items
 Two Text items are equal if they contain the same sequence of characters. For
-example `"abc" == "abc"` is `TRUE`.
+example `"abc" == "abc"` is `Bool.TRUE`.
 
 A text `s1` is less than a text `s2` if `s1` precedes `s2` alphabetically.
-For example, the following expressions return `TRUE`:
+For example, the following expressions return `Bool.TRUE`:
 
 * `"abc" < "xyz"`
 * `"zzz" > "aaa"`
 
 #### Comparison operations between List items
 Two lists are equal if they contain the same sequence of items. For
-example `[1,2,3] == [1,2,3]` is `TRUE`, but `[1,2,3] == [1,2]` is `FALSE`.
+example `[1,2,3] == [1,2,3]` is `Bool.TRUE`, but `[1,2,3] == [1,2]` is `Bool.FALSE`.
 
 A list `L1` is less than a list `L2` if `L1` precedes `L2` lexicographically.
-For example, the following expressions return `TRUE`:
+For example, the following expressions return `Bool.TRUE`:
 
 * `[1,2,3] < [4,5,6]`
 * `[1,2,3] < [1,2,4]`
 * `[1,3,4] > [1,2,4]`
 
 #### Comparison operations between Namespace items
-Two namespaces are equal if they contain the same set of name-value pairs.
+Two namespaces are equal if they contain the same set of own name-value pairs.
 For example `{a=1,b=2} == {a=1,b=2}` is true, but `{a=1,b=2} == {a=1,b=4,c=5}`
 is false.
 
 No order is defined for the Namespace type, therefore the comparison operations
-`<`, `<=`, `>` and `>=` between namespaces will always return `FALSE`.
+`<`, and `>` between namespaces will always return `Bool.FALSE`, while the 
+operations `<=` and `>=` will return `Bool.TRUE` only if the namespaces are 
+equal.
 
 #### Comparison operations between Func items
 Two functions are equal if they are the same function. For example, given two
@@ -481,24 +483,28 @@ functions `f1:x->2*x` and `f2:x->2*x`, the expression `f1 == f1` is true, but
 the expression `f1 == f2` is false.
 
 No order is defined for the Func type, therefore the comparison operations
-`<`, `<=`, `>` and `>=` between Func items will always return `FALSE`.
+`<`, and `>` between functions will always return `Bool.FALSE`, while the 
+operations `<=` and `>=` will return `Bool.TRUE` only if the functions are 
+equal.
 
 #### Comparison operation between Undefined items
 Two Undefined items are equal if they are the same item.
 
 No order is defined for the Undefined type, therefore the comparison operations
-`<`, `<=`, `>` and `>=` between Undefined items will always return `FALSE`.
+`<`, and `>` between undefined items will always return `Bool.FALSE`, while the 
+operations `<=` and `>=` will return `Bool.TRUE` only if the undefined items are 
+equal.
 
 #### Comparison operation between items of different types
-The `!=` comparison between two items of different type returns always `TRUE`,
-while all the other comparison operations return always `FALSE`.
+The `!=` comparison between two items of different type returns always `Bool.TRUE`,
+while all the other comparison operations return always `Bool.FALSE`.
 
 #### Comparison operations between tuples
 Two tuples are equal if they contain the same sequence of items. For
-example `(1,2,3) == (1,2,3)` is `TRUE`, but `(1,2,3) == (1,2)` is `FALSE`.
+example `(1,2,3) == (1,2,3)` is `Bool.TRUE`, but `(1,2,3) == (1,2)` is `Bool.FALSE`.
 
 A tuple `t1` is less than a tuple `t2` if `t1` precedes `t2` lexicographically.
-For example, the following expressions return `TRUE`:
+For example, the following expressions return `Bool.TRUE`:
 
 * `(1,2,3) < (4,5,6)`
 * `(1,2,3) < (1,2,4)`
@@ -509,18 +515,18 @@ to be `()`. The empty tuple is less than anything else and equal only to itself.
 
 
 ## TRUTY and FALSY terms
-By definition, the following items are *FALSY*, meaning they give `FALSE` when
+By definition, the following items are *FALSY*, meaning they give `Bool.FALSE` when
 converted to booleans:
 
 - empty tuple: `{}`
-- `FALSE` Bool
+- `Bool.FALSE` Bool
 - `0` Numb
 - empty Text: `""`
 - empty List: `[]`
 - empty Namespace: `{}`
 - Undefined item
 
-All other items are *TRUTY*, meaning that they give `TRUE` when converted to
+All other items are *TRUTY*, meaning that they give `Bool.TRUE` when converted to
 booleans.
 
 A tuple is *FALSY* if all its items are *FALSY*, while it is *TRUTY* if at
@@ -546,17 +552,18 @@ otherwise it returns `B`. For example:
 
 ## Selection operators
 A conditional expression `X ? Y` resolves to `Y` if `X` is 
-[TRUTY](#truty-and-falsy-terms), otherwise it resolves to `Undefined`. For example:
+[TRUTY](#truty-and-falsy-terms), otherwise it resolves to `Undefined('Term')`. 
+For example:
 
 * `2 > 1 ? "ok"` resoves to `"ok"`
-* `2 < 1 ? "ok"` resoves to `undefined('Term')`
+* `2 < 1 ? "ok"` resoves to `Undefined('Term')`
 * `"abc" ? "ok"` resoves to `"ok"`
-* `"" ? "ok"` resoves to `undefined('Term')`
+* `"" ? "ok"` resoves to `Undefined('Term')`
 
-An alternative expression `X ; Y` resolves to `X` if it is not an undefined term;
+An alternative expression `X ; Y` resolves to `X` if it is not an Undefined term;
 otherwise it resolves to `Y`. For example:
 
-* `undefined() ; 3` resolves to `3`
+* `Undefined() ; 3` resolves to `3`
 * `10 ; 2` resolves to `10`
 
 When combined together, the conditional and the alternative expression work as
@@ -601,7 +608,7 @@ example, `ns.{u:1, v:2, w:3}` will resolve to a namespace that has `ns` as
 parent.
 
 If the left-hand operand `X` of a `X.Y` operation is not a  Namespace, the `.` 
-operation returns `undefined('SubcontextingOperation', X, Y)`.
+operation returns `Undefined('SubcontextingOperation', X, Y)`.
 
 
 ## Composition operators

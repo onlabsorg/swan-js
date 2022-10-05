@@ -22,3 +22,4 @@ generate-documentation modules/math
 generate-documentation modules/time
 generate-documentation modules/debug
 generate-documentation modules/json
+generate-documentation modules/index
