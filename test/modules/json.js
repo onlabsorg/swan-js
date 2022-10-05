@@ -3,7 +3,6 @@ const expect = require("../expect");
 const types = require("../../lib/types");
 const parse = require("../../lib/interpreter");
 const json = require("../../lib/modules/json")(types);
-const dict = require("../../lib/modules/dict")(types);
 
 const evaluate = async (expression, presets={}) => {
     const context = Object.assign({json}, presets);
@@ -19,11 +18,7 @@ describe("json module", () => {
         it("should return the the Namespace represented by the JSON string t", async () => {
             const ns = {n:10, s:"abc", ls:[1,2,3], ns:{y:20}};
             const t = JSON.stringify(ns)
-            const d = await evaluate(`json.parse '`+t+`'`);
-            expect(d).to.be.instanceof(types.Namespace);
-            const uwd = types.unwrap(d);
-            expect(uwd.get('s')).to.equal("abc");
-            expect(uwd.size).to.equal(4);
+            expect(await evaluate(`json.parse '`+t+`'`)).to.be.Namespace(ns);
         });        
     });    
 

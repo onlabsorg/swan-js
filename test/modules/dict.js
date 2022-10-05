@@ -75,6 +75,7 @@ describe("dict module", () => {
         it("should return TRUE if the passed namespace is a dictionary", async () => {
             expect(await evaluate("d = dict.create([1,10],[2,20],[3,30]), dict.isDict(d)")).to.be.Bool(true);
             expect(await evaluate("dict.isDict({size:1, keys:(1), values:(10)})")).to.be.Bool(false);
+            expect(await evaluate("dict.isDict(10)")).to.be.Bool(false);
         });
     });  
 });

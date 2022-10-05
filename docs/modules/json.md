@@ -3,9 +3,9 @@ json module
 
 This module contains functions for parsing and serializing JSON data.
   
-`json.parse: Text t -> Dict Namespace d`
+`json.parse: Text t -> Namespace ns`
 ------------------------------------------------------------------------
-Converts a JSON string to a Dict Namespace (see dict module).
+Converts a JSON string to a namespace. 
   
 `json.parse: Term t -> Text s`
 ------------------------------------------------------------------------
