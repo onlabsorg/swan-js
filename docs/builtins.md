@@ -280,6 +280,12 @@ Returns the tuple of nams contained in a given Namespace item or
 `Undefined Term` if the argument is not a Namespace item. If the 
 argument is a tuple, it applies only to its first item.
   
+`Namespace.enum: Namespace ns -> Tuple items`
+------------------------------------------------------------------------
+Returns the tuple of values of a Namespace item or `Undefined Term`
+if the argumen is not a Namespace item. If the argument is a tuple, 
+it applies only to its first item.
+  
 `Namespace.size: Namespace ns -> Numb n`
 --------------------------------------------------------------------
 Returns the number of items contained in a Namespace item or

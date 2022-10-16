@@ -753,6 +753,25 @@ describe("builtins", () => {
         });                        
     });
 
+    describe("Namespace.enum: Namespace ns -> Tuple t", () => {
+        
+        it("should return the tuple of values contained in ns", async () => {
+            expect(await evaluate("Namespace.enum {a:2,b:4,c:6}")).to.be.Tuple([2,4,6]);
+        });
+
+        it("should return Undefined Term if the argument is not a Namespace item", async () => {
+            expect(await evaluate("Namespace.enum TRUE")).to.be.Undefined("Term");
+            expect(await evaluate("Namespace.enum 123")).to.be.Undefined("Term");
+            expect(await evaluate("Namespace.enum(x->x)")).to.be.Undefined("Term");
+            expect(await evaluate("Namespace.enum('abc')")).to.be.Undefined("Term");
+            expect(await evaluate("Namespace.enum([1,2,3])")).to.be.Undefined("Term");
+        });
+
+        it("should apply to the first items only, if the argument is a truple", async () => {
+            expect(await evaluate("Namespace.enum({a:1,b:2},{c:3})")).to.be.Tuple([1,2]);
+        });                        
+    });
+
     describe("Numb.tuple: Numb n -> Numb Tuple r", () => {
         
         it("should return a tuple of integer numbers between 0 and n (excluded)", async () => {
