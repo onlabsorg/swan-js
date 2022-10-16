@@ -214,6 +214,12 @@ Returns the number of items contained in a List item or `Undefined Number`
 if the argument is not a List item. If the argument is a tuple, it 
 applies only to its first item.
   
+`List.enum: List L -> Tuple items`
+------------------------------------------------------------------------
+Returns the tuple of items in a List item or `Undefined Term`
+if the argumen is not a List item. If the argument is a tuple, it 
+applies only to its first item.
+  
 `List.reverse: List l1 -> List l2`
 ------------------------------------------------------------------------
 Given a list l1, returns a new list l2, containing the items of l1 in

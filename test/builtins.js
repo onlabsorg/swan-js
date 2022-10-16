@@ -519,6 +519,25 @@ describe("builtins", () => {
         });                        
     });
 
+    describe("List.enum: List l -> Tuple i", () => {
+        
+        it("should return the tuple of items of l", async () => {
+            expect(await evaluate("List.enum [10,20,30]")).to.be.Tuple([10,20,30]);
+        });
+        
+        it("should return Undefined Term if the argument is not a List item", async () => {
+            expect(await evaluate("List.enum TRUE")).to.be.Undefined("Term");
+            expect(await evaluate("List.enum 123")).to.be.Undefined("Term");
+            expect(await evaluate("List.enum 'abc'")).to.be.Undefined("Term");
+            expect(await evaluate("List.enum(x->x)")).to.be.Undefined("Term");
+            expect(await evaluate("List.enum({x:1})")).to.be.Undefined("Term");
+        });
+
+        it("should apply to the first items only, if the argument is a truple", async () => {
+            expect(await evaluate("List.enum([1,2,3],[4,5,6])")).to.be.Tuple([1,2,3]);
+        });                        
+    });
+
     describe("List.reverse: List L1 -> List L2", () => {
 
         it("should return a new array with the items of L in reversed order", async () => {
