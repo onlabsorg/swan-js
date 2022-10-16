@@ -104,6 +104,12 @@ Returns the number of characters in a Text item or `Undefined Number`
 if the argumen is not a Text item. If the argument is a tuple, it 
 applies only to its first item.
   
+`Text.enum: Text s -> Tuple c`
+------------------------------------------------------------------------
+Returns the tuple of characters in a Text item or `Undefined Term`
+if the argumen is not a Text item. If the argument is a tuple, it 
+applies only to its first item.
+  
 `Text.find: Text s -> Text S -> Numb k`
 ------------------------------------------------------------------------
 Takes a string `s` as argument and returns a function `f`. 

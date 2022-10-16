@@ -160,6 +160,25 @@ describe("builtins", () => {
         });                        
     });
 
+    describe("Text.enum: Text s -> Tuple c", () => {
+        
+        it("should return the tuple of characters of s", async () => {
+            expect(await evaluate("Text.enum 'abc'")).to.be.Tuple(['a','b','c']);
+        });
+        
+        it("should return Undefined Term if the argument is not a Text item", async () => {
+            expect(await evaluate("Text.enum TRUE")).to.be.Undefined("Term");
+            expect(await evaluate("Text.enum 123")).to.be.Undefined("Term");
+            expect(await evaluate("Text.enum(x->x)")).to.be.Undefined("Term");
+            expect(await evaluate("Text.enum([1,2,3])")).to.be.Undefined("Term");
+            expect(await evaluate("Text.enum({x:1})")).to.be.Undefined("Term");
+        });
+
+        it("should apply to the first items only, if the argument is a truple", async () => {
+            expect(await evaluate("Text.enum('ABC','Defg')")).to.be.Tuple(['A','B','C']);
+        });                        
+    });
+
     describe("Text.find: Text s1 -> Func f", () => {
         
         describe("when s1 is an item", () => {

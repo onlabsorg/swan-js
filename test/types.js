@@ -694,7 +694,7 @@ describe("types", () => {
             
             it("should return the tuple of characters of the string", () => {
                 const item = new Text("abc");
-                expect(item.image).to.be.List(['a','b','c']);
+                expect(item.image).to.deep.equal(['a','b','c']);
             });
         });
         
@@ -971,7 +971,7 @@ describe("types", () => {
             
             it("should return the tuple of characters of the string", () => {
                 const item = new List([10,20,30]);
-                expect(item.image).to.be.List([10,20,30]);
+                expect(item.image).to.be.deep.equal([10,20,30]);
             });
         });
         
@@ -1256,7 +1256,7 @@ describe("types", () => {
             
             it("should return the array of values of the namespace", () => {
                 const item = new Namespace({k1:1, k2:2, k3:3, $k4:4});
-                expect(item.image).to.be.List([1,2,3]);
+                expect(item.image).to.be.deep.equal([1,2,3]);
             });
         });
         
