@@ -12,6 +12,8 @@ describe("SWAN LANGUAGE", () => {
         require('./modules/debug');
         require('./modules/dict');
         require('./modules/path');
+        require('./modules/text');
+        require('./modules/list');
     });
 
     require('./builtins');

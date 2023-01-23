@@ -24,4 +24,5 @@ generate-documentation modules/dict
 generate-documentation modules/json
 generate-documentation modules/math
 generate-documentation modules/path
+generate-documentation modules/text
 generate-documentation modules/time
