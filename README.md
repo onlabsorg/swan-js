@@ -25,7 +25,7 @@ parentheses (...), square braces [...] or curly braces {...}.
 
 The available binary operations are:
 
-- Arithmetic operations: `x + y`, `x - y`, `x * y`, `x / y`, `x % y`, `x ** y`
+- Arithmetic operations: `x + y`, `x - y`, `x * y`, `x / y`, `x % y`, `x ^ y`
 - Comparison operations: `x == y`, `x != y`, `x > y`, `x >= y`, `x < y`, `x <= y`
 - Logic operations: `x & y`, `x | y`
 - Conditional and alternative operations: `x ? y`, `x ; y`, or combined `x ? y ; z`

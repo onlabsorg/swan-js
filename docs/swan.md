@@ -21,7 +21,7 @@ represent the concept of nothingness.
 
 The Item types defined in swan are:
 
-- [Bool](#bool-data-type) type, representing booleans (either `Bool.TRUE` or `Bool.FALSE`) 
+- [Bool](#bool-data-type) type, representing booleans (either `TRUE` or `FALSE`) 
 - [Numb](#numb-data-type) type, representing real numbers (e.g. `-123.4e3`)
 - `Applicable` type, an abstract data type representing any Item for which an 
   [apply operation](#application-operator) is defined
@@ -38,7 +38,7 @@ The Item types defined in swan are:
 
 The following operators are defined in swan: 
 
-- [Arithmetic operators](#arithmetic-operators): `+`, `-`, `*`, `/`, `%`, `**`
+- [Arithmetic operators](#arithmetic-operators): `+`, `-`, `*`, `/`, `%`, `^`
 - [Comparison operators](#comparison-operators): `==`, `!=`, `>`, `>=`, `<`, `<=`
 - [Logic operators](#logic-operators): `&`, `|`
 - [Selection operators](#selection-operators): `?`, `;`
@@ -59,7 +59,7 @@ for which the right-most operations get executed first. For example, the
 expression `x -> y -> x+y` is equivalent to `x -> (y -> x+y)`.
 
 1. application , `.`
-2. `**`
+2. `^`
 3. `*` , `/`, `%`
 4. `+` , `-`
 5. `==` , `!=` , `<` , `<=` , `>=` , `>`
@@ -80,7 +80,7 @@ that can be loaded using the `require` builtin function.
 ## Bool data type
 A Bool item can be either true or false. It can be created either:
 
-- by referencing the built-in constants `Bool.TRUE` or `Bool.FALSE`
+- by referencing the built-in constants `TRUE` or `FALSE`
 - as return value of a [comparison expressions](#comparison-operators)
 - as result of calling the `Bool` or the `Bool.not` [builtin functions](./builtins.md)
 
@@ -352,17 +352,17 @@ operation returns `(-x1, -x2, ...)`.
 
 ## Arithmetic operators
 The arithmetic operators are: sum (`+`), subtraction (`-`), product (`*`),
-division (`/`), modulo (`%`) and exponentiation (`**`). These operations are
+division (`/`), modulo (`%`) and exponentiation (`^`). These operations are
 consistent with the following algebraic characterization of the swan types:
 
 |                                | Bool     | Numb   | Text      | List      | Namespace | Func     | Undefined |
 |--------------------------------|:--------:|:------:|:---------:|:---------:|:---------:|:--------:|:---------:|
 | Sum operation                  | `OR`     | `X+Y`  | `Concat.` | `Concat.` | `Merge`   | *Undef.* | *Undef.*  |
 | Additive inverse               | *Undef.* | `-X`   | *Undef.*  | *Undef.*  | *Undef.*  | *Undef.* | *Undef.*  |
-| Additive neutral element       | `Bool.FALSE`  | `0`    | `""`      | `[]`      | `{}`      | *Undef.* | *Undef.*  |
+| Additive neutral element       | `FALSE`  | `0`    | `""`      | `[]`      | `{}`      | *Undef.* | *Undef.*  |
 | Product operation              | `AND`    | `X*Y`  | *Undef.*  | *Undef.*  | *Undef.*  | *Undef.* | *Undef.*  |
 | Multiplicative inverse         | *Undef.* | `1/X`  | *Undef.*  | *Undef.*  | *Undef.*  | *Undef.* | *Undef.*  |
-| Multiplicative neutral element | `Bool.TRUE`   | `1`    | *Undef.*  | *Undef.*  | *Undef.*  | *Undef.* | *Undef.*  |
+| Multiplicative neutral element | `TRUE`   | `1`    | *Undef.*  | *Undef.*  | *Undef.*  | *Undef.* | *Undef.*  |
 
 The sum of a tuple `t1=(x1,x2,x3)` and a tuple `t2=(y1,y2,y3)` is the tuple
 `(x1+y1, x2+y2, x3+y3)`. The same goes for subtraction, product, division,
@@ -381,7 +381,7 @@ The Numb type implement the arithmetic operations between numbers:
 * `5 * 2` returns `10`
 * `5 / 2` returns `2.5`
 * `5 % 2` returns `1`
-* `5 ** 2` returns `25`
+* `5 ^ 2` returns `25`
 
 #### Arithmetic operations between Text items
 The Text type implements only the sum operation, which produces the
@@ -416,8 +416,8 @@ Undefined item. In particular:
 
 
 ## Comparison operators
-The comparison operations compare two values and return `Bool.TRUE` or 
-`Bool.FALSE`. Swan defines the following comparison operators:
+The comparison operations compare two values and return `TRUE` or 
+`FALSE`. Swan defines the following comparison operators:
 
 * Equal: `==`
 * Not equal: `!=` 
@@ -433,12 +433,12 @@ Tuples are compared lexicographically and the empty tuple `()` is less than any
 other item and equal only to itself.
 
 #### Comparison operations between Bool items
-Two Bool items are equal if they are both `Bool.TRUE` or both `Bool.FALSE`. 
-Furthermore `Bool.FALSE` is less than `Bool.TRUE`.
+Two Bool items are equal if they are both `TRUE` or both `FALSE`. 
+Furthermore `FALSE` is less than `TRUE`.
 
 #### Comparison operations between Numb items
 The comparison between numbers works as expected. For example, the following
-expressions resolve to `Bool.TRUE`:
+expressions resolve to `TRUE`:
 
 * `10 == 10`
 * `10 != 11`
@@ -448,20 +448,20 @@ expressions resolve to `Bool.TRUE`:
 
 #### Comparison operations between Text items
 Two Text items are equal if they contain the same sequence of characters. For
-example `"abc" == "abc"` is `Bool.TRUE`.
+example `"abc" == "abc"` is `TRUE`.
 
 A text `s1` is less than a text `s2` if `s1` precedes `s2` alphabetically.
-For example, the following expressions return `Bool.TRUE`:
+For example, the following expressions return `TRUE`:
 
 * `"abc" < "xyz"`
 * `"zzz" > "aaa"`
 
 #### Comparison operations between List items
 Two lists are equal if they contain the same sequence of items. For
-example `[1,2,3] == [1,2,3]` is `Bool.TRUE`, but `[1,2,3] == [1,2]` is `Bool.FALSE`.
+example `[1,2,3] == [1,2,3]` is `TRUE`, but `[1,2,3] == [1,2]` is `FALSE`.
 
 A list `L1` is less than a list `L2` if `L1` precedes `L2` lexicographically.
-For example, the following expressions return `Bool.TRUE`:
+For example, the following expressions return `TRUE`:
 
 * `[1,2,3] < [4,5,6]`
 * `[1,2,3] < [1,2,4]`
@@ -473,8 +473,8 @@ For example `{a=1,b=2} == {a=1,b=2}` is true, but `{a=1,b=2} == {a=1,b=4,c=5}`
 is false.
 
 No order is defined for the Namespace type, therefore the comparison operations
-`<`, and `>` between namespaces will always return `Bool.FALSE`, while the 
-operations `<=` and `>=` will return `Bool.TRUE` only if the namespaces are 
+`<`, and `>` between namespaces will always return `FALSE`, while the 
+operations `<=` and `>=` will return `TRUE` only if the namespaces are 
 equal.
 
 #### Comparison operations between Func items
@@ -483,28 +483,28 @@ functions `f1:x->2*x` and `f2:x->2*x`, the expression `f1 == f1` is true, but
 the expression `f1 == f2` is false.
 
 No order is defined for the Func type, therefore the comparison operations
-`<`, and `>` between functions will always return `Bool.FALSE`, while the 
-operations `<=` and `>=` will return `Bool.TRUE` only if the functions are 
+`<`, and `>` between functions will always return `FALSE`, while the 
+operations `<=` and `>=` will return `TRUE` only if the functions are 
 equal.
 
 #### Comparison operation between Undefined items
 Two Undefined items are equal if they are the same item.
 
 No order is defined for the Undefined type, therefore the comparison operations
-`<`, and `>` between undefined items will always return `Bool.FALSE`, while the 
-operations `<=` and `>=` will return `Bool.TRUE` only if the undefined items are 
+`<`, and `>` between undefined items will always return `FALSE`, while the 
+operations `<=` and `>=` will return `TRUE` only if the undefined items are 
 equal.
 
 #### Comparison operation between items of different types
-The `!=` comparison between two items of different type returns always `Bool.TRUE`,
-while all the other comparison operations return always `Bool.FALSE`.
+The `!=` comparison between two items of different type returns always `TRUE`,
+while all the other comparison operations return always `FALSE`.
 
 #### Comparison operations between tuples
 Two tuples are equal if they contain the same sequence of items. For
-example `(1,2,3) == (1,2,3)` is `Bool.TRUE`, but `(1,2,3) == (1,2)` is `Bool.FALSE`.
+example `(1,2,3) == (1,2,3)` is `TRUE`, but `(1,2,3) == (1,2)` is `FALSE`.
 
 A tuple `t1` is less than a tuple `t2` if `t1` precedes `t2` lexicographically.
-For example, the following expressions return `Bool.TRUE`:
+For example, the following expressions return `TRUE`:
 
 * `(1,2,3) < (4,5,6)`
 * `(1,2,3) < (1,2,4)`
@@ -515,18 +515,18 @@ to be `()`. The empty tuple is less than anything else and equal only to itself.
 
 
 ## TRUTY and FALSY terms
-By definition, the following items are *FALSY*, meaning they give `Bool.FALSE` when
+By definition, the following items are *FALSY*, meaning they give `FALSE` when
 converted to booleans:
 
 - empty tuple: `{}`
-- `Bool.FALSE` Bool
+- `FALSE` Bool
 - `0` Numb
 - empty Text: `""`
 - empty List: `[]`
 - empty Namespace: `{}`
 - Undefined item
 
-All other items are *TRUTY*, meaning that they give `Bool.TRUE` when converted to
+All other items are *TRUTY*, meaning that they give `TRUE` when converted to
 booleans.
 
 A tuple is *FALSY* if all its items are *FALSY*, while it is *TRUTY* if at

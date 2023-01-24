@@ -1037,16 +1037,16 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
         });
     });
     
-    describe("X ** Y", () => {
+    describe("X ^ Y", () => {
     
         it("should return () if both X and Y are ()", async () => {
-            expect(await parse("() ** ()")()).to.be.Tuple([]);
+            expect(await parse("() ^ ()")()).to.be.Tuple([]);
         });
     
         it("should return `X**Y` if both X and Y are numbers", async () => {
-            expect(await parse("10 ** 2"   )()).to.be.Numb(100);
-            expect(await parse("10 ** 0"   )()).to.be.Numb(1);
-            expect(await parse("10 ** (-2)")()).to.be.Numb(0.01);
+            expect(await parse("10 ^ 2"   )()).to.be.Numb(100);
+            expect(await parse("10 ^ 0"   )()).to.be.Numb(1);
+            expect(await parse("10 ^ (-2)")()).to.be.Numb(0.01);
         });
     
         it("should return Undefined PowOperation for all the other type combinations", async () => {
@@ -1062,7 +1062,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                     [fn,no], [fn,T], [fn,F], [fn,n ], [fn,s], [fn,ls], [fn,ns], [fn,fn], [fn,u ],
                     [u ,no], [u ,T], [u ,F], [u ,n ], [u ,s], [u ,ls], [u ,ns], [u ,fn], [u ,u ] ]) {
     
-                expect( await parse("L ** R")({L,R}) ).to.be.Undefined('PowOperation', (arg0, arg1) => {
+                expect( await parse("L ^ R")({L,R}) ).to.be.Undefined('PowOperation', (arg0, arg1) => {
                     expect(arg0).to.deep.equal(L);
                     expect(arg1).to.deep.equal(R);
                 });
@@ -1073,7 +1073,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("(10,20,30) * (2,3,4)")(context)).to.be.Tuple([20,60,120]);
     
             // partial exception
-            var tuple = await parse("(10,20,30) ** (1,2,{})")();
+            var tuple = await parse("(10,20,30) ^ (1,2,{})")();
             expect(Array.from(tuple)[0]).to.equal(10);
             expect(Array.from(tuple)[1]).to.equal(400);
             expect(Array.from(tuple)[2]).to.be.Undefined('PowOperation', (arg0, arg1) => {
@@ -1850,9 +1850,9 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 expect(await parse("6/2+8")()).to.be.Numb(11);
             });
             
-            it("should execute `**` before `*` and `/`", async () => {
-                expect(await parse("3*2**4")()).to.be.Numb(48);
-                expect(await parse("2**4*3")()).to.be.Numb(48);
+            it("should execute `^` before `*` and `/`", async () => {
+                expect(await parse("3*2^4")()).to.be.Numb(48);
+                expect(await parse("2^4*3")()).to.be.Numb(48);
             });            
         });
     
