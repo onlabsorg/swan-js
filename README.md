@@ -21,7 +21,7 @@ Syntax
 
 A Swan expression is simply a sequence of binary operations
 (operand operator operand operator operand ...), eventually grouped with
-parenthesis (...), square braces [...] or curly braces {...}.
+parentheses (...), square braces [...] or curly braces {...}.
 
 The available binary operations are:
 
@@ -39,7 +39,7 @@ The available binary operations are:
 
 The types of grouping available are:
 
-- Parenthesis to alter evaluation precedence: `(expr)`
+- Parentheses to alter evaluation precedence: `(expr)`
 - Square braces to create lists: `[x1, x2, x3, ...]`
 - Curly braces to create namespaces: `{n1:v1, n2=v2, n3:v3, ...}`
 
@@ -55,8 +55,8 @@ The data types defined in swan are:
 - Undefined: `undefined(operationName, operands)`
 - Tuple: `x1, x2, x3, ...`
 
-Besides the operation, Swan defines also some essential [builtins](./docs/builtins.md),
-consisting in functions and namespaces.
+Besides these operations, Swan defines also some essential [builtins](./docs/builtins.md),
+consisting in functions constants.
 
 
 Learn more

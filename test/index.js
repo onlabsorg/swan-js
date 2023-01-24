@@ -30,7 +30,7 @@ describe("SWAN LANGUAGE", () => {
                         expect(context[key]).to.equal(builtins[key]);
                     }
                 }
-                expect(context.this).to.equal(context);
+                expect(context.this.unwrap()).to.equal(context);
             });
             
             it("should contain all the properties of the passed namespaces", () => {

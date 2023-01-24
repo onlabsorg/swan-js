@@ -22,6 +22,7 @@ generate-documentation modules/index
 generate-documentation modules/debug
 generate-documentation modules/dict
 generate-documentation modules/json
+generate-documentation modules/list
 generate-documentation modules/math
 generate-documentation modules/path
 generate-documentation modules/text

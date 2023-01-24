@@ -25,12 +25,12 @@ The returned dictionary Namespace `d` contains the following items:
   `(['key1','val1'], [22, 'val2'], ['key3', 30])` in the example above)
 - `d.get` is a Func that takes a key as argument and returns the 
   corresponding value, or `Undefined('Mapping')` if the key doesn't exist.
-- `d.has` is a Func that takes a key as argument and returns `Bool.TRUE` if 
-  the dictionary contains that key, otherwise it returns `Bool.FALSE`.
+- `d.has` is a Func that takes a key as argument and returns `TRUE` if
+  the dictionary contains that key, otherwise it returns `FALSE`.
   
 `dict.isDIct: Namespace d -> Bool b`
 ----------------------------------------------------------------------------
-This function returns `Bool.TRUE` if the passed item is a dictionary 
+This function returns `TRUE` if the passed item is a dictionary
 namespace.
   
 
