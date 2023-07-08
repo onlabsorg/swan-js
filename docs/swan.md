@@ -403,6 +403,9 @@ merging `ns1` and `ns2`. For example `{a=1,b=2} + {c=3,d=4}` returns
 If `ns1` and `ns2` contain the same name, the value of `ns2` prevails. For
 example `{a=1,b=2} + {b=3, c=4}` returns `{a=1, b=3, c=4}`.
 
+If `ns1` contains a Func item named `__add__`, then `ns1.__add__(ns1, ns2)`
+is returned.
+
 #### Undefined arithmetic operations
 When an arithmetic operation is not defined between two items, the result is an
 Undefined item. In particular:

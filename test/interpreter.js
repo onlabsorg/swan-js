@@ -853,6 +853,14 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             }
             expect(await parse("ns1 + ns2")(context)).to.be.Namespace({a:1, b:2, un:context.ns2.un});
         });
+
+        it("should return X.__add__(X, Y) if X is a namespace and X.__add__ is a Func item", async () => {
+            const ns1 = {val:10, __add__: (X, Y) => X.val + Y};
+            expect(await parse('ns1 + 3')({ns1})).to.be.Numb(13);
+
+            ns1.__add__ = "not-a-func";
+            expect(await parse('ns1 + {}')({ns1})).to.be.Namespace(ns1);
+        });
     
         it("should return Undefined for all the other type combinations", async () => {
             var T=true, F=false, n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x, u=new Undefined(), no=null;
