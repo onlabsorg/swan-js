@@ -991,7 +991,15 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                 });
             }
         });
-    
+
+        it("should return X.__mul__(X, Y) if X is a namespace and X.__mul__ is a Func item", async () => {
+            const ns1 = {val:10, __mul__: (X, Y) => X.val * Y};
+            expect(await parse('ns1 * 3')({ns1})).to.be.Numb(30);
+
+            ns1.__mul__ = "not-a-func";
+            expect(await parse('ns1 * {}')({ns1})).to.be.Undefined("MulOperation");
+        });
+
         it("should return (x1*y1, x2*y2, ...) if X and/or Y is a tuple", async () => {
             expect(await parse("(10,20,30) * (2,3,4)")(context)).to.be.Tuple([20,60,120]);
     
