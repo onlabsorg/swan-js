@@ -908,7 +908,7 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("20 - 0"   )()).to.be.Numb(20);
             expect(await parse("10 - (-7)")()).to.be.Numb(17);
         });
-    
+
         it("should return Undefined for all the other type combinations", async () => {
             var T=true, F=false, n=10, s="abc", ls=[1,2,3], ns={a:1}, fn=x=>x, u=new Undefined(), no=null;
             for (let [L,R] of [
@@ -927,6 +927,14 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                     expect(arg1).to.deep.equal(R);
                 });
             }
+        });
+
+        it("should return X.__sub__(X, Y) if X is a namespace and X.__sub__ is a Func item", async () => {
+            const ns1 = {val:10, __sub__: (X, Y) => X.val - Y};
+            expect(await parse('ns1 - 3')({ns1})).to.be.Numb(7);
+
+            ns1.__sub__ = "not-a-func";
+            expect(await parse('ns1 - {}')({ns1})).to.be.Undefined("SubOperation");
         });
     
         it("should return (x1-y1, x2-y2, ...) if X and/or Y is a tuple", async () => {
