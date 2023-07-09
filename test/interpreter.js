@@ -1156,6 +1156,14 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             }            
         });
 
+        it("should return X.__mod__(X, Y) if X is a namespace and X.__mod__ is a Func item", async () => {
+            const ns1 = {val:11, __mod__: (X, Y) => X.val % Y};
+            expect(await parse('ns1 % 3')({ns1})).to.be.Numb(2);
+
+            ns1.__mod__ = "not-a-func";
+            expect(await parse('ns1 % {}')({ns1})).to.be.Undefined("ModOperation");
+        });
+
         it("should return (x1%y1, x2%y2, ...) if X and/or Y is a tuple", async () => {
             expect(await parse("(10,20,30) % (4,7,6)")(context)).to.be.Tuple([2,6,0]);
     
