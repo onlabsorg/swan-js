@@ -227,18 +227,18 @@ describe("types", () => {
         
         describe(".compare(other)", () => {
             
-            it("should return '=' if the items are both TRUE or both FALSE", () => {
+            it("should return 0 if the items are both TRUE or both FALSE", () => {
                 const TRUE = new Bool(true);
                 const FALSE = new Bool(false);
-                expect(TRUE.compare(TRUE)).to.equal('=');
-                expect(FALSE.compare(FALSE)).to.equal('=');
+                expect(TRUE.compare(TRUE)).to.equal(0);
+                expect(FALSE.compare(FALSE)).to.equal(0);
             });
             
             it("should consider FALSE less than TRUE", () => {
                 const TRUE = new Bool(true);
                 const FALSE = new Bool(false);
-                expect(TRUE.compare(FALSE)).to.equal('>');
-                expect(FALSE.compare(TRUE)).to.equal('<');
+                expect(TRUE.compare(FALSE)).to.equal(+1);
+                expect(FALSE.compare(TRUE)).to.equal(-1);
             });
         });
     });
@@ -444,10 +444,10 @@ describe("types", () => {
             it("should compare the two numbers according to the real numbers order rules", () => {
                 const item1 = new Numb(10);
                 const item2 = new Numb(20);
-                expect(item1.compare(item1)).to.equal('=');
-                expect(item2.compare(item2)).to.equal('=');
-                expect(item1.compare(item2)).to.equal('<');
-                expect(item2.compare(item1)).to.equal('>');
+                expect(item1.compare(item1)).to.equal(0);
+                expect(item2.compare(item2)).to.equal(0);
+                expect(item1.compare(item2)).to.equal(-1);
+                expect(item2.compare(item1)).to.equal(+1);
             });
         });
     });
@@ -651,12 +651,12 @@ describe("types", () => {
             it("should compare the two strings alphabetically", () => {
                 const item1 = new Text("abc");
                 const item2 = new Text("def");
-                expect(item1.compare(item1)).to.equal('=');
-                expect(item2.compare(item2)).to.equal('=');
-                expect(item1.compare(item2)).to.equal('<');
-                expect(item2.compare(item1)).to.equal('>');
+                expect(item1.compare(item1)).to.equal(0);
+                expect(item2.compare(item2)).to.equal(0);
+                expect(item1.compare(item2)).to.equal(-1);
+                expect(item2.compare(item1)).to.equal(+1);
                 
-                expect(new Text("aaa").compare(new Text("aa"))).to.equal('>');
+                expect(new Text("aaa").compare(new Text("aa"))).to.equal(+1);
             });
         });
         
@@ -928,12 +928,12 @@ describe("types", () => {
             it("should compare the two lists lexicographically", () => {
                 const item1 = new List([10,20,30]);
                 const item2 = new List([40,50,60]);
-                expect(item1.compare(item1)).to.equal('=');
-                expect(item2.compare(item2)).to.equal('=');
-                expect(item1.compare(item2)).to.equal('<');
-                expect(item2.compare(item1)).to.equal('>');
+                expect(item1.compare(item1)).to.equal(0);
+                expect(item2.compare(item2)).to.equal(0);
+                expect(item1.compare(item2)).to.equal(-1);
+                expect(item2.compare(item1)).to.equal(+1);
                 
-                expect(new List([10,10,10]).compare(new List([10,10]))).to.equal('>');
+                expect(new List([10,10,10]).compare(new List([10,10]))).to.equal(+1);
             });
         });
         
@@ -1209,12 +1209,12 @@ describe("types", () => {
             it("should return equal if two namespace have the same identifiers and equal values", () => {
                 const item1 = new Namespace({k1:1, k2:2, k3:3});
                 const item2 = new Namespace({k4:4, k5:5, k6:6});
-                expect(item1.compare(item1)).to.equal('=');
-                expect(item2.compare(item2)).to.equal('=');
-                expect(item1.compare(item2)).to.equal('#');
-                expect(item2.compare(item1)).to.equal('#');
+                expect(item1.compare(item1)).to.equal(0);
+                expect(item2.compare(item2)).to.equal(0);
+                expect(item1.compare(item2)).to.be.NaN;
+                expect(item2.compare(item1)).to.be.NaN;
                 
-                expect(new Namespace({k1:1, k2:2, $k3:3}).compare(new Namespace({k1:1, k2:2}))).to.equal('=');
+                expect(new Namespace({k1:1, k2:2, $k3:3}).compare(new Namespace({k1:1, k2:2}))).to.equal(0);
             });
         });
         
@@ -1490,10 +1490,10 @@ describe("types", () => {
             it("should return equal if two Func items wrap the same function", () => {
                 const item1 = new Func(x=>x);
                 const item2 = new Func(x=>x);
-                expect(item1.compare(item1)).to.equal('=');
-                expect(item2.compare(item2)).to.equal('=');
-                expect(item1.compare(item2)).to.equal('#');
-                expect(item2.compare(item1)).to.equal('#');
+                expect(item1.compare(item1)).to.equal(0);
+                expect(item2.compare(item2)).to.equal(0);
+                expect(item1.compare(item2)).to.be.NaN;
+                expect(item2.compare(item1)).to.be.NaN;
             });
         });        
     });
@@ -1696,10 +1696,10 @@ describe("types", () => {
             it("should return equal if two Undefined items are the same item", () => {
                 const item1 = new Undefined("TestOperation", 10, 20);
                 const item2 = new Undefined("TestOperation", 10, 20);
-                expect(item1.compare(item1)).to.equal('=');
-                expect(item2.compare(item2)).to.equal('=');
-                expect(item1.compare(item2)).to.equal('#');
-                expect(item2.compare(item1)).to.equal('#');
+                expect(item1.compare(item1)).to.equal(0);
+                expect(item2.compare(item2)).to.equal(0);
+                expect(item1.compare(item2)).to.be.NaN;
+                expect(item2.compare(item1)).to.be.NaN;
             });
         });  
         
@@ -1998,13 +1998,13 @@ describe("types", () => {
             it("should compare the two tuple lexicographically", () => {
                 const tuple1 = new Tuple(10,20,30);
                 const tuple2 = new Tuple(40,50,60);
-                expect(tuple1.compare(tuple1)).to.equal('=');
-                expect(tuple2.compare(tuple2)).to.equal('=');
-                expect(tuple1.compare(tuple2)).to.equal('<');
-                expect(tuple2.compare(tuple1)).to.equal('>');
+                expect(tuple1.compare(tuple1)).to.equal(0);
+                expect(tuple2.compare(tuple2)).to.equal(0);
+                expect(tuple1.compare(tuple2)).to.equal(-1);
+                expect(tuple2.compare(tuple1)).to.equal(+1);
                 
-                expect(new Tuple(10,10,10).compare(new Tuple(10,10))).to.equal('>');
-                expect(new Tuple(10,10,10).compare(new Numb(10))).to.equal('>');
+                expect(new Tuple(10,10,10).compare(new Tuple(10,10))).to.equal(+1);
+                expect(new Tuple(10,10,10).compare(new Numb(10))).to.equal(+1);
             });
         });  
     });

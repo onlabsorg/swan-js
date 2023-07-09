@@ -486,6 +486,16 @@ No order is defined for the Namespace type, therefore the comparison operations
 operations `<=` and `>=` will return `TRUE` only if the namespaces are 
 equal.
 
+This behaviour can be overridden by defining a `__cmp__` function in the 
+left-hand namespace:
+
+- `NS1 == NS2` is `TRUE` if `NS1.__cmp__(NS1, NS2)` returns 0
+- `NS1 != NS2` is `TRUE` if `NS1.__cmp__(NS1, NS2)` returns anything but 0
+- `NS1 <  NS2` is `TRUE` if `NS1.__cmp__(NS1, NS2)` returns a negative number
+- `NS1 <= NS2` is `TRUE` if `NS1.__cmp__(NS1, NS2)` returns a negative number or 0
+- `NS1 >  NS2` is `TRUE` if `NS1.__cmp__(NS1, NS2)` returns a positive number
+- `NS1 >= NS2` is `TRUE` if `NS1.__cmp__(NS1, NS2)` returns a positive number or 0
+
 #### Comparison operations between Func items
 Two functions are equal if they are the same function. For example, given two
 functions `f1:x->2*x` and `f2:x->2*x`, the expression `f1 == f1` is true, but

@@ -363,12 +363,12 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
         
         it("should follow the assignment rules when mapping argument names to parameters", async () => {    
             var retval, foo = await parse("(x, y) -> {a=x,b=y}")();
-            
+
             retval = await unwrap(foo)(10);
             expect(retval).to.be.Namespace({a:10, b:null});
             expect(unwrap(retval).a).to.equal(10);
             expect(unwrap(retval).b).to.be.null;
-    
+
             retval = await unwrap(foo)(10,20,30);
             expect(unwrap(retval).a).to.equal(10);
             expect(unwrap(retval).b).to.be.Tuple([20,30]);
@@ -1240,6 +1240,22 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             context.ns2 = {x:10, y:20, $z:30};
             expect(await parse("ns1 == ns2")(context)).to.be.Bool(true);
         });
+
+        it("should return true if X is a Namespace, X.__cmp__ is a function and X.__cmp__(X, Y) returns 0", async () => {
+            const ns = {val:11, __cmp__ (X,Y) {
+                if (X.val === Y) return 0;
+                if (X.val < Y) return -1;
+                if (X.val > Y) return +1;
+                return NaN;
+            }}
+            expect(await parse("ns == 10")({ns})).to.be.Bool(false);
+            expect(await parse("ns == 11")({ns})).to.be.Bool(true);
+            expect(await parse("ns == 12")({ns})).to.be.Bool(false);
+
+            ns.__cmp__ = "not-a-function";
+            expect(await parse("ns == 11")({ns})).to.be.Bool(false);
+            expect(await parse("ns == ns")({ns})).to.be.Bool(true);
+        });
     
         it("should return true if X and Y are the same function", async () => {
             var context = {fn1:x=>2*x, fn2:x=>2*x};
@@ -1327,7 +1343,23 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("{a=1} != {a=1,b=2}"    )()).to.be.Bool(true);
             expect(await parse("{} != {a=1,b=2}"       )()).to.be.Bool(true);
         });
-    
+
+        it("should return false if X is a Namespace, X.__cmp__ is a function and X.__cmp__(X, Y) returns 0", async () => {
+            const ns = {val:11, __cmp__ (X,Y) {
+                if (X.val === Y) return 0;
+                if (X.val < Y) return -1;
+                if (X.val > Y) return +1;
+                return NaN;
+            }}
+            expect(await parse("ns != 10")({ns})).to.be.Bool(true);
+            expect(await parse("ns != 11")({ns})).to.be.Bool(false);
+            expect(await parse("ns != ns")({ns})).to.be.Bool(true);
+
+            ns.__cmp__ = "not-a-function";
+            expect(await parse("ns != 11")({ns})).to.be.Bool(true);
+            expect(await parse("ns != ns")({ns})).to.be.Bool(false);
+        });
+
         it("should return false if X and Y are the same function", async () => {
             var context = {fn1:x=>2*x, fn2:x=>2*x};
             expect(await parse("fn1 != fn1"          )(context)).to.be.Bool(false);
@@ -1423,6 +1455,22 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("ns2 < ns1")(context)).to.be.Bool(false);
             expect(await parse("ns1 < ns1")(context)).to.be.Bool(false);
             expect(await parse("ns2 < ns2")(context)).to.be.Bool(false);
+        });
+
+        it("should return true if X is a Namespace, X.__cmp__ is a function and X.__cmp__(X, Y) returns a negative number", async () => {
+            const ns = {val:11, __cmp__ (X,Y) {
+                if (X.val === Y) return 0;
+                if (X.val < Y) return -5;
+                if (X.val > Y) return +5;
+                return NaN;
+            }}
+            expect(await parse("ns < 10")({ns})).to.be.Bool(false);
+            expect(await parse("ns < 11")({ns})).to.be.Bool(false);
+            expect(await parse("ns < 12")({ns})).to.be.Bool(true);
+
+            ns.__cmp__ = "not-a-function";
+            expect(await parse("ns < 12")({ns})).to.be.Bool(false);
+            expect(await parse("ns < ns")({ns})).to.be.Bool(false);
         });
     
         it("should return false if both X and Y are functions", async () => {
@@ -1545,6 +1593,22 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("ns2 >= ns1")(context)).to.be.Bool(false);
             expect(await parse("ns1 >= ns1")(context)).to.be.Bool(true);
             expect(await parse("ns2 >= ns2")(context)).to.be.Bool(true);
+        });
+
+        it("should return true if X is a Namespace, X.__cmp__ is a function and X.__cmp__(X, Y) returns a positive number or 0", async () => {
+            const ns = {val:11, __cmp__ (X,Y) {
+                if (X.val === Y) return 0;
+                if (X.val < Y) return -5;
+                if (X.val > Y) return +5;
+                return NaN;
+            }}
+            expect(await parse("ns >= 10")({ns})).to.be.Bool(true);
+            expect(await parse("ns >= 11")({ns})).to.be.Bool(true);
+            expect(await parse("ns >= 12")({ns})).to.be.Bool(false);
+
+            ns.__cmp__ = "not-a-function";
+            expect(await parse("ns >= 10")({ns})).to.be.Bool(false);
+            expect(await parse("ns >= ns")({ns})).to.be.Bool(true);
         });
     
         it("should return true if both X and Y are functions, but only if they are the same object", async () => {
@@ -1671,6 +1735,22 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("ns1 > ns1")(context)).to.be.Bool(false);
             expect(await parse("ns2 > ns2")(context)).to.be.Bool(false);
         });
+
+        it("should return true if X is a Namespace, X.__cmp__ is a function and X.__cmp__(X, Y) returns a positive number", async () => {
+            const ns = {val:11, __cmp__ (X,Y) {
+                if (X.val === Y) return 0;
+                if (X.val < Y) return -5;
+                if (X.val > Y) return +5;
+                return NaN;
+            }}
+            expect(await parse("ns > 10")({ns})).to.be.Bool(true);
+            expect(await parse("ns > 11")({ns})).to.be.Bool(false);
+            expect(await parse("ns > 12")({ns})).to.be.Bool(false);
+
+            ns.__cmp__ = "not-a-function";
+            expect(await parse("ns > 10")({ns})).to.be.Bool(false);
+            expect(await parse("ns > ns")({ns})).to.be.Bool(false);
+        });
     
         it("should return false if both X and Y are functions", async () => {
             const context = {fn1:x=>2*x, fn2:(x,y)=>x+y};
@@ -1792,6 +1872,22 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             expect(await parse("ns2 <= ns1")(context)).to.be.Bool(false);
             expect(await parse("ns1 <= ns1")(context)).to.be.Bool(true);
             expect(await parse("ns2 <= ns2")(context)).to.be.Bool(true);
+        });
+
+        it("should return true if X is a Namespace, X.__cmp__ is a function and X.__cmp__(X, Y) returns a negative number or 0", async () => {
+            const ns = {val:11, __cmp__ (X,Y) {
+                if (X.val === Y) return 0;
+                if (X.val < Y) return -4;
+                if (X.val > Y) return +4;
+                return NaN;
+            }}
+            expect(await parse("ns <= 10")({ns})).to.be.Bool(false);
+            expect(await parse("ns <= 11")({ns})).to.be.Bool(true);
+            expect(await parse("ns <= 12")({ns})).to.be.Bool(true);
+
+            ns.__cmp__ = "not-a-function";
+            expect(await parse("ns <= 12")({ns})).to.be.Bool(false);
+            expect(await parse("ns <= ns")({ns})).to.be.Bool(true);
         });
     
         it("should return true if both X and Y are functions, but only if they are the same object", async () => {
