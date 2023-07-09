@@ -409,6 +409,7 @@ Custom arithmetic operations on namespaces can be defined by adding specials fun
 * If `ns` contains a Func item named `__sub__`, then `ns - item` returns `ns.__sub__(ns, item)`.
 * If `ns` contains a Func item named `__mul__`, then `ns * item` returns `ns.__mul__(ns, item)`.
 * If `ns` contains a Func item named `__div__`, then `ns / item` returns `ns.__div__(ns, item)`.
+* If `ns` contains a Func item named `__pow__`, then `ns ^ item` returns `ns.__pow__(ns, item)`.
 
 #### Undefined arithmetic operations
 When an arithmetic operation is not defined between two items, the result is an

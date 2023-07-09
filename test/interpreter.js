@@ -1054,7 +1054,6 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
             ns1.__div__ = "not-a-func";
             expect(await parse('ns1 / {}')({ns1})).to.be.Undefined("DivOperation");
         });
-
     
         it("should return (x1/y1, x2/y2, ...) if X and/or Y is a tuple", async () => {
             expect(await parse("(10,20,30) / (2,5,3)")(context)).to.be.Tuple([5,4,10]);
@@ -1100,6 +1099,14 @@ describe("SWAN EXPRESSION INTERPRETER", () => {
                     expect(arg1).to.deep.equal(R);
                 });
             }
+        });
+
+        it("should return X.__pow__(X, Y) if X is a namespace and X.__pow__ is a Func item", async () => {
+            const ns1 = {val:10, __pow__: (X, Y) => X.val ** Y};
+            expect(await parse('ns1 ^ 3')({ns1})).to.be.Numb(1000);
+
+            ns1.__pow__ = "not-a-func";
+            expect(await parse('ns1 ^ {}')({ns1})).to.be.Undefined("PowOperation");
         });
     
         it("should return (x1*y1, x2*y2, ...) if X and/or Y is a tuple", async () => {
