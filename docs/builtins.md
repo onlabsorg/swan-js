@@ -88,8 +88,10 @@ to a Text item according to the following rules:
     . *    `<n>` is the size of `X`
 - if `X` is a `Namespace` item it returns `"[[Namespace of <n> items]]"`
   where `<n>` is the size of `X`.
-- if `X` is a `Namespace` item and `X.__text__` is a Text item, it
-  returns `X.__text__`.
+- if `X` is a `Namespace` item and `X.__str__` is a Text item, it
+  returns `X.__str__`.
+- if `X` is a `Namespace` item and `X.__str__` is a Func item, it
+  returns `X.__str__(X)`.
 - if `X` is a `Func` item, it returns `"[[Func]]"`
 - if `X` is an `Undefined` item it returns `"[[Undefined <type>]]"`,
   where `<type>` is the Undefined operaton type.
